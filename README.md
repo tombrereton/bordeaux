@@ -45,7 +45,9 @@ git checkout -b [name_of_your_new_branch]
 *Everytime* before working on your branch, rebase the branch so it's base is the latest master commit. This may introduce a merge conflict but will avoid HEAPS later. ([Rebase - pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request))
 
 ```
-git checkout -b [name_of_your_new_branch]
+git checkout master
+git pull upstream master
+git checkout [name_of_your_new_branch]
 git rebase upstream/master
 ```
 
