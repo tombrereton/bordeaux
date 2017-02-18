@@ -1,5 +1,8 @@
-# bordeaux
+# Bordeaux
 Group project for team Bordeaux at the University of Birmingham
+
+## Description
+*A online card game with a chat room and accessiblity features.*
 
 ---
 **A good, simple, guide to git and github**:
