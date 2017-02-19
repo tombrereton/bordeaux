@@ -32,7 +32,7 @@ git remote add upstream https://name:password@github.org/repo.git
 - Github forks and branches are basically the same - to keep it simple we will just use branches.
 - Create a branch for the feature you want to develop.
 - Commit only to that branch while you develop that feature.
-- As the master branch might be updated by someone else, we keep the program up to date by rebasing your branch before commiting. Rebasing means moving the orignal master commit you branched off of to the lastest master commit (this avoids major merge conflicts). 
+- As the master branch might be updated by someone else, we keep your branch up to date by rebasing it before commiting. Rebasing means moving the base of your feature branch from the original master commit, to the lastest master commit (this avoids major merge conflicts). 
 - The image below shows the feature branch at its orignal position in grey, and then it is moved (rebased) so thats its base is now the latest master commit:
 
 ![Alt description](https://cms-assets.tutsplus.com/uploads/users/585/posts/23191/image/rebase.png)
@@ -57,8 +57,8 @@ git pull upstream master
 git checkout [name_of_your_new_branch]
 git rebase upstream/master
 ```
-
-### Committing code to git and github
+---
+### Committing code to git and pushing to github
 
 If you have created new files, add them to the "staging area" with: 
 ```
@@ -104,6 +104,7 @@ git status
 git log
 ```
 
+(The commands below are for reverting back to previous code when you make an error)
 ```
 # Reverse commit
 git revert {SHA1}
