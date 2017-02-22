@@ -32,13 +32,13 @@ git remote add upstream https://name:password@github.org/repo.git
 - Github forks and branches are basically the same - to keep it simple we will just use branches.
 - Create a branch for the feature you want to develop.
 - Commit only to that branch while you develop that feature.
-- As the master branch might be updated by someone else, we keep your branch up to date by rebasing it before commiting. Rebasing means moving the base of your feature branch from the original master commit, to the lastest master commit (this avoids major merge conflicts). 
+- As the master branch might be updated by someone else, we keep your branch up to date by rebasing it before commiting (Or at the very least, before you submit a pull request). Rebasing means moving the base of your feature branch from the original master commit, to the lastest master commit (this avoids major merge conflicts). 
 - The image below shows the feature branch at its orignal position in grey, and then it is moved (rebased) so thats its base is now the latest master commit:
 
 ![Alt description](https://cms-assets.tutsplus.com/uploads/users/585/posts/23191/image/rebase.png)
-- When the feature is complete, create a pull request on github so that branch will be pulled into the master branch.
+- When your feature is complete, create a pull request on github so that your feature branch will be pulled into the master branch.
 - Pull requests means that someone can review the code before it is merged on github.
-- We always work on our own branches (not master). Create your own branch with the  commands below. 
+- We always work on our own branches (not master). Create your own branch with the commands below. 
 - https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
 
@@ -49,7 +49,7 @@ Create a branch locally on your machine:
 git checkout -b [name_of_your_new_branch]
 ```
 
-*Everytime* before working on your branch, rebase the branch so it's base is the latest master commit. This may introduce a merge conflict but will avoid HEAPS later. ([Rebase - pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request))
+Everytime before working, try to rebase your branch so it's base is the latest master commit. This may introduce a merge conflict but will avoid HUGE conflicts later. ([Rebase - pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request)). It's a lot of rebasing but it can't hurt to rebase all the time right?
 
 ```
 git checkout master
@@ -60,12 +60,14 @@ git rebase upstream/master
 ---
 ### Committing code to git and pushing to github
 
-If you have created new files, add them to the "staging area" with: 
+If you have created new files, add them to the "staging area" (files we want to commit) with: 
+
+("-A" means add all new files)
 ```
 git add -A
 ```
 
-Then commit them to your local git
+Then commit (ie save) them to your local git
 ```
 git commit -m "[some message decribing what youve done so far]"
 ```
@@ -79,7 +81,7 @@ git push upstream [name_of_your_new_branch]
 But we need to make sure the branch is up to date with the master so really the commands should be:
 ```
 git add -A
-git commit -m "[some message decribing what youve done so far]"
+git commit -m "[some message decribing what you have done]"
 git checkout master
 git pull upstream master
 git checkout [name_of_your_new_branch]
