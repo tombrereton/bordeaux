@@ -150,10 +150,11 @@ public class FunctionDB {
         String sql = "SELECT username FROM user WHERE user =?";  
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
-        free(rs,stat,con);
         if(rs.next() == false){
+        	free(rs,stat,con);
         	return false;
         }else{
+        	free(rs,stat,con);
         	return true;
         }
     }
