@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author Yifan Wu
@@ -36,7 +37,65 @@ public class FunctionDB {
     public Connection getConnection()throws Exception{  
         return con;  
     }  
-    
+    /**
+     * 
+     * A method named free to close connections
+     * @param rs
+     * @param sta
+     * @param con
+     */
+    public static void free(Statement sta , Connection con)  
+    {  
+    	try{
+            if(null != sta)  
+            {  
+                sta.close();  
+                sta = null ;  
+            }  
+              
+            if(null != con)  
+            {  
+                con.close();  
+                con = null ;  
+            }  
+            
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+    }
+
+    /**
+     * 
+     * A method named free to close connections
+     * @param rs
+     * @param sta
+     * @param con
+     */
+    public static void free(ResultSet rs, Statement sta , Connection con)  
+    {  
+        try {  
+            if(null != rs)  
+            {  
+                rs.close();  
+                rs = null ;  
+            }  
+              
+            if(null != sta)  
+            {  
+                sta.close();  
+                sta = null ;  
+            }  
+              
+            if(null != con)  
+            {  
+                con.close();  
+                con = null ;  
+            }  
+            
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+    }
     public boolean insertUserIntoDatabase(User user) throws SQLException{  
         String sql = "INSERT INTO users(username,password,first_name,last_name,data_registered) VALUES(?,?,?,?,?)";  
         stat = con.prepareStatement(sql);  
@@ -46,12 +105,14 @@ public class FunctionDB {
         stat.setString(4,user.getLastName());  
         stat.setDate(5,(Date) user.getDateRegistered());  
         int update = stat.executeUpdate();  
+        free(stat,con);
         if(update>0){  
             return true;  
         }  
         else{  
             return false;  
-        }  
+        } 
+        
     }  
     public User retrieveUserFromDatabase(String username) throws SQLException{
         String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE username =?";  
@@ -64,6 +125,7 @@ public class FunctionDB {
         	user.setFirstName(rs.getString(3));
         	user.setLastName(rs.getString(4));
         }  
+        free(rs,stat,con);
         return user;  
     	
     }
@@ -79,8 +141,21 @@ public class FunctionDB {
         	user.setFirstName(rs.getString(3));
         	user.setLastName(rs.getString(4));
         }  
+        free(rs,stat,con);
+
         return user;  
     	
+    }
+	public boolean isUserRegistered(String username) throws SQLException{
+        String sql = "SELECT username FROM user WHERE user =?";  
+        stat = con.prepareStatement(sql);  
+        ResultSet rs = stat.executeQuery();  
+        free(rs,stat,con);
+        if(rs.next() == false){
+        	return false;
+        }else{
+        	return true;
+        }
     }
     
 }
