@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * The DAO of the card game
  * @author Yifan Wu
  * @version 2017-02-26
  */
