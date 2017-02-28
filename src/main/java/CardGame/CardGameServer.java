@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
  * @Author Tom Brereton
  */
 public class CardGameServer {
-    private List<User> users = new ArrayList<User>();
-    private final int port = 8000;
+    static List<User> users = new ArrayList<User>();
+    private final int port = 7654;
     private ServerSocket serverSocket;
     private final int numberOfThreads = 10;
 
@@ -42,12 +42,12 @@ public class CardGameServer {
         }
     }
 
-    public synchronized void addUsertoUsers(User user) {
-        this.users.add(user);
+    public static synchronized void addUsertoUsers(User user) {
+        users.add(user);
     }
 
-    public synchronized User getUsers(int i){
-        return this.users.get(i);
+    public static synchronized User getUsers(int i){
+        return users.get(i);
     }
 
     public static void main(String[] args) throws IOException {
