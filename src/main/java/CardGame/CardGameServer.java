@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  */
 public class CardGameServer {
     private List<User> users = new ArrayList<User>();
-    private final int port = 6666;
+    private final int port = 8000;
     private ServerSocket serverSocket;
     private final int numberOfThreads = 10;
 
