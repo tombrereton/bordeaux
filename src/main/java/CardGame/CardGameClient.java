@@ -15,7 +15,7 @@ public class CardGameClient {
 
     private Socket socket;
     private String host = "localhost";
-    private int port = 8000;
+    private int port = 7654;
 
     public CardGameClient() {
 
@@ -28,9 +28,8 @@ public class CardGameClient {
         }
     }
 
-    public void sendUserObject(String userName, String password, String firstName, String lastName, Socket socket) throws IOException {
+    public void sendUserObject(User user, Socket socket) throws IOException {
         DataOutputStream toServer = new DataOutputStream(socket.getOutputStream());
-        User user = new User(userName, password, firstName, lastName);
 
         Gson gson = new Gson();
 
@@ -46,8 +45,27 @@ public class CardGameClient {
         return socket;
     }
 
+    public void closeConnection(){
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         CardGameClient cardGameClient = new CardGameClient();
+
+        User userObjectTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
+
+        Socket clientSock = cardGameClient.getSocket();
+        try {
+            cardGameClient.sendUserObject(userObjectTest, clientSock);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        cardGameClient.closeConnection();
     }
 
 }

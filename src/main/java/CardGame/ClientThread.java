@@ -13,11 +13,9 @@ import java.net.Socket;
  */
 public class ClientThread implements Runnable {
     private Socket toClientSocket;
-    private CardGameServer cardGameServer;
 
     public ClientThread(Socket toClientSocket) {
         this.toClientSocket = toClientSocket;
-        this.cardGameServer = new CardGameServer();
     }
 
     @Override
@@ -34,10 +32,15 @@ public class ClientThread implements Runnable {
             User user = gson.fromJson(jsonInString, User.class);
 
             // Add user to users
-            this.cardGameServer.addUsertoUsers(user);
+            CardGameServer.addUsertoUsers(user);
 
             //print the object
             System.out.println("Object is " + user);
+
+            //get user object from arraylist
+            User addedUser = CardGameServer.getUsers(0);
+
+            System.out.println("This user was just added: " + addedUser);
 
             in.close();
         } catch (IOException e) {
