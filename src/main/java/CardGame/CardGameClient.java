@@ -15,7 +15,7 @@ public class CardGameClient {
 
     private Socket socket;
     private String host = "localhost";
-    private int port = 6666;
+    private int port = 8000;
 
     public CardGameClient() {
 
