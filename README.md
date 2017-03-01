@@ -22,8 +22,9 @@ git remote add upstream https://name:password@github.org/repo.git
 ---
 ### Git Branch Model / Project Structure
 
-- **Master**: Working program and where we submit our pull requests to.
-- **Feature** branches: whatever feature you are currently working on.
+- **Master**: Working program 
+- **Dev** Trial program and where we submit our pull requests to.
+- **Feature branches**: whatever feature you are currently working on.
 - Ignore release and dev branches
 ![Alt description](http://nvie.com/img/git-model@2x.png)
 
@@ -32,13 +33,13 @@ git remote add upstream https://name:password@github.org/repo.git
 - Github forks and branches are basically the same - to keep it simple we will just use branches.
 - Create a branch for the feature you want to develop.
 - Commit only to that branch while you develop that feature.
-- As the master branch might be updated by someone else, we keep your branch up to date by rebasing it before commiting (Or at the very least, before you submit a pull request). Rebasing means moving the base of your feature branch from the original master commit, to the lastest master commit (this avoids major merge conflicts). 
+- As the dev branch might be updated by someone else, we keep your branch up to date by rebasing it before commiting (Or at the very least, before you submit a pull request). Rebasing means moving the base of your feature branch from the original dev commit, to the lastest dev commit (this avoids major merge conflicts). 
 - The image below shows the feature branch at its orignal position in grey, and then it is moved (rebased) so thats its base is now the latest master commit:
 
 ![Alt description](https://cms-assets.tutsplus.com/uploads/users/585/posts/23191/image/rebase.png)
 - When your feature is complete, create a pull request on github so that your feature branch will be pulled into the master branch.
 - Pull requests means that someone can review the code before it is merged on github.
-- We always work on our own branches (not master). Create your own branch with the commands below. 
+- We always work on our own branches (not dev). Create your own branch with the commands below. 
 - https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
 
@@ -49,13 +50,13 @@ Create a branch locally on your machine:
 git checkout -b [name_of_your_new_branch]
 ```
 
-Everytime before working, try to rebase your branch so it's base is the latest master commit. This may introduce a merge conflict but will avoid HUGE conflicts later. ([Rebase - pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request)). It's a lot of rebasing but it can't hurt to rebase all the time right?
+Everytime before working, try to rebase your branch so it's base is the latest dev commit. This may introduce a merge conflict but will avoid HUGE conflicts later. ([Rebase - pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request)). It's a lot of rebasing but it can't hurt to rebase all the time right?
 
 ```
-git checkout master
-git pull upstream master
+git checkout dev
+git pull upstream dev
 git checkout [name_of_your_new_branch]
-git rebase upstream/master
+git rebase upstream/dev
 ```
 ---
 ### Committing code to git and pushing to github
@@ -82,11 +83,11 @@ But we need to make sure the branch is up to date with the master so really the 
 ```
 git add -A
 git commit -m "[some message decribing what you have done]"
-git checkout master
-git pull upstream master
-git checkout [name_of_your_new_branch]
-git rebase upstream/master
-git push upstream [name_of_your_new_branch]
+git checkout dev
+git pull upstream dev
+git checkout [name_of_your_branch]
+git rebase upstream/dev
+git push upstream [name_of_your_branch]
 ```
 ---
 ### Other useful git commands
