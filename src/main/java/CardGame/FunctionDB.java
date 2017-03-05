@@ -20,7 +20,9 @@ public class FunctionDB {
     private static final String USER = "root";  
     private static final String PASS = "test";  
     private PreparedStatement stat = null;  
-    
+    /**
+     * The constructor of FunctionDB
+     */
     public FunctionDB(){  
 		try {
 			Class.forName(DRIVER);
@@ -38,13 +40,7 @@ public class FunctionDB {
     public Connection getConnection()throws Exception{  
         return con;  
     }  
-    /**
-     * 
-     * A method named free to close connections
-     * @param rs
-     * @param sta
-     * @param con
-     */
+
     public static void free(Statement sta , Connection con)  
     {  
     	try{
@@ -65,13 +61,6 @@ public class FunctionDB {
         }  
     }
 
-    /**
-     * 
-     * A method named free to close connections
-     * @param rs
-     * @param sta
-     * @param con
-     */
     public static void free(ResultSet rs, Statement sta , Connection con)  
     {  
         try {  
@@ -120,7 +109,7 @@ public class FunctionDB {
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
         User user = null;  
-        while(rs.next()){  
+        if(rs.next()){  
         	user.setUserName(rs.getString(1));
         	user.setPassword(rs.getString(2));
         	user.setFirstName(rs.getString(3));
@@ -131,12 +120,13 @@ public class FunctionDB {
     	
     }
     
-	public User retrieveUserFromDatabase(int id) throws SQLException{
-        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE id =?";  
+	public User retrieveUserFromDatabase(int userid) throws SQLException{
+        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE user_id =?";  
         stat = con.prepareStatement(sql);  
+        stat.setInt(1,userid);
         ResultSet rs = stat.executeQuery();  
         User user = null;  
-        while(rs.next()){  
+        if(rs.next()){  
         	user.setUserName(rs.getString(1));
         	user.setPassword(rs.getString(2));
         	user.setFirstName(rs.getString(3));
@@ -145,11 +135,11 @@ public class FunctionDB {
         free(rs,stat,con);
 
         return user;  
-    	
     }
 	public boolean isUserRegistered(String username) throws SQLException{
-        String sql = "SELECT username FROM user WHERE user =?";  
+        String sql = "SELECT username FROM user WHERE username =?";  
         stat = con.prepareStatement(sql);  
+        stat.setString(1,username);
         ResultSet rs = stat.executeQuery();  
         if(rs.next() == false){
         	free(rs,stat,con);
@@ -159,5 +149,8 @@ public class FunctionDB {
         	return true;
         }
     }
-    
+
+        
+    }
+
 }
