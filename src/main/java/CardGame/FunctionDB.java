@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * The DAO of the card game
  * @author Yifan Wu
  * @version 2017-02-26
  */
@@ -19,7 +20,9 @@ public class FunctionDB {
     private static final String USER = "root";  
     private static final String PASS = "test";  
     private PreparedStatement stat = null;  
-    
+    /**
+     * The constructor of FunctionDB
+     */
     public FunctionDB(){  
 		try {
 			Class.forName(DRIVER);
@@ -37,13 +40,7 @@ public class FunctionDB {
     public Connection getConnection()throws Exception{  
         return con;  
     }  
-    /**
-     * 
-     * A method named free to close connections
-     * @param rs
-     * @param sta
-     * @param con
-     */
+
     public static void free(Statement sta , Connection con)  
     {  
     	try{
@@ -64,13 +61,6 @@ public class FunctionDB {
         }  
     }
 
-    /**
-     * 
-     * A method named free to close connections
-     * @param rs
-     * @param sta
-     * @param con
-     */
     public static void free(ResultSet rs, Statement sta , Connection con)  
     {  
         try {  
@@ -119,7 +109,7 @@ public class FunctionDB {
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
         User user = null;  
-        while(rs.next()){  
+        if(rs.next()){  
         	user.setUserName(rs.getString(1));
         	user.setPassword(rs.getString(2));
         	user.setFirstName(rs.getString(3));
@@ -130,12 +120,13 @@ public class FunctionDB {
     	
     }
     
-	public User retrieveUserFromDatabase(int id) throws SQLException{
-        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE id =?";  
+	public User retrieveUserFromDatabase(int userid) throws SQLException{
+        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE user_id =?";  
         stat = con.prepareStatement(sql);  
+        stat.setInt(1,userid);
         ResultSet rs = stat.executeQuery();  
         User user = null;  
-        while(rs.next()){  
+        if(rs.next()){  
         	user.setUserName(rs.getString(1));
         	user.setPassword(rs.getString(2));
         	user.setFirstName(rs.getString(3));
@@ -144,11 +135,11 @@ public class FunctionDB {
         free(rs,stat,con);
 
         return user;  
-    	
     }
 	public boolean isUserRegistered(String username) throws SQLException{
-        String sql = "SELECT username FROM user WHERE user =?";  
+        String sql = "SELECT username FROM user WHERE username =?";  
         stat = con.prepareStatement(sql);  
+        stat.setString(1,username);
         ResultSet rs = stat.executeQuery();  
         if(rs.next() == false){
         	free(rs,stat,con);
@@ -158,5 +149,69 @@ public class FunctionDB {
         	return true;
         }
     }
+	
+	public boolean insertNewGameIntoDatabase(int timelength,int totalpot) throws SQLException{  
+        String sql = "INSERT INTO games(time_length,total_wining_pot) VALUES(?,?)";  
+        stat = con.prepareStatement(sql);  
+        stat.setInt(1,timelength);  
+        stat.setInt(2,totalpot);  
+        int update = stat.executeUpdate();  
+        free(stat,con);
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
+	}
+	public int insertGameOutcomeIntoDatabse(String outcomes) throws SQLException{  
+		String sql = "INSERT INTO game_outcomes(outcome) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_outcomes WHERE outcome=?) RETURNING outcome_id";
+		stat = con.prepareStatement(sql);
+		stat.setString(1, outcomes);
+		stat.setString(2, outcomes);
+		ResultSet rs = stat.executeQuery();
+		if (rs.next()) {
+			int result = rs.getInt(1);
+			rs.close();
+			return result;
+		}
+        free(stat,con);
+        // if any else happen throw a wrong result
+		return -1;
+	}
+	public boolean updateGameOutcomeFromDatabse(int outcome_id, String outcomes) throws SQLException{  
+		String sql = "UPDATE game_outcomes SET outcomes = (?) WHERE outcoms_id = (?)";
+		stat = con.prepareStatement(sql);
+		stat.setInt(1, outcome_id);
+		stat.setString(2, outcomes);
+		ResultSet rs = stat.executeQuery();
+		free(stat,con);
+        int update = stat.executeUpdate();  
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
+	}
+    public boolean insertGameStatsIntoDatabase(int gameid,int userid,int chip_amount_changed) throws SQLException{  
+    	// initialise the outcome result
+    	int outcomeid = insertGameOutcomeIntoDatabse("");
+        String sql = "INSERT INTO users_games(user_id,game_id,outcom_id,chip_amount_changed) VALUES(?,?,?,?)";  
+        stat = con.prepareStatement(sql);
+        stat.setInt(1, userid);
+        stat.setInt(2, gameid);
+        stat.setInt(3, outcomeid);
+        stat.setInt(4, chip_amount_changed);
+        int update = stat.executeUpdate();  
+        free(stat,con);
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
+    }
     
+
 }
