@@ -149,8 +149,69 @@ public class FunctionDB {
         	return true;
         }
     }
-
-        
+	
+	public boolean insertNewGameIntoDatabase(int timelength,int totalpot) throws SQLException{  
+        String sql = "INSERT INTO games(time_length,total_wining_pot) VALUES(?,?)";  
+        stat = con.prepareStatement(sql);  
+        stat.setInt(1,timelength);  
+        stat.setInt(2,totalpot);  
+        int update = stat.executeUpdate();  
+        free(stat,con);
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
+	}
+	public int insertGameOutcomeIntoDatabse(String outcomes) throws SQLException{  
+		String sql = "INSERT INTO game_outcomes(outcome) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_outcomes WHERE outcome=?) RETURNING outcome_id";
+		stat = con.prepareStatement(sql);
+		stat.setString(1, outcomes);
+		stat.setString(2, outcomes);
+		ResultSet rs = stat.executeQuery();
+		if (rs.next()) {
+			int result = rs.getInt(1);
+			rs.close();
+			return result;
+		}
+        free(stat,con);
+        // if any else happen throw a wrong result
+		return -1;
+	}
+	public boolean updateGameOutcomeFromDatabse(int outcome_id, String outcomes) throws SQLException{  
+		String sql = "UPDATE game_outcomes SET outcomes = (?) WHERE outcoms_id = (?)";
+		stat = con.prepareStatement(sql);
+		stat.setInt(1, outcome_id);
+		stat.setString(2, outcomes);
+		ResultSet rs = stat.executeQuery();
+		free(stat,con);
+        int update = stat.executeUpdate();  
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
+	}
+    public boolean insertGameStatsIntoDatabase(int gameid,int userid,int chip_amount_changed) throws SQLException{  
+    	// initialise the outcome result
+    	int outcomeid = insertGameOutcomeIntoDatabse("");
+        String sql = "INSERT INTO users_games(user_id,game_id,outcom_id,chip_amount_changed) VALUES(?,?,?,?)";  
+        stat = con.prepareStatement(sql);
+        stat.setInt(1, userid);
+        stat.setInt(2, gameid);
+        stat.setInt(3, outcomeid);
+        stat.setInt(4, chip_amount_changed);
+        int update = stat.executeUpdate();  
+        free(stat,con);
+        if(update>0){  
+            return true;  
+        }  
+        else{  
+            return false;  
+        } 
     }
+    
 
 }
