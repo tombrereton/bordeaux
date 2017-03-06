@@ -8,35 +8,88 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import readfile.ReadFile;
+
 /**
  * @author Yifan Wu
+ * @author Lois Holman
+ * 
  * @version 2017-02-26
+ * @version 2017-03-05
+ * 
+ * In class FunctionDB we have all the methods relating to database use. 
+ * Method createTables() only needs to be called once ever and creates the database and 
+ * inital table structure. 
+ * The other methods are called based on user interaction with the GUI interface. 
+ * At login a user is checked against the database using method doesUserExist().
+ * 
+ * 
+ * 
+ * 
  */
+
+
+
 public class FunctionDB {
-    private Connection con = null;  
+    private Connection con = null; //why not private static?  
     private static final String DRIVER = "org.postgresql.Driver";  
     private static final String URL = "jdbc:postgresql://localhost:5432/cardgame";  
-    private static final String USER = "root";  
-    private static final String PASS = "test";  
+    private static final String USER = "lgh312"; //"root";  
+    private static final String PASS = "help";//"test";  
     private PreparedStatement stat = null;  
     
+    
+    //connecting to DB
     public FunctionDB(){  
 		try {
 			Class.forName(DRIVER);
 			try {
-				con = DriverManager.getConnection(URL, USER, PASS);
+				
+				//temporarily using local DB for testing
+				con = DriverManager.getConnection("jdbc:postgresql:bordeauxDB");
+				//con = DriverManager.getConnection(URL, USER, PASS);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		}   
+		
+		if (con != null) {
+			System.out.println("Database accessed!");
+		} else {
+			System.out.println("Failed to make connection");
 		}
-        
     }  
     
     public Connection getConnection()throws Exception{  
         return con;  
+      
     }  
+    
+    //method to run once, creating DB and tables   
+    
+    public void createTables() throws SQLException { // does this want to be static?
+		Statement stmt = con.createStatement();
+		
+		stmt.executeUpdate("CREATE TABLE Artists ("
+				+ "artistID VARCHAR(64) UNIQUE NOT NULL,"
+				+ "artistName CHAR(60) NOT NULL,"
+				+ "CONSTRAINT artistKey PRIMARY KEY(artistID));");
+    }
+    /*
+     * 		try {
+		createTables();
+		ReadFile.readToDB(conn);
+		conn.close();
+	} catch (SQLException e) {
+		e.printStackTrace();
+     * 
+     */
+    
+    
+    
+    
     /**
      * 
      * A method named free to close connections
@@ -96,6 +149,8 @@ public class FunctionDB {
             e.printStackTrace();  
         }  
     }
+    
+    // I DONT UNDERSTAND HOW THIS ONE WORKS
     public boolean insertUserIntoDatabase(User user) throws SQLException{  
         String sql = "INSERT INTO users(username,password,first_name,last_name,data_registered) VALUES(?,?,?,?,?)";  
         stat = con.prepareStatement(sql);  
@@ -114,6 +169,8 @@ public class FunctionDB {
         } 
         
     }  
+    
+    
     public User retrieveUserFromDatabase(String username) throws SQLException{
         String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE username =?";  
         stat = con.prepareStatement(sql);  
@@ -146,7 +203,11 @@ public class FunctionDB {
         return user;  
     	
     }
-	public boolean isUserRegistered(String username) throws SQLException{
+	
+	// check to see if the user is in database when they login
+	// is this statement doing what i want it to do?
+	
+	public boolean doesUserExist(String username) throws SQLException{
         String sql = "SELECT username FROM user WHERE user =?";  
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
@@ -158,5 +219,10 @@ public class FunctionDB {
         	return true;
         }
     }
+	
+	
+	public static void main(String[] args){
+	}
+	
     
 }
