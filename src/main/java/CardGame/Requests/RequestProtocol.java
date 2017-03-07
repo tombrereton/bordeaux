@@ -3,13 +3,13 @@ package CardGame.Requests;
 /**
  * Created by tom on 06/03/17.
  */
-public abstract class AbstractRequestProtocol {
+public class RequestProtocol {
     private int protocolId;
     protected int type;
 
     // TODO: define type with another class which uses final
 
-    public AbstractRequestProtocol(int protocolId, int type) {
+    public RequestProtocol(int protocolId, int type) {
         this.protocolId = protocolId;
         this.type = type;
     }
@@ -26,7 +26,7 @@ public abstract class AbstractRequestProtocol {
 
     @Override
     public String toString() {
-        return "AbstractRequestProtocol{" +
+        return "RequestProtocol{" +
                 "protocolId=" + protocolId +
                 ", type=" + type +
                 '}';

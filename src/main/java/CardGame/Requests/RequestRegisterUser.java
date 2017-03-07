@@ -4,7 +4,7 @@ import CardGame.User;
 /**
  * Created by tom on 06/03/17.
  */
-public class RequestRegisterUser extends AbstractRequestProtocol {
+public class RequestRegisterUser extends RequestProtocol {
     private User user;
 
 

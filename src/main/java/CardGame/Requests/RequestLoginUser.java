@@ -4,7 +4,7 @@ import CardGame.User;
 /**
  * Created by tom on 06/03/17.
  */
-public class RequestLoginUser extends AbstractRequestProtocol {
+public class RequestLoginUser extends RequestProtocol {
     private User user;
 
     public RequestLoginUser(int protocolId, User user) {
