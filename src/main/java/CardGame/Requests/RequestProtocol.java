@@ -5,9 +5,9 @@ package CardGame.Requests;
  */
 public class RequestProtocol {
     private int protocolId;
-    // TODO: define type with another class which uses final
     protected int type;
 
+    // TODO: define type with another class which uses final
 
     public RequestProtocol(int protocolId, int type) {
         this.protocolId = protocolId;
