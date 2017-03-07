@@ -16,9 +16,9 @@ import java.sql.Statement;
 public class FunctionDB {
     private Connection con = null;  
     private static final String DRIVER = "org.postgresql.Driver";  
-    private static final String URL = "jdbc:postgresql://localhost:5432/cardgame";  
-    private static final String USER = "root";  
-    private static final String PASS = "test";  
+    private static final String URL = "jdbc:postgresql://mod-fund-databases.cs.bham.ac.uk/tlb646";
+    private static final String USER = "tlb646";
+    private static final String PASS = "m4lvc9jdq9";
     private PreparedStatement stat = null;  
     /**
      * The constructor of FunctionDB

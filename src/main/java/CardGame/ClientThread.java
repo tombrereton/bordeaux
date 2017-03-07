@@ -1,9 +1,17 @@
 package CardGame;
 
+import CardGame.Requests.AbstractRequestProtocol;
+import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestRegisterUser;
+import CardGame.Requests.RequestSendMessage;
+import CardGame.Responses.AbstractResponseProtocol;
+import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseRegisterUser;
 import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  * This class implements the Runnable interface and
@@ -13,36 +21,105 @@ import java.net.Socket;
  */
 public class ClientThread implements Runnable {
     private Socket toClientSocket;
+    private boolean clientAlive;
+    private String clientID;
+    private FunctionDB functionDB;// TODO: make functionDB methods synchronised
+    protected User user;
 
     public ClientThread(Socket toClientSocket) {
         this.toClientSocket = toClientSocket;
+        this.functionDB = new FunctionDB();
+    }
+
+    public AbstractResponseProtocol handleInput(String JSONInput){
+
+        AbstractResponseProtocol response = null;
+
+        Gson gson = new Gson();
+
+        AbstractRequestProtocol request = gson.fromJson(JSONInput, AbstractRequestProtocol.class);
+
+        int requestType = request.getType();
+
+        if(requestType == 0){
+            RequestRegisterUser rru = (RequestRegisterUser) request;
+            this.user = rru.getUser();
+
+            try {
+
+                functionDB.insertUserIntoDatabase(this.user);
+                int protocolId = rru.getProtocolId();
+                response = new ResponseRegisterUser(protocolId, 1);
+
+            } catch (SQLException e) {
+
+                System.out.println("Failed to insert user into database");
+                e.printStackTrace();
+
+                int protocolId = rru.getProtocolId();
+                response = new ResponseRegisterUser(protocolId, 0);
+
+            } finally {
+                return response;
+            }
+
+        } else if (requestType == 1) {
+            RequestLoginUser rlu = (RequestLoginUser) request;
+            this.user = rlu.getUser();
+            String userName = this.user.getUserName();
+
+            try {
+                functionDB.isUserRegistered(userName);
+                int protocolId = rlu.getProtocolId();
+                response = new ResponseLoginUser(protocolId, 1);
+            } catch (SQLException e) {
+                System.out.println("Failed to check if user is registered");
+                e.printStackTrace();
+                int protocolId = rlu.getProtocolId();
+                response = new ResponseLoginUser(protocolId, 0);
+            } finally {
+                return response;
+            }
+
+            // login user stuff
+        } else if (requestType == 2 ) {
+            RequestSendMessage rsm = (RequestSendMessage) request;
+
+            // send message stuff
+            return response;
+        } else {
+            return response;
+        }
     }
 
     @Override
     public void run() {
         try {
 
-            DataInputStream in = new DataInputStream(toClientSocket.getInputStream());
+            DataInputStream inputStream = new DataInputStream(toClientSocket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(toClientSocket.getOutputStream());
+            this.clientAlive = true;
 
-            String jsonInString = in.readUTF();
+            while(clientAlive) {
 
-            Gson gson = new Gson();
+                String jsonInString = inputStream.readUTF();
 
-            // JSON to java object
-            User user = gson.fromJson(jsonInString, User.class);
+                if (!jsonInString.isEmpty()){
+                    AbstractResponseProtocol response = handleInput(jsonInString);
 
-            // Add user to users
-            CardGameServer.addUsertoUsers(user);
+                    Gson gson = new Gson();
 
-            //print the object
-            System.out.println("Object is " + user);
+                    String jsonOutString = gson.toJson(response);
 
-            //get user object from arraylist
-            User addedUser = CardGameServer.getUsers(0);
+                    outputStream.writeUTF(jsonOutString);
+                    outputStream.flush();
 
-            System.out.println("This user was just added: " + addedUser);
+                }
+            }
 
-            in.close();
+
+
+            inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
