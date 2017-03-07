@@ -1,10 +1,10 @@
 package CardGame;
 
-import CardGame.Requests.AbstractRequestProtocol;
+import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestLoginUser;
 import CardGame.Requests.RequestRegisterUser;
 import CardGame.Requests.RequestSendMessage;
-import CardGame.Responses.AbstractResponseProtocol;
+import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
 import com.google.gson.Gson;
@@ -31,13 +31,13 @@ public class ClientThread implements Runnable {
         this.functionDB = new FunctionDB();
     }
 
-    public AbstractResponseProtocol handleInput(String JSONInput){
+    public ResponseProtocol handleInput(String JSONInput){
 
-        AbstractResponseProtocol response = null;
+        ResponseProtocol response = null;
 
         Gson gson = new Gson();
 
-        AbstractRequestProtocol request = gson.fromJson(JSONInput, AbstractRequestProtocol.class);
+        RequestProtocol request = gson.fromJson(JSONInput, RequestProtocol.class);
 
         int requestType = request.getType();
 
@@ -105,7 +105,7 @@ public class ClientThread implements Runnable {
                 String jsonInString = inputStream.readUTF();
 
                 if (!jsonInString.isEmpty()){
-                    AbstractResponseProtocol response = handleInput(jsonInString);
+                    ResponseProtocol response = handleInput(jsonInString);
 
                     Gson gson = new Gson();
 

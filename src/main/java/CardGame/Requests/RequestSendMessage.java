@@ -5,7 +5,7 @@ import CardGame.MessageObject;
 /**
  * Created by tom on 06/03/17.
  */
-public class RequestSendMessage extends AbstractRequestProtocol {
+public class RequestSendMessage extends RequestProtocol {
     private MessageObject messageObject;
 
     public RequestSendMessage(int protocolId, String userName, String message) {

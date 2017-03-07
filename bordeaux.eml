@@ -9,5 +9,6 @@
 		<level name="Maven: com.google.code.gson:gson:2.8.0" value="project"/>
 		<level name="Maven: junit:junit:4.12" value="project"/>
 		<level name="Maven: org.hamcrest:hamcrest-core:1.3" value="project"/>
+		<level name="Maven: postgresql:postgresql:9.1-901-1.jdbc4" value="project"/>
 	</levels>
 </component>
