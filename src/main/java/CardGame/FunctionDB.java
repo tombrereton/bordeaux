@@ -86,15 +86,14 @@ public class FunctionDB {
             e.printStackTrace();  
         }  
     }
-    public boolean insertUserIntoDatabase(User user) throws SQLException{  
-        String sql = "INSERT INTO users(username,password,first_name,last_name,data_registered) VALUES(?,?,?,?,?)";  
+    public synchronized boolean insertUserIntoDatabase(User user) throws SQLException{
+        String sql = "INSERT INTO users(username,password,first_name,last_name) VALUES(?,?,?,?)";
         stat = con.prepareStatement(sql);  
         stat.setString(1,user.getUserName());  
         stat.setString(2,user.getPassword());  
         stat.setString(3,user.getFirstName());  
         stat.setString(4,user.getLastName());  
-        stat.setDate(5,(Date) user.getDateRegistered());  
-        int update = stat.executeUpdate();  
+        int update = stat.executeUpdate();
         free(stat,con);
         if(update>0){  
             return true;  
@@ -104,8 +103,8 @@ public class FunctionDB {
         } 
         
     }  
-    public User retrieveUserFromDatabase(String username) throws SQLException{
-        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE username =?";  
+    public synchronized User retrieveUserFromDatabase(String username) throws SQLException{
+        String sql = "SELECT username,password,first_name,last_name FROM users WHERE username =?";
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
         User user = null;  
@@ -120,7 +119,7 @@ public class FunctionDB {
     	
     }
     
-	public User retrieveUserFromDatabase(int userid) throws SQLException{
+	public synchronized User retrieveUserFromDatabase(int userid) throws SQLException{
         String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE user_id =?";  
         stat = con.prepareStatement(sql);  
         stat.setInt(1,userid);
@@ -136,7 +135,7 @@ public class FunctionDB {
 
         return user;  
     }
-	public boolean isUserRegistered(String username) throws SQLException{
+	public synchronized boolean isUserRegistered(String username) throws SQLException{
         String sql = "SELECT username FROM user WHERE username =?";  
         stat = con.prepareStatement(sql);  
         stat.setString(1,username);
@@ -150,7 +149,7 @@ public class FunctionDB {
         }
     }
 	
-	public boolean insertNewGameIntoDatabase(int timelength,int totalpot) throws SQLException{  
+	public synchronized boolean insertNewGameIntoDatabase(int timelength,int totalpot) throws SQLException{
         String sql = "INSERT INTO games(time_length,total_wining_pot) VALUES(?,?)";  
         stat = con.prepareStatement(sql);  
         stat.setInt(1,timelength);  
@@ -164,7 +163,7 @@ public class FunctionDB {
             return false;  
         } 
 	}
-	public int insertGameOutcomeIntoDatabse(String outcomes) throws SQLException{  
+	public synchronized int insertGameOutcomeIntoDatabse(String outcomes) throws SQLException{
 		String sql = "INSERT INTO game_outcomes(outcome) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_outcomes WHERE outcome=?) RETURNING outcome_id";
 		stat = con.prepareStatement(sql);
 		stat.setString(1, outcomes);
@@ -179,7 +178,7 @@ public class FunctionDB {
         // if any else happen throw a wrong result
 		return -1;
 	}
-	public boolean updateGameOutcomeFromDatabse(int outcome_id, String outcomes) throws SQLException{  
+	public synchronized boolean updateGameOutcomeFromDatabse(int outcome_id, String outcomes) throws SQLException{
 		String sql = "UPDATE game_outcomes SET outcomes = (?) WHERE outcoms_id = (?)";
 		stat = con.prepareStatement(sql);
 		stat.setInt(1, outcome_id);
@@ -194,7 +193,7 @@ public class FunctionDB {
             return false;  
         } 
 	}
-    public boolean insertGameStatsIntoDatabase(int gameid,int userid,int chip_amount_changed) throws SQLException{  
+    public synchronized boolean insertGameStatsIntoDatabase(int gameid,int userid,int chip_amount_changed) throws SQLException{
     	// initialise the outcome result
     	int outcomeid = insertGameOutcomeIntoDatabse("");
         String sql = "INSERT INTO users_games(user_id,game_id,outcom_id,chip_amount_changed) VALUES(?,?,?,?)";  
