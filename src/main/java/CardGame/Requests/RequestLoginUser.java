@@ -1,4 +1,5 @@
 package CardGame.Requests;
+import CardGame.ProtocolTypes;
 import CardGame.User;
 
 /**
@@ -8,7 +9,13 @@ public class RequestLoginUser extends RequestProtocol {
     private User user;
 
     public RequestLoginUser(int protocolId, User user) {
-        super(protocolId, 1); // type 1 is for login
+        super(protocolId, ProtocolTypes.LOGIN_USER); // type 1 is for login
+        this.user = user;
+    }
+
+
+    public RequestLoginUser(User user) {
+        super(ProtocolTypes.LOGIN_USER); // type 1 is for login
         this.user = user;
     }
 

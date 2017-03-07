@@ -7,14 +7,15 @@ public class RequestProtocol {
     private int protocolId;
     protected int type;
 
-    // TODO: define type with another class which uses final
-
     public RequestProtocol(int protocolId, int type) {
         this.protocolId = protocolId;
         this.type = type;
     }
 
-    // TODO: implement cons with rand for protocolID
+    public RequestProtocol(int type) {
+        this.protocolId = (int) (Math.random() * 1000) + 1;
+        this.type = type;
+    }
 
     public int getProtocolId() {
         return protocolId;

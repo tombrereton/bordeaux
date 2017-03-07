@@ -1,8 +1,8 @@
 package CardGame;
 
-import CardGame.Requests.AbstractRequestProtocol;
+import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.AbstractResponseProtocol;
+import CardGame.Responses.ResponseProtocol;
 import com.google.gson.Gson;
 
 import java.io.DataInputStream;
@@ -62,7 +62,7 @@ public class CardGameClient {
 
         User userObjectTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
 
-        AbstractRequestProtocol request = new RequestRegisterUser(2, userObjectTest);
+        RequestProtocol request = new RequestRegisterUser(2, userObjectTest);
 
         Socket sock = cardGameClient.getSocket();
         try {
@@ -94,3 +94,4 @@ public class CardGameClient {
     }
 
 }
+

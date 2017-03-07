@@ -1,5 +1,8 @@
 package CardGame;
 
+import CardGame.Requests.RequestProtocol;
+import CardGame.Requests.RequestRegisterUser;
+import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,32 +22,25 @@ public class CardGameServerTest {
     // SET UP
 
     CardGameServer server;
-    CardGameClient client;
 
 
     @Before
     public void setUp() throws Exception {
         server = new CardGameServer();
-        client = new CardGameClient();
     }
 
     // TESTS
     @Test
-    public void sendingJSONObject1_test() {
+    public void registerUser01_test() {
 
-//        User expected = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
-//
-//        Socket clientSock = client.getSocket();
-//        try {
-//            client.sendUserObject("N00B_D3STROYER", "password",
-//                    "Gwenith", "Hazlenut", clientSock);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        User actual = server.getUsers(1);
+        User expected = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
+        RequestProtocol request = new RequestRegisterUser(expected);
 
-//        assertEquals("Should return the user Gwenith matching expected ", expected, actual);
+
+        Gson gson = new Gson();
+
+        String expectedJSON = gson.toJson(expected);
+
 
 
 
