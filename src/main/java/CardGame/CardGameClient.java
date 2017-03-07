@@ -76,32 +76,22 @@ public class CardGameClient {
             toServer.writeUTF(jsonOutString);
             toServer.flush();
 
-            String jsonInString = fromServer.readUTF();
-
-
-            ResponseProtocol response = gson.fromJson(jsonInString, ResponseProtocol.class);
-
-            int success = response.getRequestSuccess();
-
-            System.out.println("Success (1: yes, 0: no) : " + success);
-            System.out.println(response);
-
-            int i = 0;
-            while (true){
-                System.out.println("Count:" + i);
-
-                i++;
-                Thread.sleep(1000);
-            }
+//            String jsonInString = fromServer.readUTF();
+//
+//
+//            AbstractResponseProtocol response = gson.fromJson(jsonInString, AbstractResponseProtocol.class);
+//
+//            int success = response.getRequestSuccess();
+//
+//            System.out.println("Success (1: yes, 0: no) : " + success);
 
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            cardGameClient.closeConnection();
         }
+
+        cardGameClient.closeConnection();
     }
 
 }
+

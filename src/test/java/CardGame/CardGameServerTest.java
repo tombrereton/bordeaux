@@ -22,7 +22,6 @@ public class CardGameServerTest {
     // SET UP
 
     CardGameServer server;
-    CardGameClient client;
 
 
     @Before
