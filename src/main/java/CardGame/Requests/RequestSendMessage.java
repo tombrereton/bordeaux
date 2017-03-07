@@ -12,4 +12,16 @@ public class RequestSendMessage extends AbstractRequestProtocol {
         super(protocolId, 2); // type 2 means send message
         this.messageObject = new MessageObject(userName, message);
     }
+
+
+    public MessageObject getMessageObject() {
+        return messageObject;
+    }
+
+    @Override
+    public String toString() {
+        return "RequestSendMessage{" +
+                "messageObject=" + messageObject +
+                "} " + super.toString();
+    }
 }

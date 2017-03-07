@@ -5,9 +5,9 @@ package CardGame.Requests;
  */
 public abstract class AbstractRequestProtocol {
     private int protocolId;
-    // TODO: define type with another class which uses final
     protected int type;
 
+    // TODO: define type with another class which uses final
 
     public AbstractRequestProtocol(int protocolId, int type) {
         this.protocolId = protocolId;
