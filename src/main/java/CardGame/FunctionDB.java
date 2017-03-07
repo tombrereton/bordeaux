@@ -28,7 +28,8 @@ public class FunctionDB {
 			Class.forName(DRIVER);
 			try {
 				con = DriverManager.getConnection(URL, USER, PASS);
-			} catch (SQLException e) {
+                System.out.println("Connected to database");
+            } catch (SQLException e) {
 				e.printStackTrace();
 			}
 		} catch (ClassNotFoundException e) {
@@ -87,7 +88,7 @@ public class FunctionDB {
         }  
     }
     public synchronized boolean insertUserIntoDatabase(User user) throws SQLException{
-        String sql = "INSERT INTO users(username,password,first_name,last_name) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO users(username,password,firstname,lastname) VALUES(?,?,?,?)";
         stat = con.prepareStatement(sql);  
         stat.setString(1,user.getUserName());  
         stat.setString(2,user.getPassword());  
@@ -104,7 +105,7 @@ public class FunctionDB {
         
     }  
     public synchronized User retrieveUserFromDatabase(String username) throws SQLException{
-        String sql = "SELECT username,password,first_name,last_name FROM users WHERE username =?";
+        String sql = "SELECT username,password,firstname,lastname FROM users WHERE username =?";
         stat = con.prepareStatement(sql);  
         ResultSet rs = stat.executeQuery();  
         User user = null;  
@@ -120,7 +121,7 @@ public class FunctionDB {
     }
     
 	public synchronized User retrieveUserFromDatabase(int userid) throws SQLException{
-        String sql = "SELECT username,password,first_name,last_name,data_registered FROM user WHERE user_id =?";  
+        String sql = "SELECT username,password,firstname,lastname FROM user WHERE user_id =?";
         stat = con.prepareStatement(sql);  
         stat.setInt(1,userid);
         ResultSet rs = stat.executeQuery();  
