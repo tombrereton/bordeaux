@@ -13,6 +13,7 @@ package CardGame;
 public class ProtocolMessages {
     public static final String DUPE_USERNAME = "duplicate username in database.";
     public static final String NON_EXIST = "does not exist.";
+    public static final String EMPTY_INSERT = "cannot insert empty object into database.";
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 

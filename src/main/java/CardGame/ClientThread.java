@@ -97,13 +97,17 @@ public class ClientThread implements Runnable {
     private ResponseProtocol handleRegisterUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
 
         // We deserialise it again but as a RequestRegisterUser object
-        RequestRegisterUser rru = gson.fromJson(JSONInput, RequestRegisterUser.class);
-        this.user = rru.getUser();
+        RequestRegisterUser requestRegisterUser = gson.fromJson(JSONInput, RequestRegisterUser.class);
+        this.user = requestRegisterUser.getUser();
 
         // Try to insert into database
         try {
-            boolean success = functionDB.insertUserIntoDatabase(this.user);
-            response = new ResponseRegisterUser(protocolId, SUCCESS);
+            if ( this.user.getUserName() == null || this.user.isUserEmpty()) {
+                response = new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
+            } else {
+                boolean success = functionDB.insertUserIntoDatabase(this.user);
+                response = new ResponseRegisterUser(protocolId, SUCCESS);
+            }
         } catch (SQLException e) {
             String sqlState = e.getSQLState();
             if (sqlState.equalsIgnoreCase("23505")) {
@@ -115,6 +119,7 @@ public class ClientThread implements Runnable {
             return response;
         }
     }
+
 
     @Override
     public void run() {
