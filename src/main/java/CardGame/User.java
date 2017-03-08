@@ -87,4 +87,11 @@ public class User {
                 ", dateRegistered=" + dateRegistered +
                 '}';
     }
+
+    public boolean isUserEmpty() {
+        return this.getUserName().equals("") ||
+                this.getPassword().equals("") ||
+                this.getFirstName().equals("") ||
+                this.getLastName().equals("");
+    }
 }
