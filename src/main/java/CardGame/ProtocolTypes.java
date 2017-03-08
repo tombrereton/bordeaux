@@ -11,4 +11,5 @@ public class ProtocolTypes {
     public static final int LOGIN_USER = 1;
     public static final int SEND_MESSAGE = 2;
     public static final int CLIENT_ID = 3;
+    public static final int UNKNOWN_TYPE = 99;
 }

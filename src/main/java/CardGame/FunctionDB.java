@@ -29,6 +29,7 @@ public class FunctionDB {
             Class.forName(DRIVER);
             try {
                 con = DriverManager.getConnection(URL, USER, PASS);
+                System.out.println("Connected to database");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
