@@ -13,6 +13,8 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
 
+import static CardGame.ProtocolMessages.*;
+
 /**
  * This class implements the Runnable interface and
  * make a connection via a 'Socket.'
@@ -30,8 +32,10 @@ public class ClientThread implements Runnable {
 
     public ClientThread(Socket toClientSocket) {
         this.toClientSocket = toClientSocket;
-        this.functionDB = new FunctionDB();
         this.clientID = Thread.currentThread().getId();
+
+        // We connect to the database and create functionsDB object
+        this.functionDB = new FunctionDB();
     }
 
     public ResponseProtocol handleInput(String JSONInput) {
@@ -49,42 +53,10 @@ public class ClientThread implements Runnable {
 
         // If type is register we try to register user in database
         if (requestType == ProtocolTypes.REGISTER_USER) {
-
-            // We deserialise it again but as a RequestRegisterUser object
-            RequestRegisterUser rru = gson.fromJson(JSONInput, RequestRegisterUser.class);
-            this.user = rru.getUser();
-
-            // Try to insert into database
-            try {
-                boolean success = functionDB.insertUserIntoDatabase(this.user);
-                response = new ResponseRegisterUser(protocolId, 1);
-            } catch (SQLException e) {
-                String sqlState = e.getSQLState();
-                if (sqlState.equalsIgnoreCase("23505")) {
-                    response = new ResponseRegisterUser(protocolId, 0, ProtocolMessages.DUPE_USERNAME);
-                } else {
-                    response = new ResponseRegisterUser(protocolId, 0);
-                }
-            } finally {
-                return response;
-            }
-
+            return handleRegisterUser(JSONInput, gson, protocolId, response);
 
         } else if (requestType == ProtocolTypes.LOGIN_USER) {
-            RequestLoginUser rlu = (RequestLoginUser) request;
-            this.user = rlu.getUser();
-            String userName = this.user.getUserName();
-
-            try {
-                functionDB.isUserRegistered(userName);
-                response = new ResponseLoginUser(protocolId, 1);
-            } catch (SQLException e) {
-                System.out.println("Failed to check if user is registered");
-                e.printStackTrace();
-                response = new ResponseLoginUser(protocolId, 0);
-            } finally {
-                return response;
-            }
+            return handleLoginUser(JSONInput, gson, protocolId, response);
 
         } else if (requestType == ProtocolTypes.SEND_MESSAGE) {
             RequestSendMessage rsm = (RequestSendMessage) request;
@@ -96,8 +68,57 @@ public class ClientThread implements Runnable {
         }
     }
 
+    private ResponseProtocol handleLoginUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
+        // We deserialise it again but as a RequestRegisterUser object
+        RequestLoginUser requestLoginUser = gson.fromJson(JSONInput, RequestLoginUser.class);
+        this.user = requestLoginUser.getUser();
+
+        // retrive user from database and check passwords match
+        try {
+            // retrieve user
+            User existingUser = functionDB.retrieveUserFromDatabase(this.user.getUserName());
+
+            // check if passwords match
+            if (existingUser.getPassword() == null) {
+                response = new ResponseLoginUser(protocolId, FAIL, NON_EXIST);
+            } else if (existingUser.getPassword().equals(this.user.getPassword())) {
+                response = new ResponseLoginUser(protocolId, SUCCESS);
+            } else {
+                response = new ResponseLoginUser(protocolId, FAIL);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return response;
+        }
+    }
+
+    private ResponseProtocol handleRegisterUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
+
+        // We deserialise it again but as a RequestRegisterUser object
+        RequestRegisterUser rru = gson.fromJson(JSONInput, RequestRegisterUser.class);
+        this.user = rru.getUser();
+
+        // Try to insert into database
+        try {
+            boolean success = functionDB.insertUserIntoDatabase(this.user);
+            response = new ResponseRegisterUser(protocolId, SUCCESS);
+        } catch (SQLException e) {
+            String sqlState = e.getSQLState();
+            if (sqlState.equalsIgnoreCase("23505")) {
+                response = new ResponseRegisterUser(protocolId, FAIL, DUPE_USERNAME);
+            } else {
+                response = new ResponseRegisterUser(protocolId, FAIL);
+            }
+        } finally {
+            return response;
+        }
+    }
+
     @Override
     public void run() {
+
         try {
 
             DataInputStream inputStream = new DataInputStream(toClientSocket.getInputStream());

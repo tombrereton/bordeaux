@@ -23,6 +23,10 @@ public class CardGameServer {
     private final int numberOfThreads = 10;
 
     public CardGameServer() {
+        connectToClients();
+    }
+
+    public void connectToClients(){
         ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
 
         try {
@@ -30,7 +34,6 @@ public class CardGameServer {
 
             while (true) {
                 System.out.println("Waiting for connection from Client");
-
                 Socket socket = this.serverSocket.accept();
 
                 System.out.println("Accepted connection form client");
