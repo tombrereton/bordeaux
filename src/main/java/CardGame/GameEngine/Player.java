@@ -66,4 +66,8 @@ public class Player {
     public boolean isBetWithinBudget(int bet){
         return bet >= 0 && bet <= this.budget;
     }
+
+    public boolean isBust(){
+        return this.getPlayerHandValue() <= 21 && this.getPlayerHandValue() >= 1;
+    }
 }
