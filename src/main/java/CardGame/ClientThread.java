@@ -103,6 +103,8 @@ public class ClientThread implements Runnable {
         // We deserialise it again but as a RequestRegisterUser object
         RequestLoginUser requestLoginUser = gson.fromJson(JSONInput, RequestLoginUser.class);
         this.user = requestLoginUser.getUser();
+        
+        CardGameServer.addUsertoUsers(this.user);
 
         // retrieve user from database and check passwords match
         try {
