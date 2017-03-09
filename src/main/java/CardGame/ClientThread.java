@@ -7,6 +7,7 @@ import CardGame.Requests.RequestSendMessage;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.ResponseSendMessage;
 import com.google.gson.Gson;
 
 import java.io.*;
