@@ -15,9 +15,7 @@ public class MessageObject {
     public MessageObject(String userName, String message) {
         this.userName = userName;
         this.message = message;
-
-        DateFormat df = new SimpleDateFormat("HH:mm:ss");
-        this.timeStamp = timeStamp;
+        this.timeStamp = new Date();
     }
 
     public String getUserName() {
@@ -34,10 +32,11 @@ public class MessageObject {
 
     @Override
     public String toString() {
+        DateFormat df = new SimpleDateFormat("HH:mm:ss");
         return "MessageObject{" +
                 "userName='" + userName + '\'' +
                 ", message='" + message + '\'' +
-                ", timeStamp=" + timeStamp +
+                ", timeStamp=" + df.format(timeStamp) +
                 '}';
     }
 }
