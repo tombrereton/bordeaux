@@ -7,14 +7,10 @@ import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
 import com.google.gson.Gson;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.Socket;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This class tests the CardGameServer.
@@ -73,6 +69,11 @@ public class CardGameServerTest {
         // We check for failed response
         int actualSuccess = responseRegisterUser.getRequestSuccess();
         assertEquals("Should return failed response matching expected success ", expectedSuccess, actualSuccess);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
     /**
@@ -109,6 +110,11 @@ public class CardGameServerTest {
         // We check for failed response
         int actualSuccess = responseRegisterUser.getRequestSuccess();
         assertEquals("Should return failed response matching expected success ", expectedSuccess, actualSuccess);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
     /**
@@ -145,6 +151,11 @@ public class CardGameServerTest {
         // We check for failed response
         int actualSuccess = responseRegisterUser.getRequestSuccess();
         assertEquals("Should return failed response matching expected success ", expectedSuccess, actualSuccess);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
 
@@ -177,6 +188,11 @@ public class CardGameServerTest {
         int actual = responseLoginUser.getRequestSuccess();
         assertEquals("Should return success of value 1, matching expected ", expected, actual);
 
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
     }
 
     /**
@@ -206,6 +222,11 @@ public class CardGameServerTest {
         ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
         int actual = responseLoginUser.getRequestSuccess();
         assertEquals("Should return success of value 0 (signalling mismatch), matching expected ", expected, actual);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
     /**
@@ -235,6 +256,11 @@ public class CardGameServerTest {
         ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
         int actual = responseLoginUser.getRequestSuccess();
         assertEquals("Should return a failed response, matching expected ", expected, actual);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
     /**
@@ -264,6 +290,11 @@ public class CardGameServerTest {
         ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
         int actual = responseLoginUser.getRequestSuccess();
         assertEquals("Should return a failed response, matching expected ", expected, actual);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
 }
