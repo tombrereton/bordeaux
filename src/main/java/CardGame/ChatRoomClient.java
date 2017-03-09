@@ -15,35 +15,37 @@ public class ChatRoomClient {
     private DataInputStream input;
     private final int numberOfThreads = 10;
     private DataOutputStream out;
-    private String messageContent;
-    private User user;
 
-    public ChatRoomClient(User user,String messageContent) throws IOException {
-        this.user = user;
-        this.messageContent = messageContent;
+    public ChatRoomClient() throws IOException {
         this.socket = new Socket(this.host, this.port);
-        sendMessagesToServer();
-        retriveMessagesFromServer();
-    }
-    public void sendMessagesToServer(){
-
-
         ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
-        // Create thread send messages
-        threadPool.execute(new ChatRoomClientThread(socket,user,messageContent));
+        // Create thread to send messages
+        threadPool.execute(new ChatRoomClientThread(socket));
+
+        retriveMessagesFromServer();
+
     }
     public void retriveMessagesFromServer() throws IOException {
         input = new DataInputStream(socket.getInputStream());
-        DateFormat df = new SimpleDateFormat("HH:mm:ss");
-        String msg = input.readUTF();
-        String tt = null;
-        while ( tt != msg && msg !=null) {
-            MessageObject message = new Gson().fromJson(msg,MessageObject.class);
-            // ---------------------------------------------------------
-            // These codes will be replaced if the GUI part is done
-            System.out.println(df.format(message.getTimeStamp()) + "\n" + message.getUserName() +": " + message.getMessage());
-            // ---------------------------------------------------------
-            tt = msg;
+        while(true){
+            String msg = null;
+            DateFormat df = new SimpleDateFormat("HH:mm:ss");
+            if(!socket.isClosed()){
+                try {
+                    msg = input.readUTF();
+                    System.out.println(msg);
+                    if(msg!=null){
+                        MessageObject message = new Gson().fromJson(msg, MessageObject.class);
+                        // ---------------------------------------------------------
+                        // These codes will be replaced if the GUI part is done
+                        System.out.println(df.format(message.getTimeStamp()) + "\n" + message.getUserName() + ": " + message.getMessage());
+                        // ---------------------------------------------------------
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
     }
     public Socket getSocket() {
@@ -51,13 +53,8 @@ public class ChatRoomClient {
     }
 
     public static void main(String[] args) throws IOException {
-        // ---------------------------------------------------------
-        // These codes will be replaced if the GUI part is done
-        String cc ="This is a test";
-        User user = new User("Yifan");
-        // ---------------------------------------------------------
-        ChatRoomClient chatroomClient = new ChatRoomClient(user,cc);
-        ChatRoomClient chatroomClnt = new ChatRoomClient(user,"Test 2");
+
+        ChatRoomClient chatroomClient = new ChatRoomClient();
     }
 
 }

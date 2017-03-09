@@ -12,30 +12,38 @@ public class ChatRoomServerThread implements Runnable  {
     private BufferedReader br;
     private long clientID;
     private boolean clientAlive;
-    private DataInputStream inputStream;
     private DataOutputStream outputStream;
-    private String msg;
 
     public ChatRoomServerThread(Socket socket) throws IOException {
         this.socket = socket;
         this.clientID = (int) Thread.currentThread().getId();
-        this.inputStream = new DataInputStream(socket.getInputStream());
-        this.msg = inputStream.readUTF();
 
     }
+
+    /**
+     * Send messages to all clients
+     * @param msgContent
+     * @throws IOException
+     */
     private void sendMessage(String msgContent) throws IOException {
         for (Socket client :  ChatRoomServer.socketlist) {
-            outputStream = new DataOutputStream(socket.getOutputStream());
-            outputStream.writeUTF(msgContent);
+            if(!client.isClosed()){
+                outputStream = new DataOutputStream(client.getOutputStream());
+                System.out.println(msgContent);
+                outputStream.writeUTF(msgContent);
+            }
         }
     }
     public void run() {
         try {
-            String tt = null;
-            while ( tt != msg && msg !=null) {
-                 sendMessage(msg);
-                 tt = msg;
-            }
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+
+        String msg = null;
+        if(!socket.isClosed()){
+                msg = inputStream.readUTF();
+                sendMessage(msg);
+
+        }
         } catch (IOException e) {
             e.printStackTrace();
         }
