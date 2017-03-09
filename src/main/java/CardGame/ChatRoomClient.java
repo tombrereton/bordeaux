@@ -1,12 +1,8 @@
 package CardGame;
-
-import CardGame.Requests.RequestProtocol;
-import CardGame.Requests.RequestSendMessage;
 import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutorService;
@@ -33,7 +29,7 @@ public class ChatRoomClient {
 
 
         ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
-        // 创建线程发送消息
+        // Create thread send messages
         threadPool.execute(new ChatRoomClientThread(socket,user,messageContent));
     }
     public void retriveMessagesFromServer() throws IOException {

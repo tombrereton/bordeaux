@@ -1,7 +1,5 @@
 package CardGame;
 
-import CardGame.Requests.RequestProtocol;
-import CardGame.Requests.RequestSendMessage;
 import com.google.gson.Gson;
 
 import java.io.*;
@@ -26,7 +24,7 @@ public class ChatRoomClientThread implements Runnable {
     }
     @Override
     public void run() {
-        // 发消息
+        // Send messages
         try {
                 MessageObject mo = new MessageObject(user.getUserName(),msg);
                 Gson gson = new Gson();
