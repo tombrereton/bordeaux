@@ -22,26 +22,25 @@ public class ChatRoomClient {
         // Create thread to send messages
         threadPool.execute(new ChatRoomClientThread(socket));
 
-        retriveMessagesFromServer();
+        retrieveMessagesFromServer();
 
     }
-    public void retriveMessagesFromServer() throws IOException {
+    public void retrieveMessagesFromServer() throws IOException {
         input = new DataInputStream(socket.getInputStream());
-        while(socket.isConnected()){
-            String msg = null;
+        String msg = null;
+        try {
+        while((msg = input.readUTF())!=null){
+
             DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                try {
-                    msg = input.readUTF();
-                    if(msg!=null){
                         MessageObject message = new Gson().fromJson(msg, MessageObject.class);
                         // ---------------------------------------------------------
                         // These codes will be replaced if the GUI part is done
                         System.out.println(df.format(message.getTimeStamp()) + "\n" + message.getUserName() + ": " + message.getMessage());
                         // ---------------------------------------------------------
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     public Socket getSocket() {
