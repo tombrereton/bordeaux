@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 public class ChatRoomClient {
     private Socket socket;
     private String host = "localhost";
-    private int port = 7655;
+    private int port = 7654;
     private DataInputStream input;
     private final int numberOfThreads = 10;
     private DataOutputStream out;
@@ -32,11 +32,11 @@ public class ChatRoomClient {
         while((msg = input.readUTF())!=null){
 
             DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                        MessageObject message = new Gson().fromJson(msg, MessageObject.class);
-                        // ---------------------------------------------------------
-                        // These codes will be replaced if the GUI part is done
-                        System.out.println(df.format(message.getTimeStamp()) + "\n" + message.getUserName() + ": " + message.getMessage());
-                        // ---------------------------------------------------------
+                MessageObject message = new Gson().fromJson(msg, MessageObject.class);
+                // ---------------------------------------------------------
+                // These codes will be replaced if the GUI part is done
+                System.out.println(df.format(message.getTimeStamp()) + "\n" + message.getUserName() + ": " + message.getMessage());
+                // ---------------------------------------------------------
 
             }
         } catch (IOException e) {

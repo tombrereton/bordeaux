@@ -7,6 +7,7 @@ import CardGame.Requests.RequestSendMessage;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.ResponseSendMessage;
 import com.google.gson.Gson;
 
 import java.io.*;
@@ -59,11 +60,22 @@ public class ClientThread implements Runnable {
             return handleLoginUser(JSONInput, gson, protocolId, response);
 
         } else if (requestType == ProtocolTypes.SEND_MESSAGE) {
-            RequestSendMessage rsm = (RequestSendMessage) request;
-
-            // send message stuff
-            return response;
+            return handleSendMessage(JSONInput, gson, protocolId, response);
         } else {
+            return response;
+        }
+    }
+
+    private ResponseProtocol handleSendMessage(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
+        RequestSendMessage requestSendMessage = gson.fromJson(JSONInput, RequestSendMessage.class);
+        MessageObject message = requestSendMessage.getMessageObject();
+        try {
+            CardGameServer.sendMessage(message);
+            response = new ResponseSendMessage(protocolId, SUCCESS);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response = new ResponseSendMessage(protocolId, FAIL);
+        } finally {
             return response;
         }
     }
@@ -102,7 +114,7 @@ public class ClientThread implements Runnable {
 
         // Try to insert into database
         try {
-            if ( this.user.getUserName() == null || this.user.isUserEmpty()) {
+            if (this.user.getUserName() == null || this.user.isUserEmpty()) {
                 response = new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
             } else {
                 boolean success = functionDB.insertUserIntoDatabase(this.user);

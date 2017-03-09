@@ -1,5 +1,8 @@
 package CardGame;
 
+import com.google.gson.Gson;
+
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,6 +24,8 @@ public class CardGameServer {
     private final int port = 7654;
     private ServerSocket serverSocket;
     private final int numberOfThreads = 10;
+    static ArrayList<Socket> socketlist = new ArrayList<Socket>();
+
 
     public CardGameServer() {
         connectToClients();
@@ -35,13 +40,33 @@ public class CardGameServer {
             while (true) {
                 System.out.println("Waiting for connection from Client");
                 Socket socket = this.serverSocket.accept();
-
+                // add socket to socket list
+                socketlist.add(socket);
                 System.out.println("Accepted connection form client");
 
                 threadPool.execute(new ClientThread(socket));
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Send messages to all clients
+     * @param
+     * @throws IOException
+     */
+    public static synchronized void sendMessage(MessageObject msg) throws IOException {
+        Gson gson = new Gson();
+        DataOutputStream outputStream;
+        for (Socket client :  CardGameServer.socketlist) {
+            if(!client.isClosed()){
+                outputStream = new DataOutputStream(client.getOutputStream());
+                String jsonOutString = gson.toJson(msg);
+                outputStream.writeUTF(jsonOutString);
+                outputStream.flush();
+            }
         }
     }
 

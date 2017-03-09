@@ -18,8 +18,6 @@ public class ChatRoomClientThread implements Runnable {
     public ChatRoomClientThread(Socket socket) {
         this.socket = socket;
         this.clientID = (int) Thread.currentThread().getId();
-        this.user = user;
-        this.msg = msg;
 
     }
     @Override
@@ -28,12 +26,13 @@ public class ChatRoomClientThread implements Runnable {
         try {
             // ---------------------------------------------------------
             // These codes will be replaced if the GUI part is done
-            String msg ="Good!";
+            String msg ="Hello!";
             User user = new User("User 3");
             // ---------------------------------------------------------
+
                 MessageObject mo = new MessageObject(user.getUserName(),msg);
                 Gson gson = new Gson();
-                // Send the message to the server
+                // Send the messages to the server
 
                 out = new DataOutputStream(socket.getOutputStream());
                 out.writeUTF(gson.toJson(mo));

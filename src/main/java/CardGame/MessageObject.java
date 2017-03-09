@@ -15,7 +15,6 @@ public class MessageObject {
     public MessageObject(String userName, String message) {
         this.userName = userName;
         this.message = message;
-
         this.timeStamp = new Date();
     }
 
