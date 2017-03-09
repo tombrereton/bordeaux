@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 import static CardGame.ProtocolMessages.*;
+import static CardGame.ProtocolTypes.*;
 
 /**
  * This class implements the Runnable interface and
@@ -38,6 +39,13 @@ public class ClientThread implements Runnable {
         this.functionDB = new FunctionDB();
     }
 
+    /**
+     * This method handles the input from the client and
+     * returns a response as per the request sent.
+     *
+     * @param JSONInput
+     * @return
+     */
     public ResponseProtocol handleInput(String JSONInput) {
 
         // Deserialise request object
@@ -51,35 +59,46 @@ public class ClientThread implements Runnable {
         // Declare a response variable
         ResponseProtocol response = null;
 
-        // If type is register we try to register user in database
-        if (requestType == ProtocolTypes.REGISTER_USER) {
+        // We handle the request accordingly
+        if (requestType == REGISTER_USER) {
             return handleRegisterUser(JSONInput, gson, protocolId, response);
 
-        } else if (requestType == ProtocolTypes.LOGIN_USER) {
+        } else if (requestType == LOGIN_USER) {
             return handleLoginUser(JSONInput, gson, protocolId, response);
 
-        } else if (requestType == ProtocolTypes.SEND_MESSAGE) {
+        } else if (requestType == SEND_MESSAGE) {
             RequestSendMessage rsm = (RequestSendMessage) request;
 
             // send message stuff
             return response;
         } else {
-            return response;
+            return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
 
+    /**
+     * A method to login a user. This method checks the password send from the client
+     * with the password stored in the database, if they match, we return a successful response,
+     * otherwise, we return a failed response.
+     *
+     * @param JSONInput
+     * @param gson
+     * @param protocolId
+     * @param response
+     * @return
+     */
     private ResponseProtocol handleLoginUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
         // We deserialise it again but as a RequestRegisterUser object
         RequestLoginUser requestLoginUser = gson.fromJson(JSONInput, RequestLoginUser.class);
         this.user = requestLoginUser.getUser();
 
-        // retrive user from database and check passwords match
+        // retrieve user from database and check passwords match
         try {
             // retrieve user
             User existingUser = functionDB.retrieveUserFromDatabase(this.user.getUserName());
 
             // check if passwords match
-            if (existingUser.getPassword() == null) {
+            if (existingUser.getPassword() == null || existingUser.getUserName() == null) {
                 response = new ResponseLoginUser(protocolId, FAIL, NON_EXIST);
             } else if (existingUser.getPassword().equals(this.user.getPassword())) {
                 response = new ResponseLoginUser(protocolId, SUCCESS);
@@ -94,6 +113,16 @@ public class ClientThread implements Runnable {
         }
     }
 
+    /**
+     * Method to handle a user Registering. This method will
+     * insert a users details into the database.
+     *
+     * @param JSONInput
+     * @param gson
+     * @param protocolId
+     * @param response
+     * @return
+     */
     private ResponseProtocol handleRegisterUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
 
         // We deserialise it again but as a RequestRegisterUser object
@@ -102,7 +131,7 @@ public class ClientThread implements Runnable {
 
         // Try to insert into database
         try {
-            if ( this.user.getUserName() == null || this.user.isUserEmpty()) {
+            if (this.user.getUserName() == null || this.user.isUserEmpty()) {
                 response = new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
             } else {
                 boolean success = functionDB.insertUserIntoDatabase(this.user);
@@ -121,6 +150,9 @@ public class ClientThread implements Runnable {
     }
 
 
+    /**
+     * This method runs when the thread starts.
+     */
     @Override
     public void run() {
 
@@ -150,6 +182,7 @@ public class ClientThread implements Runnable {
 
 
             inputStream.close();
+            outputStream.close();
         } catch (EOFException e) {
             System.out.println("Client likely disconnected.: " + e.toString());
         } catch (IOException e) {
