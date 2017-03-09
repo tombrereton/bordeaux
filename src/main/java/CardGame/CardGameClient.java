@@ -2,8 +2,16 @@ package CardGame;
 
 import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.ResponseProtocol;
+import CardGame.Responses.*;
+
 import com.google.gson.Gson;
+
+import static CardGame.ProtocolMessages.FAIL;
+import static CardGame.ProtocolMessages.UNKNOWN_ERROR;
+import static CardGame.ProtocolTypes.LOGIN_USER;
+import static CardGame.ProtocolTypes.REGISTER_USER;
+import static CardGame.ProtocolTypes.SEND_MESSAGE;
+import static CardGame.ProtocolTypes.UNKNOWN_TYPE;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -56,42 +64,66 @@ public class CardGameClient {
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        CardGameClient cardGameClient = new CardGameClient();
-
-        User userObjectTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
-
-        RequestProtocol request = new RequestRegisterUser(2, userObjectTest);
-
-        Socket sock = cardGameClient.getSocket();
-        try {
-            DataOutputStream toServer = new DataOutputStream(sock.getOutputStream());
-            DataInputStream fromServer = new DataInputStream(sock.getInputStream());
-
+    
+    public ResponseProtocol sendRequest(RequestProtocol rp) throws IOException{
+    	
+    		DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             Gson gson = new Gson();
+            String request =gson.toJson(rp);
+            outputStream.writeUTF(request);
+            outputStream.flush();
+            String jsonInString = "";
+            //read response
+            while(jsonInString == ""){
+            jsonInString = inputStream.readUTF();
+            }
+            return handleResponse(jsonInString);
+            
+            
+            
+    	
+    		
+    	
+    	
+    	
+    }
+    
+    public ResponseProtocol handleResponse(String str){
+    	Gson gson = new Gson();
+    	ResponseProtocol rp = gson.fromJson(str, ResponseProtocol.class);
+    	int protocolId = rp.getProtocolId();
+int responseType = rp.getType();     	
+    	if (responseType == REGISTER_USER) {
+    		return gson.fromJson(str, ResponseRegisterUser.class);
 
-            String jsonOutString = gson.toJson(request);
+        } else if (responseType == LOGIN_USER) {
+        	return gson.fromJson(str, ResponseLoginUser.class);
 
-            toServer.writeUTF(jsonOutString);
-            toServer.flush();
-
-//            String jsonInString = fromServer.readUTF();
-//
-//
-//            AbstractResponseProtocol response = gson.fromJson(jsonInString, AbstractResponseProtocol.class);
-//
-//            int success = response.getRequestSuccess();
-//
-//            System.out.println("Success (1: yes, 0: no) : " + success);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else if (responseType == SEND_MESSAGE) {
+        	return gson.fromJson(str, ResponseSendMessage.class);
+        } else {
+            return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
-
-        cardGameClient.closeConnection();
+    }
+    
+    public static void main(String[] args){
+    	CardGameClient cgc = new CardGameClient();
+    	User user = new User("ILoveTerryWogan","terry","Barry","Moonpie");
+    	RequestRegisterUser request = new RequestRegisterUser(user);
+    	ResponseProtocol response;
+		try {
+			response = cgc.sendRequest(request);
+			System.out.println(response);
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		}
+    	
+    	
     }
 
+
 }
+
 
