@@ -29,7 +29,6 @@ public class ChatRoomServerThread implements Runnable  {
         for (Socket client :  ChatRoomServer.socketlist) {
             if(!client.isClosed()){
                 outputStream = new DataOutputStream(client.getOutputStream());
-                System.out.println(msgContent);
                 outputStream.writeUTF(msgContent);
             }
         }
@@ -41,7 +40,8 @@ public class ChatRoomServerThread implements Runnable  {
         String msg = null;
         if(!socket.isClosed()){
                 msg = inputStream.readUTF();
-                sendMessage(msg);
+                System.out.println("Received msg: "+ msg);
+            sendMessage(msg);
 
         }
         } catch (IOException e) {

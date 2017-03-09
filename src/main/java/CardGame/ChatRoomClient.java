@@ -27,13 +27,11 @@ public class ChatRoomClient {
     }
     public void retriveMessagesFromServer() throws IOException {
         input = new DataInputStream(socket.getInputStream());
-        while(true){
+        while(socket.isConnected()){
             String msg = null;
             DateFormat df = new SimpleDateFormat("HH:mm:ss");
-            if(!socket.isClosed()){
                 try {
                     msg = input.readUTF();
-                    System.out.println(msg);
                     if(msg!=null){
                         MessageObject message = new Gson().fromJson(msg, MessageObject.class);
                         // ---------------------------------------------------------
@@ -44,8 +42,6 @@ public class ChatRoomClient {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-            }
         }
     }
     public Socket getSocket() {

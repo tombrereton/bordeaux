@@ -28,8 +28,8 @@ public class ChatRoomClientThread implements Runnable {
         try {
             // ---------------------------------------------------------
             // These codes will be replaced if the GUI part is done
-            String msg ="This is a tests";
-            User user = new User("Hi");
+            String msg ="Good!";
+            User user = new User("User 3");
             // ---------------------------------------------------------
                 MessageObject mo = new MessageObject(user.getUserName(),msg);
                 Gson gson = new Gson();
