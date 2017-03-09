@@ -9,6 +9,35 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * CREATE TABLE users (
+ * userID SERIAL,
+ * username varchar(50) UNIQUE NOT NULL,
+ * password varchar(50) NOT NULL,
+ * firstname varchar(50) NOT NULL,
+ * lastname varchar(50) NOT NULL,
+ * CONSTRAINT users_key PRIMARY KEY (userID)
+ * );
+ * <p>
+ * CREATE TABLE users_games (
+ * user_game_ID SERIAL NOT NULL,
+ * userID INTEGER NOT NULL,
+ * gameID INTEGER NOT NULL,
+ * outcomeID INTEGER NOT NULL,
+ * chip_amount_changed INTEGER NOT NULL,
+ * CONSTRAINT users_games_key PRIMARY KEY (user_game_ID, userID, gameID),
+ * FOREIGN KEY (userID) REFERENCES users(userID),
+ * FOREIGN KEY (outcomeID) REFERENCES game_outcomes(outcomeID)
+ * );
+ * <p>
+ * CREATE TABLE game_outcomes (
+ * outcomeID SERIAL,
+ * outcome VARCHAR(100) NOT NULL UNIQUE,
+ * CONSTRAINT game_outcomes_key PRIMARY KEY (outcomeID)
+ * );
+ */
+
+
+/**
  * The DAO of the card game
  *
  * @author Yifan Wu

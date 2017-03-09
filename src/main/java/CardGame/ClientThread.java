@@ -41,6 +41,52 @@ public class ClientThread implements Runnable {
     }
 
     /**
+     * This method runs when the thread starts.
+     */
+    @Override
+    public void run() {
+
+        try {
+
+            DataInputStream inputStream = new DataInputStream(toClientSocket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(toClientSocket.getOutputStream());
+            this.clientAlive = true;
+
+            while (clientAlive) {
+
+                String jsonInString = inputStream.readUTF();
+
+                if (!jsonInString.isEmpty()) {
+                    ResponseProtocol response = handleInput(jsonInString);
+                    System.out.println(response);
+
+                    Gson gson = new Gson();
+
+                    String jsonOutString = gson.toJson(response);
+
+                    outputStream.writeUTF(jsonOutString);
+                    outputStream.flush();
+
+                }
+            }
+
+            inputStream.close();
+            outputStream.close();
+        } catch (EOFException e) {
+            System.out.println("Client likely disconnected.: " + e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                this.toClientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
      * This method handles the input from the client and
      * returns a response as per the request sent.
      *
@@ -164,50 +210,4 @@ public class ClientThread implements Runnable {
     }
 
 
-    /**
-     * This method runs when the thread starts.
-     */
-    @Override
-    public void run() {
-
-        try {
-
-            DataInputStream inputStream = new DataInputStream(toClientSocket.getInputStream());
-            DataOutputStream outputStream = new DataOutputStream(toClientSocket.getOutputStream());
-            this.clientAlive = true;
-
-            while (clientAlive) {
-
-                String jsonInString = inputStream.readUTF();
-
-                if (!jsonInString.isEmpty()) {
-                    ResponseProtocol response = handleInput(jsonInString);
-                    System.out.println(response);
-
-                    Gson gson = new Gson();
-
-                    String jsonOutString = gson.toJson(response);
-
-                    outputStream.writeUTF(jsonOutString);
-                    outputStream.flush();
-
-                }
-            }
-
-
-            inputStream.close();
-            outputStream.close();
-        } catch (EOFException e) {
-            System.out.println("Client likely disconnected.: " + e.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                this.toClientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 }
