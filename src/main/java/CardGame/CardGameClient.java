@@ -75,9 +75,10 @@ public class CardGameClient {
             outputStream.flush();
             String jsonInString = "";
             //read response
-            while(jsonInString == ""){
-            jsonInString = inputStream.readUTF();
-            }
+            System.out.println("before read");
+            	jsonInString = inputStream.readUTF();
+            	System.out.println("after read");
+            
             return handleResponse(jsonInString);
             
             
@@ -88,6 +89,18 @@ public class CardGameClient {
     	
     	
     }
+    public ResponseRegisterUser sendRequestRegisterUser(User user) throws IOException{
+    	RequestRegisterUser request = new RequestRegisterUser(user);
+    	ResponseProtocol response = sendRequest(request);
+		System.out.println(response);
+		
+		Gson gson = new Gson();
+		String s = gson.toJson(response);
+		ResponseRegisterUser rru = gson.fromJson(s, ResponseRegisterUser.class);
+		return rru;
+    	
+    }
+    
     
     public ResponseProtocol handleResponse(String str){
     	Gson gson = new Gson();
@@ -110,11 +123,11 @@ int responseType = rp.getType();
     public static void main(String[] args){
     	CardGameClient cgc = new CardGameClient();
     	User user = new User("ILoveTerryWogan","terry","Barry","Moonpie");
-    	RequestRegisterUser request = new RequestRegisterUser(user);
-    	ResponseProtocol response;
+    	
 		try {
-			response = cgc.sendRequest(request);
-			System.out.println(response);
+			ResponseRegisterUser rru = cgc.sendRequestRegisterUser(user);
+			System.out.println(rru);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			
