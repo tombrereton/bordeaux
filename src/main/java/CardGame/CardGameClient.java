@@ -1,6 +1,6 @@
 package CardGame;
 
-import CardGame.Requests.RequestProtocol;
+import CardGame.Requests.*;
 import CardGame.Requests.RequestRegisterUser;
 import CardGame.Responses.*;
 
@@ -101,6 +101,17 @@ public class CardGameClient {
     	
     }
     
+    public ResponseLoginUser sendRequestLoginUser(User user) throws IOException{
+    	RequestLoginUser request = new RequestLoginUser(user);
+    	ResponseProtocol response = sendRequest(request);
+		System.out.println(response);
+		
+		Gson gson = new Gson();
+		String s = gson.toJson(response);
+		ResponseLoginUser rlu = gson.fromJson(s, ResponseLoginUser.class);
+		return rlu;
+    	
+    }
     
     public ResponseProtocol handleResponse(String str){
     	Gson gson = new Gson();
@@ -127,6 +138,8 @@ int responseType = rp.getType();
 		try {
 			ResponseRegisterUser rru = cgc.sendRequestRegisterUser(user);
 			System.out.println(rru);
+			ResponseLoginUser rlu = cgc.sendRequestLoginUser(user);
+			System.out.println(rlu);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
