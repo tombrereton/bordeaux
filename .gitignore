@@ -2,3 +2,6 @@
 .idea/misc.xml
 target/
 .idea/encodings.xml
+.classpath
+.project
+.settings/
