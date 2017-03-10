@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static CardGame.ProtocolMessages.NO_CLIENTS;
+
 /**
  * This class runs a server for a
  * blackjack card game and chat client.
@@ -58,6 +60,10 @@ public class CardGameServer {
      * @throws IOException
      */
     public static synchronized void sendMessage(MessageObject msg) throws IOException {
+        if (socketlist.size() == 0){
+            throw new IOException(NO_CLIENTS);
+        }
+
         Gson gson = new Gson();
         DataOutputStream outputStream;
         for (Socket client :  CardGameServer.socketlist) {

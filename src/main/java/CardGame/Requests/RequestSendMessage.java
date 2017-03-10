@@ -19,6 +19,11 @@ public class RequestSendMessage extends RequestProtocol {
         this.messageObject = new MessageObject(userName, message);
     }
 
+    public RequestSendMessage(MessageObject messageObject){
+        super(ProtocolTypes.SEND_MESSAGE);
+        this.messageObject = messageObject;
+    }
+
     public MessageObject getMessageObject() {
         return messageObject;
     }

@@ -127,8 +127,11 @@ public class ClientThread implements Runnable {
             CardGameServer.sendMessage(message);
             response = new ResponseSendMessage(protocolId, SUCCESS);
         } catch (IOException e) {
-            e.printStackTrace();
-            response = new ResponseSendMessage(protocolId, FAIL);
+            if (e.getMessage().equals(NO_CLIENTS)){
+                response = new ResponseSendMessage(protocolId, FAIL, NO_CLIENTS);
+            } else {
+                response = new ResponseSendMessage(protocolId, FAIL);
+            }
         } finally {
             return response;
         }

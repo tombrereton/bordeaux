@@ -3,9 +3,11 @@ package CardGame;
 import CardGame.Requests.RequestLoginUser;
 import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestRegisterUser;
+import CardGame.Requests.RequestSendMessage;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.ResponseSendMessage;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
@@ -297,4 +299,38 @@ public class CardGameServerTest {
         assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
+/**
+     * We test for empty username and password
+     */
+    @Test
+    public void sendMessage01_test() {
+        int expected = 0; // 0 equals fail
+
+        // Create message object and request
+        User user = new User("Test user", "pword");
+        MessageObject messageObject = new MessageObject(user.getUserName(), "Hello this is a test.");
+        RequestProtocol request = new RequestSendMessage(messageObject);
+
+        // Convert to json
+        Gson gson = new Gson();
+        String userJson = gson.toJson(request);
+
+        // Create clientThread object and handle the json object
+        ClientThread clientThread = new ClientThread(null);
+        ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
+
+        // We check the type is login user
+        int type = responseProtocol.getType();
+        assertEquals("Type should match send message", ProtocolTypes.SEND_MESSAGE, type);
+
+        // We check we got a failed response back
+        ResponseSendMessage responseSendMessage = (ResponseSendMessage) responseProtocol;
+        int actual = responseSendMessage.getRequestSuccess();
+        assertEquals("Should return a failed response, matching expected ", expected, actual);
+
+        // We check the protocolId is the same.
+        int expectedID = request.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+    }
 }
