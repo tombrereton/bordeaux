@@ -14,5 +14,11 @@ public class ProtocolTypes {
     public static final int CLIENT_ID = 4;
     public static final int CREATE_GAME = 5;
     public static final int PUSH_GAME_NAMES = 50;
+    public static final int PUSH_PLAYER_HANDS = 51;
+    public static final int PUSH_PLAYER_NAMES = 52;
+    public static final int PUSH_PLAYER_BETS = 53;
+    public static final int PUSH_PLAYER_BUDGETS = 54;
+    public static final int PUSH_DEALER_HAND = 55;
+    public static final int PUSH_PLAYERS_FINISHED = 56;
     public static final int UNKNOWN_TYPE = 99;
 }
