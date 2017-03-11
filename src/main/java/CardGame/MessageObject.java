@@ -32,11 +32,7 @@ public class MessageObject {
 
     @Override
     public String toString() {
-        DateFormat df = new SimpleDateFormat("HH:mm:ss");
-        return "MessageObject{" +
-                "userName='" + userName + '\'' +
-                ", message='" + message + '\'' +
-                ", timeStamp=" + df.format(timeStamp) +
-                '}';
+        DateFormat df = new SimpleDateFormat("hh:mm:ss");
+        return "(" + df.format(timeStamp) + ")" + userName + ": " + message;
     }
 }
