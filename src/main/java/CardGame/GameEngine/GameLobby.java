@@ -19,6 +19,8 @@ public class GameLobby {
      */
     public GameLobby(User user){
         this.lobbyName = user.getUserName();
+        this.players = new ArrayList<>();
+        this.dealerHand = new BlackjackHand();
     }
 
     /**
@@ -80,9 +82,9 @@ public class GameLobby {
         return null;
     }
 
-    public synchronized void removePlayer(User user){
+    public synchronized boolean removePlayer(User user){
        // fill out
-        int removeID = 999;
+        int removeID = -1;
         int index =0;
         for(Player player: players){
             if(player.getUsername().equals(user.getUserName())){
@@ -90,7 +92,13 @@ public class GameLobby {
             }
             index++;
         }
-        players.remove(removeID);
+        if(removeID!=-1){
+            players.remove(removeID);
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
     public synchronized void updatePlayer(Player player){
