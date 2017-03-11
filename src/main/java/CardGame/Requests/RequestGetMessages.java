@@ -9,19 +9,19 @@ package CardGame.Requests;
  * Created by tom on 11/03/17.
  */
 public class RequestGetMessages extends RequestProtocol {
-    private long offset;
+    private int offset;
 
-    public RequestGetMessages(int protocolId, int type, long offset) {
+    public RequestGetMessages(int protocolId, int type, int offset) {
         super(protocolId, type);
         this.offset = offset;
     }
 
-    public RequestGetMessages(int type, long offset) {
+    public RequestGetMessages(int type, int offset) {
         super(type);
         this.offset = offset;
     }
 
-    public long getOffset() {
+    public int getOffset() {
         return offset;
     }
 

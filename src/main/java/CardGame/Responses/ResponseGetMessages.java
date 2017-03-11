@@ -7,15 +7,15 @@ import java.util.ArrayList;
 /**
  * Created by tom on 11/03/17.
  */
-public class ResponseGetMessage extends ResponseProtocol {
+public class ResponseGetMessages extends ResponseProtocol {
     private ArrayList<MessageObject> messages;
 
-    public ResponseGetMessage(int protocolId, int type, int requestSuccess, ArrayList<MessageObject> messages) {
+    public ResponseGetMessages(int protocolId, int type, int requestSuccess, ArrayList<MessageObject> messages) {
         super(protocolId, type, requestSuccess);
         this.messages = messages;
     }
 
-    public ResponseGetMessage(int protocolId, int type, int requestSuccess, String errorMsg, ArrayList<MessageObject> messages) {
+    public ResponseGetMessages(int protocolId, int type, int requestSuccess, String errorMsg, ArrayList<MessageObject> messages) {
         super(protocolId, type, requestSuccess, errorMsg);
         this.messages = messages;
     }
@@ -26,7 +26,7 @@ public class ResponseGetMessage extends ResponseProtocol {
 
     @Override
     public String toString() {
-        return "ResponseGetMessage{" +
+        return "ResponseGetMessages{" +
                 "messages=" + messages +
                 "} " + super.toString();
     }

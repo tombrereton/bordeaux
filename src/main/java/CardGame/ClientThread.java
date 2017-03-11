@@ -1,13 +1,7 @@
 package CardGame;
 
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestProtocol;
-import CardGame.Requests.RequestRegisterUser;
-import CardGame.Requests.RequestSendMessage;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseProtocol;
-import CardGame.Responses.ResponseRegisterUser;
-import CardGame.Responses.ResponseSendMessage;
+import CardGame.Requests.*;
+import CardGame.Responses.*;
 import com.google.gson.Gson;
 
 import java.io.DataInputStream;
@@ -16,6 +10,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -32,10 +27,11 @@ public class ClientThread implements Runnable {
     private Socket toClientSocket;
     private boolean clientAlive;
     private long clientID;
-    private FunctionDB functionDB;
     protected User user;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
+    private FunctionDB functionDB;
+    private Gson gson;
 
     // Shared data structures
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
@@ -44,16 +40,15 @@ public class ClientThread implements Runnable {
 
 
     public ClientThread(Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
-                        ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users) {
+                        ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users,
+                        FunctionDB functionsDB) {
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
         this.messageQueue = messageQueue;
         this.socketList = socketList;
         this.users = users;
-
-        // We connect to the database and create functionsDB object
-        // TODO, move this to Server and make methods static
-        this.functionDB = new FunctionDB();
+        this.functionDB = functionsDB;
+        this.gson = new Gson();
     }
 
     /**
@@ -76,30 +71,36 @@ public class ClientThread implements Runnable {
                     ResponseProtocol response = handleInput(jsonInString);
                     System.out.println(response);
 
-                    Gson gson = new Gson();
-
-                    String jsonOutString = gson.toJson(response);
+                    String jsonOutString = this.gson.toJson(response);
 
                     outputStream.writeUTF(jsonOutString);
                     outputStream.flush();
-
                 }
             }
 
-            inputStream.close();
-            outputStream.close();
         } catch (EOFException e) {
             System.out.println("Client likely disconnected.: " + e.toString());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                this.toClientSocket.close();
+                closeConnections();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+    }
+
+    /**
+     * This method closes all open connections.
+     *
+     * @throws IOException
+     */
+    public void closeConnections() throws IOException {
+        this.inputStream.close();
+        this.outputStream.close();
+        this.toClientSocket.close();
     }
 
     /**
@@ -112,38 +113,84 @@ public class ClientThread implements Runnable {
     public ResponseProtocol handleInput(String JSONInput) {
 
         // Deserialise request object
-        Gson gson = new Gson();
-        RequestProtocol request = gson.fromJson(JSONInput, RequestProtocol.class);
+        RequestProtocol request = this.gson.fromJson(JSONInput, RequestProtocol.class);
 
         // Get packet ID and its type
         int protocolId = request.getProtocolId();
         int requestType = request.getType();
 
-        // Declare a response variable
-        ResponseProtocol response = null;
-
-        // We handle the request accordingly
-        if (requestType == REGISTER_USER) {
-            return handleRegisterUser(JSONInput, gson, protocolId, response);
-
-        } else if (requestType == LOGIN_USER) {
-            return handleLoginUser(JSONInput, gson, protocolId, response);
-
-        } else if (requestType == SEND_MESSAGE) {
-            return handleSendMessage(JSONInput, gson, protocolId, response);
-        } else {
-            return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
+        switch (requestType) {
+            case REGISTER_USER:
+                return handleRegisterUser(JSONInput, protocolId);
+            case LOGIN_USER:
+                return handleLoginUser(JSONInput, protocolId);
+            case SEND_MESSAGE:
+                return handleSendMessage(JSONInput, protocolId);
+            case GET_MESSAGE:
+                return handleGetMessages(JSONInput, protocolId);
+            default:
+                return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
 
-    private ResponseProtocol handleSendMessage(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
-        RequestSendMessage requestSendMessage = gson.fromJson(JSONInput, RequestSendMessage.class);
+
+    /**
+     * We use a method to handle the get message requests. This
+     * method returns a responseGetMessages which contains all the messages
+     * as specified by the offset in the request.
+     *
+     * @param JSONInput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleGetMessages(String JSONInput, int protocolId) {
+
+        RequestGetMessages requestGetMessages = this.gson.fromJson(JSONInput, RequestGetMessages.class);
+        ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
+
+        return new ResponseGetMessages(protocolId, GET_MESSAGE, SUCCESS, messagesToClient);
+    }
+
+    /**
+     * We use a method to get the messages from the message queue. This method
+     * return an arraylist of the messages as specified by the offset in the request.
+     *
+     * @param requestGetMessages
+     * @return
+     */
+    private ArrayList<MessageObject> getMessages(RequestGetMessages requestGetMessages) {
+
+        int offset = requestGetMessages.getOffset();
+
+        ArrayList<MessageObject> messageArrayList = new ArrayList<>(messageQueue);
+        ArrayList<MessageObject> messagesToClient = new ArrayList<>();
+
+        for (int i = offset + 1; i < messageArrayList.size(); i++) {
+            messagesToClient.add(messageArrayList.get(i));
+        }
+
+        return messagesToClient;
+    }
+
+    /**
+     * We use a method to handle the send message requests. This method
+     * adds the message the message queue and returns a response depending on
+     * if it was successfully added.
+     *
+     * @param JSONInput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleSendMessage(String JSONInput, int protocolId) {
+        ResponseProtocol response = null;
+
+        RequestSendMessage requestSendMessage = this.gson.fromJson(JSONInput, RequestSendMessage.class);
         MessageObject message = requestSendMessage.getMessageObject();
         try {
             addToMessageQueue(message);
             response = new ResponseSendMessage(protocolId, SUCCESS);
         } catch (IOException e) {
-            if (e.getMessage().equals(NO_CLIENTS)){
+            if (e.getMessage().equals(NO_CLIENTS)) {
                 response = new ResponseSendMessage(protocolId, FAIL, NO_CLIENTS);
             } else {
                 response = new ResponseSendMessage(protocolId, FAIL);
@@ -159,22 +206,23 @@ public class ClientThread implements Runnable {
      * otherwise, we return a failed response.
      *
      * @param JSONInput
-     * @param gson
      * @param protocolId
-     * @param response
      * @return
      */
-    private ResponseProtocol handleLoginUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
+    private ResponseProtocol handleLoginUser(String JSONInput, int protocolId) {
+        ResponseProtocol response = null;
+
         // We deserialise it again but as a RequestRegisterUser object
-        RequestLoginUser requestLoginUser = gson.fromJson(JSONInput, RequestLoginUser.class);
+        RequestLoginUser requestLoginUser = this.gson.fromJson(JSONInput, RequestLoginUser.class);
+
+        // We add the user to the current thread and the list of current users
         this.user = requestLoginUser.getUser();
-        
         addUsertoUsers(this.user);
 
         // retrieve user from database and check passwords match
         try {
             // retrieve user
-            User existingUser = functionDB.retrieveUserFromDatabase(this.user.getUserName());
+            User existingUser = this.functionDB.retrieveUserFromDatabase(this.user.getUserName());
 
             // check if passwords match
             if (existingUser.getPassword() == null || existingUser.getUserName() == null) {
@@ -197,15 +245,14 @@ public class ClientThread implements Runnable {
      * insert a users details into the database.
      *
      * @param JSONInput
-     * @param gson
      * @param protocolId
-     * @param response
      * @return
      */
-    private ResponseProtocol handleRegisterUser(String JSONInput, Gson gson, int protocolId, ResponseProtocol response) {
+    private ResponseProtocol handleRegisterUser(String JSONInput, int protocolId) {
+        ResponseProtocol response = null;
 
         // We deserialise it again but as a RequestRegisterUser object
-        RequestRegisterUser requestRegisterUser = gson.fromJson(JSONInput, RequestRegisterUser.class);
+        RequestRegisterUser requestRegisterUser = this.gson.fromJson(JSONInput, RequestRegisterUser.class);
         this.user = requestRegisterUser.getUser();
 
         // Try to insert into database
@@ -213,7 +260,7 @@ public class ClientThread implements Runnable {
             if (this.user.getUserName() == null || this.user.isUserEmpty()) {
                 response = new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
             } else {
-                boolean success = functionDB.insertUserIntoDatabase(this.user);
+                boolean success = this.functionDB.insertUserIntoDatabase(this.user);
                 response = new ResponseRegisterUser(protocolId, SUCCESS);
             }
         } catch (SQLException e) {
@@ -229,30 +276,14 @@ public class ClientThread implements Runnable {
     }
 
 
-
     /**
-     * Send messages to all clients
+     * Add a message to the message queue.
+     *
      * @param
      * @throws IOException
      */
     public void addToMessageQueue(MessageObject msg) throws IOException {
         this.messageQueue.add(msg);
-
-
-//        if (this.socketList.size() == 0){
-//            throw new IOException(NO_CLIENTS);
-//        }
-//
-//        Gson gson = new Gson();
-//        DataOutputStream outputStream;
-//        for (Socket client :  this.socketList) {
-//            if(!client.isClosed()){
-//                outputStream = new DataOutputStream(client.getOutputStream());
-//                String jsonOutString = gson.toJson(msg);
-//                outputStream.writeUTF(jsonOutString);
-//                outputStream.flush();
-//            }
-//        }
     }
 
 
@@ -260,19 +291,19 @@ public class ClientThread implements Runnable {
         this.users.add(user);
     }
 
-    public synchronized void removeUser(User user){
+    public synchronized void removeUser(User user) {
         this.users.remove(user);
     }
 
-    public synchronized int getSizeOfUsers(){
+    public synchronized int getSizeOfUsers() {
         return users.size();
     }
 
-    public synchronized User getUser(int i){
+    public synchronized User getUser(int i) {
         return users.get(i);
     }
 
-    public synchronized User getUser(User user){
+    public synchronized User getUser(User user) {
         int index = users.indexOf(user);
         return users.get(index);
 

@@ -14,6 +14,7 @@ public class ProtocolMessages {
     public static final String UNKNOWN_ERROR = "failed to recognise protocol; unknown handle error.";
     public static final String DUPE_USERNAME = "duplicate username in database.";
     public static final String NON_EXIST = "does not exist.";
+    public static final String PASSWORD_MISMATCH = "username or password does not match.";
     public static final String EMPTY_INSERT = "cannot insert empty object into database.";
     public static final String NO_CLIENTS = "no clients connected.";
     public static final int SUCCESS = 1;
