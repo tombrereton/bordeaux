@@ -24,6 +24,7 @@ public class Card {
     //    SPADES, HEARTS, DIAMONDS, CLUBS.
 
     private final int value;  // The value of this card, from 1 to 11.
+    private boolean isFaceUp;
 
     public Card(int theValue, int theSuit) {
         // Construct a card with the specified value and suit.
@@ -32,6 +33,7 @@ public class Card {
         // the constructed card object will be invalid.
         this.value = theValue;
         this.suit = theSuit;
+        this.isFaceUp = true;
     }
 
     public boolean validateValue(int value){
@@ -111,5 +113,11 @@ public class Card {
         return getValueAsString() + " of " + getSuitAsString();
     }
 
+    public void setFaceUp(boolean faceUp) {
+        isFaceUp = faceUp;
+    }
 
+    public boolean isFaceUp() {
+        return isFaceUp;
+    }
 } // end class Card
