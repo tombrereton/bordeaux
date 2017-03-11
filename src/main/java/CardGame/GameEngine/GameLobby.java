@@ -177,12 +177,11 @@ public class GameLobby {
         return false;
     }
 
-    public synchronized boolean stand(User user){
+    public synchronized void stand(User user){
         // does nothing
         // sets player to finished round
         Player player = getPlayer(user);
         player.setFinishedRound(true);
-        return true;
     }
 
     public synchronized boolean doubleBet(User user){
@@ -190,7 +189,7 @@ public class GameLobby {
         // sets player to finished round
         Player player = getPlayer(user);
         player.setBet(player.getBet()*2);
-        return true;
+        return hit(user);
     }
 
 
