@@ -35,6 +35,7 @@ public class ClientThread implements Runnable {
     private Gson gson;
     private ArrayList<String> gameNames;
     private CardGameServer server;
+    private String gameJoined;
 
     // Shared data structures
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
@@ -148,12 +149,13 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleCreateGame(int protocolId) {
-        GameLobby newGame = new GameLobby(this.getLoggedInUser());
+        GameLobby newGame = new GameLobby(this.getLoggedInUser(), this.toClientSocket);
 
         this.getGames().add(newGame);
         this.gameNames.add(newGame.getLobbyName());
 
         String gameName = this.gameNames.get(this.gameNames.size()-1);
+        this.gameJoined = gameName;
 
         this.server.updateGameNames();
         this.server.pushGameListToClient();
@@ -247,10 +249,6 @@ public class ClientThread implements Runnable {
         // We deserialise it again but as a RequestRegisterUser object
         RequestLoginUser requestLoginUser = this.gson.fromJson(JSONInput, RequestLoginUser.class);
 
-        // We add the user to the current thread and the list of current users
-        this.user = requestLoginUser.getUser();
-        addUsertoUsers(this.user);
-
         // retrieve user from database and check passwords match
         try {
             // retrieve user
@@ -261,6 +259,10 @@ public class ClientThread implements Runnable {
                 response = new ResponseLoginUser(protocolId, FAIL, null, NON_EXIST);
             } else if (existingUser.getPassword().equals(this.user.getPassword())) {
                 response = new ResponseLoginUser(protocolId, SUCCESS, existingUser);
+
+                // We add the user to the current thread and the list of current users
+                this.user = requestLoginUser.getUser();
+                addUsertoUsers(this.user);
             } else {
                 response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
             }
@@ -306,6 +308,8 @@ public class ClientThread implements Runnable {
             return response;
         }
     }
+
+
 
 
     /**
