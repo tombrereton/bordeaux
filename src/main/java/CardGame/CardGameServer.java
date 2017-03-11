@@ -18,6 +18,7 @@ public class CardGameServer {
     private final int port = 7654;
     private ServerSocket serverSocket;
     private final int numberOfThreads = 10;
+    protected FunctionDB functionDB;
 
     // Shared data structures
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
@@ -26,10 +27,13 @@ public class CardGameServer {
 
 
     public CardGameServer() {
-        connectToClients();
     }
 
-    public void connectToClients(){
+    public void connectToDatabase() {
+        this.functionDB = new FunctionDB();
+    }
+
+    public void connectToClients() {
         ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
 
         try {
@@ -43,7 +47,8 @@ public class CardGameServer {
                 System.out.println("Accepted connection form client");
 
 
-                threadPool.execute(new ClientThread(socket, messageQueue, socketList, users));
+                threadPool.execute(new ClientThread(socket, this.messageQueue,
+                        this.socketList, this.users, this.functionDB));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,10 +56,10 @@ public class CardGameServer {
     }
 
 
-
     public static void main(String[] args) throws IOException {
 
         CardGameServer server = new CardGameServer();
-
+        server.connectToDatabase();
+        server.connectToClients();
     }
 }
