@@ -13,7 +13,6 @@ public class RequestLoginUser extends RequestProtocol {
         this.user = user;
     }
 
-
     public RequestLoginUser(User user) {
         super(ProtocolTypes.LOGIN_USER); // type 1 is for login
         this.user = user;

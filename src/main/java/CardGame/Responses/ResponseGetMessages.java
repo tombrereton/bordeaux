@@ -15,7 +15,7 @@ public class ResponseGetMessages extends ResponseProtocol {
         this.messages = messages;
     }
 
-    public ResponseGetMessages(int protocolId, int type, int requestSuccess, String errorMsg, ArrayList<MessageObject> messages) {
+    public ResponseGetMessages(int protocolId, int type, int requestSuccess, ArrayList<MessageObject> messages, String errorMsg) {
         super(protocolId, type, requestSuccess, errorMsg);
         this.messages = messages;
     }
