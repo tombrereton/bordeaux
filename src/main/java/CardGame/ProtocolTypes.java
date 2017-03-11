@@ -13,5 +13,6 @@ public class ProtocolTypes {
     public static final int GET_MESSAGE = 3;
     public static final int CLIENT_ID = 4;
     public static final int CREATE_GAME = 5;
+    public static final int PUSH_GAME_NAMES = 50;
     public static final int UNKNOWN_TYPE = 99;
 }

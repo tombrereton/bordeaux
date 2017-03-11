@@ -28,11 +28,7 @@ public class GameLobby {
      * @return true if bust, false if not
      */
     public synchronized boolean isDealerBust(){
-        if(dealerHand.getBlackjackValue()>21){
-            return false;
-        }else{
-            return true;
-        }
+        return dealerHand.getBlackjackValue() <= 21;
 
     }
 
@@ -45,11 +41,7 @@ public class GameLobby {
     public synchronized boolean compareHandWithDealer(Player player){
         int playerValue = player.getPlayerHand().getBlackjackValue();
         if(playerValue >0 && playerValue <=21){
-            if(playerValue > dealerHand.getBlackjackValue()){
-                return true;
-            }else{
-                return false;
-            }
+            return playerValue > dealerHand.getBlackjackValue();
         }
         return false;
     }
@@ -171,10 +163,7 @@ public class GameLobby {
         Card newCard = new Deck().dealCard();
         player.getPlayerHand().addCard(newCard);
         player.setFinishedRound(true);
-        if(player.getPlayerHand().getBlackjackValue()<=21){
-            return true;
-        }
-        return false;
+        return player.getPlayerHand().getBlackjackValue() <= 21;
     }
 
     public synchronized boolean stand(User user){
@@ -193,5 +182,20 @@ public class GameLobby {
         return true;
     }
 
+    public String getLobbyName() {
+        return lobbyName;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        GameLobby gameLobby = (GameLobby) o;
+
+        return this.getLobbyName().equals(gameLobby.getLobbyName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getLobbyName() != null ? getLobbyName().hashCode() : 0;
+    }
 }

@@ -33,6 +33,8 @@ public class ClientThread implements Runnable {
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
     private Gson gson;
+    private ArrayList<String> gameNames;
+    private CardGameServer server;
 
     // Shared data structures
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
@@ -41,9 +43,10 @@ public class ClientThread implements Runnable {
     private volatile CopyOnWriteArrayList<GameLobby> games;
 
 
-    public ClientThread(Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
+    public ClientThread(CardGameServer server, Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
                         ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users,
                         FunctionDB functionsDB, CopyOnWriteArrayList<GameLobby> games) {
+        this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
         this.messageQueue = messageQueue;
@@ -52,6 +55,7 @@ public class ClientThread implements Runnable {
         this.functionDB = functionsDB;
         this.games = games;
         this.gson = new Gson();
+        this.gameNames = new ArrayList<>();
     }
 
     /**
@@ -67,7 +71,6 @@ public class ClientThread implements Runnable {
             this.clientAlive = true;
 
             while (clientAlive) {
-
                 String jsonInString = inputStream.readUTF();
 
                 if (!jsonInString.isEmpty()) {
@@ -132,7 +135,7 @@ public class ClientThread implements Runnable {
             case GET_MESSAGE:
                 return handleGetMessages(JSONInput, protocolId);
             case CREATE_GAME:
-                return handleCreateGame(JSONInput, protocolId);
+                return handleCreateGame(protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
@@ -141,12 +144,25 @@ public class ClientThread implements Runnable {
     /**
      * We use a method to create a new game of blackjack and add it to the games list.
      * This method returns a response containing a list of the current games.
-     * @param jsonInput
      * @param protocolId
      * @return
      */
-    private ResponseProtocol handleCreateGame(String jsonInput, int protocolId) {
-        return null;
+    private ResponseProtocol handleCreateGame(int protocolId) {
+        GameLobby newGame = new GameLobby(this.getLoggedInUser());
+
+        this.getGames().add(newGame);
+        this.gameNames.add(newGame.getLobbyName());
+
+        String gameName = this.gameNames.get(this.gameNames.size()-1);
+
+        this.server.updateGameNames();
+        this.server.pushGameListToClient();
+
+        if (this.getGame(this.getLoggedInUser()).equals(newGame)){
+            return new ResponseCreateGame(protocolId, CREATE_GAME, SUCCESS, gameName);
+        } else {
+            return new ResponseCreateGame(protocolId, CREATE_GAME, FAIL, null);
+        }
     }
 
 
@@ -242,11 +258,11 @@ public class ClientThread implements Runnable {
 
             // check if passwords match
             if (existingUser.getPassword() == null || existingUser.getUserName() == null) {
-                response = new ResponseLoginUser(protocolId, FAIL, NON_EXIST);
+                response = new ResponseLoginUser(protocolId, FAIL, null, NON_EXIST);
             } else if (existingUser.getPassword().equals(this.user.getPassword())) {
-                response = new ResponseLoginUser(protocolId, SUCCESS);
+                response = new ResponseLoginUser(protocolId, SUCCESS, existingUser);
             } else {
-                response = new ResponseLoginUser(protocolId, FAIL);
+                response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
             }
 
         } catch (SQLException e) {
@@ -307,7 +323,7 @@ public class ClientThread implements Runnable {
         this.users.add(user);
     }
 
-    public synchronized void removeUser(User user) {
+    public synchronized void removeUserFromUsers(User user) {
         this.users.remove(user);
     }
 
@@ -315,15 +331,47 @@ public class ClientThread implements Runnable {
         return users.size();
     }
 
-    public synchronized User getUser(int i) {
+    public synchronized User getUserFromUsers(int i) {
         return users.get(i);
     }
 
-    public synchronized User getUser(User user) {
+    public synchronized User getUserFromUsers(User user) {
         int index = users.indexOf(user);
         return users.get(index);
 
     }
 
+    public User getLoggedInUser() {
+        return user;
+    }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setLoggedInUser(User user) {
+        this.user = user;
+    }
+
+    public ConcurrentLinkedDeque<Socket> getSocketList() {
+        return socketList;
+    }
+
+    public CopyOnWriteArrayList<User> getUsers() {
+        return users;
+    }
+
+    public CopyOnWriteArrayList<GameLobby> getGames() {
+        return games;
+    }
+
+    public GameLobby getGame(User user){
+        for (GameLobby game : games){
+            if (game.getLobbyName().equals(user.getUserName())){
+                return game;
+            }
+        }
+
+        return null;
+    }
 }

@@ -16,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolTypes.CREATE_GAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * This class tests the CardGameServer.
@@ -33,12 +34,14 @@ public class CardGameServerTest {
     FunctionDB functionDB;
     ClientThread clientThread;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
+    User userTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
     Gson gson = new Gson();
 
     @Before
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
-        clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
+        server = new CardGameServer();
+        clientThread = new ClientThread(server,null, new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games);
     }
 
@@ -201,6 +204,9 @@ public class CardGameServerTest {
         int actualID = responseProtocol.getProtocolId();
         assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
 
+        // We check the user from the database is the same
+        User fromDB = responseLoginUser.getUser();
+        assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
     }
 
     /**
@@ -302,7 +308,7 @@ public class CardGameServerTest {
         assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
     }
 
-/**
+    /**
      * We test for empty username and password
      */
     @Test
@@ -340,10 +346,59 @@ public class CardGameServerTest {
     public void CreateGameRequest01_test() {
         int expected = 1;
 
-        RequestProtocol requestProtocol = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
 
+        // LOGIN
 
+        // Convert to json
+        String userJson = gson.toJson(requestLoginUser);
 
+        // handle the json object
+        ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
+        // We check the type is login user
+        int type = responseProtocol.getType();
+        assertEquals("Type should match login user", ProtocolTypes.LOGIN_USER, type);
+
+        // We check the passwords match as per the response
+        ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
+        int actual = responseLoginUser.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actual);
+
+        // We check the log in protocolId is the same.
+        int expectedID = requestLoginUser.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
+        // We check the user from the database is the same
+        User fromDB = responseLoginUser.getUser();
+        assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
+
+        User loggedInUser = this.clientThread.getLoggedInUser();
+
+        //CREATE GAME
+        String createGameJson = gson.toJson(requestCreateGame);
+
+        // Calling handle input will create game and add it to gameLobby list
+        ResponseProtocol responseCreateGame = this.clientThread.handleInput(createGameJson);
+
+        // We check the type is create game
+        int typeCreateGame = responseCreateGame.getType();
+        assertEquals("Type should match login user", ProtocolTypes.CREATE_GAME, typeCreateGame);
+
+        // We check we got a successful response
+        int actualCreateGame = responseCreateGame.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actualCreateGame);
+
+        // We check the protocolId is the same.
+        int expectedIDCreateGame = requestCreateGame.getProtocolId();
+        int actualIDCreateGame = responseCreateGame.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ",
+                expectedIDCreateGame, actualIDCreateGame);
+
+        // We check we created the correct game
+        GameLobby game = this.clientThread.getGame(this.userTest);
+        assertNotNull(game);
     }
 }
