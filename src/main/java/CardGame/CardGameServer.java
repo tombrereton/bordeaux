@@ -1,5 +1,7 @@
 package CardGame;
 
+import CardGame.GameEngine.GameLobby;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,6 +26,7 @@ public class CardGameServer {
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
+    private volatile CopyOnWriteArrayList<GameLobby> games;
 
 
     public CardGameServer() {
@@ -48,7 +51,7 @@ public class CardGameServer {
 
 
                 threadPool.execute(new ClientThread(socket, this.messageQueue,
-                        this.socketList, this.users, this.functionDB));
+                        this.socketList, this.users, this.functionDB, this.games));
             }
         } catch (IOException e) {
             e.printStackTrace();

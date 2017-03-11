@@ -1,9 +1,7 @@
 package CardGame;
 
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestProtocol;
-import CardGame.Requests.RequestRegisterUser;
-import CardGame.Requests.RequestSendMessage;
+import CardGame.GameEngine.GameLobby;
+import CardGame.Requests.*;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
@@ -16,6 +14,7 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static CardGame.ProtocolTypes.CREATE_GAME;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -32,10 +31,15 @@ public class CardGameServerTest {
 
     CardGameServer server;
     FunctionDB functionDB;
+    ClientThread clientThread;
+    CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
+    Gson gson = new Gson();
 
     @Before
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
+        clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
+                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games);
     }
 
     // TESTS
@@ -62,8 +66,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is register user
@@ -104,8 +106,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is register user
@@ -146,8 +146,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is register user
@@ -187,8 +185,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clientThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is login user
@@ -223,8 +219,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clientThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is login user
@@ -258,8 +252,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clientThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is login user
@@ -293,8 +285,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clientThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is login user
@@ -329,8 +319,6 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clientThread object and handle the json object
-        ClientThread clientThread = new ClientThread(null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB);
         ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
 
         // We check the type is login user
@@ -346,5 +334,16 @@ public class CardGameServerTest {
         int expectedID = request.getProtocolId();
         int actualID = responseProtocol.getProtocolId();
         assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+    }
+
+    @Test
+    public void CreateGameRequest01_test() {
+        int expected = 1;
+
+        RequestProtocol requestProtocol = new RequestCreateGame(CREATE_GAME);
+
+
+
+
     }
 }

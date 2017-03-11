@@ -1,5 +1,6 @@
 package CardGame;
 
+import CardGame.GameEngine.GameLobby;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -37,17 +38,19 @@ public class ClientThread implements Runnable {
     private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
+    private volatile CopyOnWriteArrayList<GameLobby> games;
 
 
     public ClientThread(Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
                         ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users,
-                        FunctionDB functionsDB) {
+                        FunctionDB functionsDB, CopyOnWriteArrayList<GameLobby> games) {
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
         this.messageQueue = messageQueue;
         this.socketList = socketList;
         this.users = users;
         this.functionDB = functionsDB;
+        this.games = games;
         this.gson = new Gson();
     }
 
@@ -128,9 +131,22 @@ public class ClientThread implements Runnable {
                 return handleSendMessage(JSONInput, protocolId);
             case GET_MESSAGE:
                 return handleGetMessages(JSONInput, protocolId);
+            case CREATE_GAME:
+                return handleCreateGame(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * We use a method to create a new game of blackjack and add it to the games list.
+     * This method returns a response containing a list of the current games.
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleCreateGame(String jsonInput, int protocolId) {
+        return null;
     }
 
 
