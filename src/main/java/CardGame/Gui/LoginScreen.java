@@ -5,6 +5,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Login Screen
+ * @author Alex
+ *
+ */
 public class LoginScreen extends JPanel {
 
 	/**
@@ -13,11 +18,11 @@ public class LoginScreen extends JPanel {
 	private JTextField usernameField;
 	private JPasswordField passwordField;
 
+
 	/**
 	 * Create the application.
 	 */
 	public LoginScreen() {
-		setBackground(new Color(46, 139, 87));
 		initialize();
 	}
 
@@ -26,27 +31,28 @@ public class LoginScreen extends JPanel {
 	 */
 	private void initialize() {
 		
+		setSize(1024,576);
 		setLayout(null);
 		
 		JLabel lblUsername = new JLabel("Username");
 		lblUsername.setForeground(new Color(255, 255, 255));
-		lblUsername.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblUsername.setBounds(106, 89, 73, 14);
+		lblUsername.setFont(new Font("Soho Std", Font.PLAIN, 18));
+		lblUsername.setBounds(345, 226, 127, 31);
 		add(lblUsername);
 		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setForeground(new Color(255, 255, 255));
-		lblPassword.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblPassword.setBounds(106, 129, 73, 14);
+		lblPassword.setFont(new Font("Soho Std", Font.PLAIN, 18));
+		lblPassword.setBounds(345, 283, 101, 17);
 		add(lblPassword);
 		
 		usernameField = new JTextField();
-		usernameField.setBounds(200, 86, 154, 20);
+		usernameField.setBounds(526, 233, 140, 20);
 		add(usernameField);
 		usernameField.setColumns(10);
 		
 		passwordField = new JPasswordField();
-		passwordField.setBounds(200, 126, 154, 20);
+		passwordField.setBounds(526, 283, 140, 20);
 		add(passwordField);
 		
 		
@@ -54,38 +60,40 @@ public class LoginScreen extends JPanel {
 		 * button events for the login button
 		 */
 		JButton btnLogin = new JButton("Login");
-		btnLogin.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnLogin.setBackground(new Color(255, 255, 255));
+		btnLogin.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen,ScreenFactory.frame.HomeScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
 			}
 		});
 		
-		btnLogin.setBounds(200, 171, 154, 23);
+		btnLogin.setBounds(526, 332, 140, 30);
 		add(btnLogin);
 		
 		/**
 		 * button events for create account button
 		 */
 		JButton btnCreateAccount = new JButton("Create Account");
-		btnCreateAccount.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnCreateAccount.setBackground(new Color(255, 255, 255));
+		btnCreateAccount.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnCreateAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen,ScreenFactory.frame.CreateAccountScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.CreateAccountScreen);
 			}
 		});
-		btnCreateAccount.setBounds(197, 214, 157, 23);
+		btnCreateAccount.setBounds(432, 418, 160, 30);
 		add(btnCreateAccount);
 		
 		
 		/**
-		 * formatting
+		 * Main Heading
 		 */
-		JLabel lblLogin = new JLabel("Login");
+		JLabel lblLogin = new JLabel("BlackJack Online");
 		lblLogin.setForeground(new Color(255, 255, 255));
-		lblLogin.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblLogin.setFont(new Font("Script MT Bold", Font.BOLD, 36));
 		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogin.setBounds(182, 34, 46, 29);
+		lblLogin.setBounds(314, 115, 396, 57);
 		add(lblLogin);
 	}
 		
