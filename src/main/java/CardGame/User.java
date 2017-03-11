@@ -94,4 +94,24 @@ public class User {
                 this.getFirstName().equals("") ||
                 this.getLastName().equals("");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        User user = (User) o;
+
+        return this.getUserName().equals(user.getUserName()) &&
+                this.getPassword().equals(user.getPassword()) &&
+                this.getFirstName().equals(user.getFirstName()) &&
+                this.getLastName().equals(user.getLastName());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUserName() != null ? getUserName().hashCode() : 0;
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + (getFirstName() != null ? getFirstName().hashCode() : 0);
+        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
+        result = 31 * result + (getDateRegistered() != null ? getDateRegistered().hashCode() : 0);
+        return result;
+    }
 }
