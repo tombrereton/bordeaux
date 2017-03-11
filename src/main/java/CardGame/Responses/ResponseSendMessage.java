@@ -12,6 +12,6 @@ public class ResponseSendMessage extends ResponseProtocol {
     }
 
     public ResponseSendMessage(int protocolId, int requestSuccess) {
-        super(protocolId,ProtocolTypes.SEND_MESSAGE, requestSuccess); // type is 2 for sendMessage
+        super(protocolId,ProtocolTypes.SEND_MESSAGE, requestSuccess); // type is 2 for addToMessageQueue
     }
 }

@@ -1,18 +1,23 @@
 package CardGame;
 
-import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestRegisterUser;
 import CardGame.Requests.RequestSendMessage;
-import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
 import CardGame.Responses.ResponseSendMessage;
 import com.google.gson.Gson;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
@@ -29,14 +34,25 @@ public class ClientThread implements Runnable {
     private long clientID;
     private FunctionDB functionDB;
     protected User user;
-    DataInputStream inputStream;
-    DataOutputStream outputStream;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
 
-    public ClientThread(Socket toClientSocket) {
+    // Shared data structures
+    private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
+    private volatile ConcurrentLinkedDeque<Socket> socketList;
+    private volatile CopyOnWriteArrayList<User> users;
+
+
+    public ClientThread(Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
+                        ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users) {
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
+        this.messageQueue = messageQueue;
+        this.socketList = socketList;
+        this.users = users;
 
         // We connect to the database and create functionsDB object
+        // TODO, move this to Server and make methods static
         this.functionDB = new FunctionDB();
     }
 
@@ -48,8 +64,8 @@ public class ClientThread implements Runnable {
 
         try {
 
-            DataInputStream inputStream = new DataInputStream(toClientSocket.getInputStream());
-            DataOutputStream outputStream = new DataOutputStream(toClientSocket.getOutputStream());
+            this.inputStream = new DataInputStream(toClientSocket.getInputStream());
+            this.outputStream = new DataOutputStream(toClientSocket.getOutputStream());
             this.clientAlive = true;
 
             while (clientAlive) {
@@ -124,7 +140,7 @@ public class ClientThread implements Runnable {
         RequestSendMessage requestSendMessage = gson.fromJson(JSONInput, RequestSendMessage.class);
         MessageObject message = requestSendMessage.getMessageObject();
         try {
-            CardGameServer.sendMessage(message);
+            addToMessageQueue(message);
             response = new ResponseSendMessage(protocolId, SUCCESS);
         } catch (IOException e) {
             if (e.getMessage().equals(NO_CLIENTS)){
@@ -153,7 +169,7 @@ public class ClientThread implements Runnable {
         RequestLoginUser requestLoginUser = gson.fromJson(JSONInput, RequestLoginUser.class);
         this.user = requestLoginUser.getUser();
         
-        CardGameServer.addUsertoUsers(this.user);
+        addUsertoUsers(this.user);
 
         // retrieve user from database and check passwords match
         try {
@@ -210,6 +226,56 @@ public class ClientThread implements Runnable {
         } finally {
             return response;
         }
+    }
+
+
+
+    /**
+     * Send messages to all clients
+     * @param
+     * @throws IOException
+     */
+    public void addToMessageQueue(MessageObject msg) throws IOException {
+        this.messageQueue.add(msg);
+
+
+//        if (this.socketList.size() == 0){
+//            throw new IOException(NO_CLIENTS);
+//        }
+//
+//        Gson gson = new Gson();
+//        DataOutputStream outputStream;
+//        for (Socket client :  this.socketList) {
+//            if(!client.isClosed()){
+//                outputStream = new DataOutputStream(client.getOutputStream());
+//                String jsonOutString = gson.toJson(msg);
+//                outputStream.writeUTF(jsonOutString);
+//                outputStream.flush();
+//            }
+//        }
+    }
+
+
+    public synchronized void addUsertoUsers(User user) {
+        this.users.add(user);
+    }
+
+    public synchronized void removeUser(User user){
+        this.users.remove(user);
+    }
+
+    public synchronized int getSizeOfUsers(){
+        return users.size();
+    }
+
+    public synchronized User getUser(int i){
+        return users.get(i);
+    }
+
+    public synchronized User getUser(User user){
+        int index = users.indexOf(user);
+        return users.get(index);
+
     }
 
 
