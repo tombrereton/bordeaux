@@ -1,5 +1,7 @@
 package CardGame.Requests;
 
+import static CardGame.ProtocolTypes.QUIT_GAME;
+
 /**
  * This class is a request to quit the current game the user is playing.
  * This means the user will leave the game lobby and unsubscribe from the pushes
@@ -9,11 +11,11 @@ package CardGame.Requests;
  */
 public class RequestQuitGame extends RequestProtocol {
 
-    public RequestQuitGame(int protocolId, int type) {
-        super(protocolId, type);
+    public RequestQuitGame(int protocolId) {
+        super(protocolId, QUIT_GAME);
     }
 
-    public RequestQuitGame(int type) {
-        super(type);
+    public RequestQuitGame() {
+        super(QUIT_GAME);
     }
 }

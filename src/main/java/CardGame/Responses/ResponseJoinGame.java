@@ -1,5 +1,7 @@
 package CardGame.Responses;
 
+import static CardGame.ProtocolTypes.JOIN_GAME;
+
 /**
  * This class is a response to the Join Game Request.
  *
@@ -11,11 +13,11 @@ package CardGame.Responses;
  */
 public class ResponseJoinGame extends ResponseProtocol {
 
-    public ResponseJoinGame(int protocolId, int type, int requestSuccess) {
-        super(protocolId, type, requestSuccess);
+    public ResponseJoinGame(int protocolId, int requestSuccess) {
+        super(protocolId, JOIN_GAME, requestSuccess);
     }
 
-    public ResponseJoinGame(int protocolId, int type, int requestSuccess, String errorMsg) {
-        super(protocolId, type, requestSuccess, errorMsg);
+    public ResponseJoinGame(int protocolId, int requestSuccess, String errorMsg) {
+        super(protocolId, JOIN_GAME, requestSuccess, errorMsg);
     }
 }

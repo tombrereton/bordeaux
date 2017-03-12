@@ -16,8 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.CREATE_GAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * This class tests the CardGameServer.
@@ -214,8 +213,7 @@ public class CardGameServerTest {
         assertEquals("Should return size of 1 ", 1, userSize);
 
         // We check correct user is added to users on thread
-//        List<User> usersOnThread = this.clientThread.getUsers();
-        User userOnThread = this.clientThread.getUserFromUsers(0);
+        User userOnThread = this.clientThread.getLoggedInUser();
         assertEquals("Should return user matching userTest ", this.userTest, userOnThread);
     }
 
@@ -254,6 +252,10 @@ public class CardGameServerTest {
         // We check we get password mismatch error
         String errorMsg = responseLoginUser.getErrorMsg();
         assertEquals("Should return password mismatch error ", PASSWORD_MISMATCH, errorMsg);
+
+        // We check no user was logged in
+        User userOnThread = this.clientThread.getLoggedInUser();
+        assertEquals("Should return user matching userTest ", null, userOnThread);
     }
 
     /**
@@ -416,6 +418,51 @@ public class CardGameServerTest {
         assertNotNull(game);
     }
 
+    /**
+     * We test creating a game when not logged in.
+     */
+    @Test
+    public void CreateGameRequest02_test() {
+        int expected = 0;
+
+        ClientThread clientThreadEmpty = new ClientThread(
+                new CardGameServer(),
+                null,
+                new ConcurrentLinkedDeque<MessageObject>(),
+                new ConcurrentLinkedDeque<Socket>(),
+                new CopyOnWriteArrayList<User>(),
+                new FunctionDB(),
+                new CopyOnWriteArrayList<GameLobby>());
+
+        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+
+        //CREATE GAME
+        String createGameJson = gson.toJson(requestCreateGame);
+
+        // Calling handle input will create game and add it to gameLobby list
+        ResponseProtocol responseCreateGame = clientThreadEmpty.handleInput(createGameJson);
+
+        // We check the type is create game
+        int typeCreateGame = responseCreateGame.getType();
+        assertEquals("Type should match login user", ProtocolTypes.CREATE_GAME, typeCreateGame);
+
+        // We check we got a successful response
+        int actualCreateGame = responseCreateGame.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actualCreateGame);
+
+        // We check the error message is user not logged in
+        String errorMsg = responseCreateGame.getErrorMsg();
+        assertEquals("Should return error message of not logged in matching errorMsg ", NOT_LOGGED_IN, errorMsg);
+        // We check the protocolId is the same.
+        int expectedIDCreateGame = requestCreateGame.getProtocolId();
+        int actualIDCreateGame = responseCreateGame.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ",
+                expectedIDCreateGame, actualIDCreateGame);
+
+        // We check we created the correct game
+        GameLobby game = this.clientThread.getGame(this.userTest);
+        assertNull(game);
+    }
     @Test
     public void joinGame01_test() {
 

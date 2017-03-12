@@ -1,6 +1,7 @@
 package CardGame.Requests;
-import CardGame.ProtocolTypes;
 import CardGame.User;
+
+import static CardGame.ProtocolTypes.REGISTER_USER;
 
 /**
  * Created by tom on 06/03/17.
@@ -10,12 +11,12 @@ public class RequestRegisterUser extends RequestProtocol {
 
 
     public RequestRegisterUser(int protocolId, User user) {
-        super(protocolId, ProtocolTypes.REGISTER_USER); // type 0 is register
+        super(protocolId, REGISTER_USER); // type 0 is register
         this.user = user;
     }
 
     public RequestRegisterUser(User user) {
-        super(ProtocolTypes.REGISTER_USER); // type 0 is register
+        super(REGISTER_USER); // type 0 is register
         this.user = user;
     }
 

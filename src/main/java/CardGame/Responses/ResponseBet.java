@@ -1,5 +1,7 @@
 package CardGame.Responses;
 
+import static CardGame.ProtocolTypes.BET;
+
 /**
  * This class is a response for a BET. It tells the client
  * of the success of the BET request.
@@ -8,11 +10,11 @@ package CardGame.Responses;
  */
 public class ResponseBet extends ResponseProtocol {
 
-    public ResponseBet(int protocolId, int type, int requestSuccess) {
-        super(protocolId, type, requestSuccess);
+    public ResponseBet(int protocolId, int requestSuccess) {
+        super(protocolId, BET, requestSuccess);
     }
 
-    public ResponseBet(int protocolId, int type, int requestSuccess, String errorMsg) {
-        super(protocolId, type, requestSuccess, errorMsg);
+    public ResponseBet(int protocolId, int requestSuccess, String errorMsg) {
+        super(protocolId, BET, requestSuccess, errorMsg);
     }
 }
