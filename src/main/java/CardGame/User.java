@@ -105,6 +105,11 @@ public class User {
                 this.getLastName().equals(user.getLastName());
     }
 
+    public boolean checkPassword(User user){
+        return this.getUserName().equals(user.getUserName()) &&
+                this.getPassword().equals(user.getPassword());
+    }
+
     @Override
     public int hashCode() {
         int result = getUserName() != null ? getUserName().hashCode() : 0;
