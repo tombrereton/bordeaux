@@ -5,6 +5,8 @@ import CardGame.ClientModel;
 import javax.swing.*;
 import java.awt.*;
 
+import static CardGame.Gui.ScreenTypes.HOMESCREEN;
+
 /**
  * Class that creates and controls the frame and the panels to be displayed
  *
@@ -24,7 +26,7 @@ public class ScreenFactory extends JFrame {
     public static JPanel backgroundPane;
     public static ScreenFactory frame = null;
     public LoginScreen LoginScreen;
-    public HomeScreen HomeScreen = new HomeScreen();
+    public HomeScreen HomeScreen;
     public CreateAccountScreen CreateAccountScreen;
     public SettingsScreen SettingsScreen = new SettingsScreen();
     public StatisticsScreen StatisticsScreen = new StatisticsScreen();
@@ -45,8 +47,13 @@ public class ScreenFactory extends JFrame {
      */
     public ScreenFactory(ClientModel clientModel) {
         this.clientModel = clientModel;
+
         this.CreateAccountScreen = new CreateAccountScreen(clientModel);
-        this.LoginScreen = new LoginScreen(clientModel);
+        this.LoginScreen = new LoginScreen(clientModel, this);
+
+        // this screen should be created at run time so it can access the
+        // logged in user after the user has logged in
+//        this.HomeScreen = new HomeScreen(clientModel);
 
         setTitle("CardGame");
         setResizable(true);
@@ -81,6 +88,17 @@ public class ScreenFactory extends JFrame {
 
         masterPane.add(centerPane);
         add(masterPane);
+    }
+
+    /**
+     * This method instantiates a screen at runtime.
+     *
+     * @param type
+     */
+    public void screenFactory(String type){
+        if (type.equals(HOMESCREEN)){
+            this.HomeScreen = new HomeScreen(this.clientModel);
+        }
     }
 
 

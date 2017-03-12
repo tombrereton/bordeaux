@@ -1,6 +1,7 @@
 package CardGame;
 
 import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
 
 import java.io.IOException;
@@ -33,17 +34,21 @@ public class ClientModel extends Observable {
 	 * @param username
 	 * @param password
 	 */
-	public void login(String username, String password){
-		User user = new User(username,password);
+	public ResponseProtocol login(String username, String password) {
+		User user = new User(username, password);
+		ResponseLoginUser responseLoginUser = null;
 		try {
-			ResponseLoginUser responseLoginUser = cardGameClient.sendRequestLoginUser(user);
-			if(responseLoginUser.getRequestSuccess() == SUCCESS){
+			responseLoginUser = cardGameClient.sendRequestLoginUser(user);
+			if (responseLoginUser.getRequestSuccess() == SUCCESS) {
 				setLoggedIn(true, responseLoginUser.getUser());
+
 			}
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			return responseLoginUser;
 		}
 	}
 	/**
