@@ -86,6 +86,18 @@ public class GameLobby {
         return null;
     }
 
+    public synchronized Player getPlayer(String username) {
+        // check
+        for (Player player : players) {
+            if (player.getUsername().equals(username)) {
+                return player;
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
     public synchronized boolean removePlayer(User user) {
         // fill out
         int removeID = -1;
@@ -102,7 +114,23 @@ public class GameLobby {
         } else {
             return false;
         }
+    }
 
+    public synchronized boolean removePlayer(String username){
+        int removeID = -1;
+        int index = 0;
+        for (Player player : players) {
+            if (player.getUsername().equals(username)) {
+                removeID = index;
+            }
+            index++;
+        }
+        if (removeID != -1) {
+            players.remove(removeID);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public synchronized void updatePlayer(Player player) {

@@ -49,9 +49,13 @@ public class ClientThread implements Runnable {
     private volatile CopyOnWriteArrayList<String> gameNames;
 
 
-    public ClientThread(CardGameServer server, Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
-                        ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users,
-                        FunctionDB functionsDB, CopyOnWriteArrayList<GameLobby> games,
+    public ClientThread(CardGameServer server,
+                        Socket toClientSocket,
+                        ConcurrentLinkedDeque<MessageObject> messageQueue,
+                        ConcurrentLinkedDeque<Socket> socketList,
+                        CopyOnWriteArrayList<User> users,
+                        FunctionDB functionsDB,
+                        CopyOnWriteArrayList<GameLobby> games,
                         CopyOnWriteArrayList<String> gameNames) {
         this.server = server;
         this.toClientSocket = toClientSocket;
@@ -91,8 +95,8 @@ public class ClientThread implements Runnable {
             e.printStackTrace();
         } finally {
             try {
-                closeConnections();
                 Thread.sleep(10);
+                closeConnections();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -150,15 +154,85 @@ public class ClientThread implements Runnable {
             case CREATE_GAME:
                 return handleCreateGame(protocolId);
             case JOIN_GAME:
-                return handleJoinGame(protocolId);
+                return handleJoinGame(JSONInput, protocolId);
+            case QUIT_GAME:
+                return handleQuitGame(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
 
-    private ResponseProtocol handleJoinGame(int protocolId) {
-        // return fail if no one logged in
-        return null;
+    /**
+     * This method quits the player from the games. This means
+     * the user is no longer subscribed to the game pushes, and sets
+     * gameJoined to null.
+     *
+     * @param JSONinput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleQuitGame(String JSONinput, int protocolId) {
+        RequestQuitGame requestQuitGame = this.gson.fromJson(JSONinput, RequestQuitGame.class);
+
+        String requestUsername = requestQuitGame.getUsername();
+        String gameToQuit = requestQuitGame.getGameToQuit();
+
+        if (this.getLoggedInUser() == null) {
+            // return fail if no one logged in
+            return new ResponseQuitGame(protocolId, FAIL, NOT_LOGGED_IN);
+
+        } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
+            // return fail if log in user does not match request user
+            return new ResponseQuitGame(protocolId, FAIL, USERNAME_MISMATCH);
+
+        } else if (this.getGames().size() == 0) {
+            // return fail if no games exist
+            return new ResponseQuitGame(protocolId, FAIL, NO_GAMES);
+
+        } else if (getGame(gameToQuit) == null) {
+            // return fail if game to join does not exist
+            return new ResponseQuitGame(protocolId, FAIL, NO_GAME);
+
+        } else {
+            quitGame(gameToQuit, requestUsername);
+            return new ResponseQuitGame(protocolId, SUCCESS);
+        }
+    }
+
+    private boolean quitGame(String gameToQuit, String requestUsername) {
+        getGame(gameToQuit).removePlayer(requestUsername);
+        this.gameJoined = null;
+
+        return getGame(gameToQuit).getPlayer(requestUsername) == null;
+    }
+
+    private ResponseProtocol handleJoinGame(String JSONinput, int protocolId) {
+        RequestJoinGame requestJoinGame = this.gson.fromJson(JSONinput, RequestJoinGame.class);
+
+        String requestUsername = requestJoinGame.getUsername();
+        String gameToJoin = requestJoinGame.getGameToJoin();
+
+        if (this.getLoggedInUser() == null) {
+            // return fail if no one logged in
+            return new ResponseJoinGame(protocolId, FAIL, NOT_LOGGED_IN);
+
+        } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
+            // return fail if log in user does not match request user
+            return new ResponseJoinGame(protocolId, FAIL, USERNAME_MISMATCH);
+
+        } else if (this.getGames().size() == 0) {
+            // return fail if no games exist
+            return new ResponseJoinGame(protocolId, FAIL, NO_GAMES);
+
+        } else if (getGame(gameToJoin) == null) {
+            // return fail if game to join does not exist
+            return new ResponseJoinGame(protocolId, FAIL, NO_GAME);
+
+        } else {
+            this.gameJoined = gameToJoin;
+            joinGame(gameToJoin);
+            return new ResponseJoinGame(protocolId, SUCCESS);
+        }
     }
 
     /**

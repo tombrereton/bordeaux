@@ -19,6 +19,9 @@ public class ProtocolMessages {
     public static final String NO_CLIENTS = "no clients connected.";
     public static final String NOT_LOGGED_IN = "user not logged in.";
     public static final String GAME_ALREADY_EXISTS = "game already exists.";
+    public static final String USERNAME_MISMATCH = "username does not match logged in user.";
+    public static final String NO_GAMES = "no games exist.";
+    public static final String NO_GAME = "game requested does not exist.";
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 
