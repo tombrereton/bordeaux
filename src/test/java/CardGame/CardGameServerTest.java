@@ -47,7 +47,7 @@ public class CardGameServerTest {
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
         server = new CardGameServer();
-        clientThread = new ClientThread(server, null, new ConcurrentLinkedDeque<MessageObject>(),
+        clientThread = new ClientThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games, gameNames);
     }
 
@@ -433,7 +433,7 @@ public class CardGameServerTest {
 
         ClientThread clientThreadEmpty = new ClientThread(
                 new CardGameServer(),
-                null,
+                new Socket(),
                 new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(),
                 new CopyOnWriteArrayList<User>(),
@@ -609,7 +609,7 @@ public class CardGameServerTest {
         assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
 
         // JOIN GAME
-        RequestJoinGame requestJoinGame = new RequestJoinGame();
+        RequestJoinGame requestJoinGame = new RequestJoinGame(userTest.getUserName(), userTestTwo.getUserName());
         ResponseProtocol responseJoin = this.clientThread.handleInput(encodeRequest(requestJoinGame));
 
         // we check for successful response
@@ -622,7 +622,7 @@ public class CardGameServerTest {
      */
     @Test
     public void bet01_test() {
-        RequestBet requestBet = new RequestBet(10);
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
 
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestBet));
 
@@ -636,7 +636,7 @@ public class CardGameServerTest {
      */
     @Test
     public void hit01_test() {
-        RequestHit requestHit = new RequestHit();
+        RequestHit requestHit = new RequestHit(userTest.getUserName());
 
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestHit));
 
@@ -650,7 +650,7 @@ public class CardGameServerTest {
      */
     @Test
     public void double01_test() {
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet();
+        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest.getUserName());
 
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestDoubleBet));
 

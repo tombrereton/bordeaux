@@ -21,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
 import static CardGame.Pushes.PushProtocol.encodePush;
+import static CardGame.Requests.RequestProtocol.decodeRequest;
 
 /**
  * This class implements the Runnable interface and
@@ -63,6 +64,8 @@ public class ClientThread implements Runnable {
         this.gameNames = gameNames;
         this.gson = new Gson();
         this.user = null;
+        this.clientAlive = true;
+        connectStreams();
     }
 
     /**
@@ -72,24 +75,14 @@ public class ClientThread implements Runnable {
     public void run() {
 
         try {
-
-            this.inputStream = new DataInputStream(toClientSocket.getInputStream());
-            this.outputStream = new DataOutputStream(toClientSocket.getOutputStream());
-            this.clientAlive = true;
-
             while (clientAlive) {
-                String jsonInString = inputStream.readUTF();
+                ResponseProtocol response = handleInput(inputStream.readUTF());
+                System.out.println(response);
 
-                if (!jsonInString.isEmpty()) {
+                String jsonOutString = this.gson.toJson(response);
 
-                    ResponseProtocol response = handleInput(jsonInString);
-                    System.out.println(response);
-
-                    String jsonOutString = this.gson.toJson(response);
-
-                    outputStream.writeUTF(jsonOutString);
-                    outputStream.flush();
-                }
+                outputStream.writeUTF(jsonOutString);
+                outputStream.flush();
             }
 
         } catch (EOFException e) {
@@ -107,6 +100,15 @@ public class ClientThread implements Runnable {
             }
         }
 
+    }
+
+    private void connectStreams() {
+        try {
+            this.inputStream = new DataInputStream(this.toClientSocket.getInputStream());
+            this.outputStream = new DataOutputStream(this.toClientSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("Cannot get input and output streams from client socket.");
+        }
     }
 
     /**
@@ -130,7 +132,7 @@ public class ClientThread implements Runnable {
     public ResponseProtocol handleInput(String JSONInput) {
 
         // Deserialise request object
-        RequestProtocol request = this.gson.fromJson(JSONInput, RequestProtocol.class);
+        RequestProtocol request = decodeRequest(JSONInput);
 
         // Get packet ID and its type
         int protocolId = request.getProtocolId();
@@ -147,9 +149,16 @@ public class ClientThread implements Runnable {
                 return handleGetMessages(JSONInput, protocolId);
             case CREATE_GAME:
                 return handleCreateGame(protocolId);
+            case JOIN_GAME:
+                return handleJoinGame(protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    private ResponseProtocol handleJoinGame(int protocolId) {
+        // return fail if no one logged in
+        return null;
     }
 
     /**
