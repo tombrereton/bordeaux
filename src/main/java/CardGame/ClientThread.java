@@ -99,7 +99,10 @@ public class ClientThread implements Runnable {
         } finally {
             try {
                 closeConnections();
+                Thread.sleep(10);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }

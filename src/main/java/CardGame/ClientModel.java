@@ -1,12 +1,12 @@
 package CardGame;
 
-import static CardGame.ProtocolMessages.SUCCESS;
+import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseRegisterUser;
 
 import java.io.IOException;
 import java.util.Observable;
 
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
+import static CardGame.ProtocolMessages.SUCCESS;
 /**
  * The observable class that contains all the information to be displayed on the client gui and methods for sending to server.
  * @author Lloyd
@@ -68,6 +68,9 @@ public class ClientModel extends Observable {
 		User user = new User(username,password,first,last);
 		try {
 			ResponseRegisterUser responseRegisterUser = cardGameClient.sendRequestRegisterUser(user);
+			if (responseRegisterUser.getRequestSuccess() == 1){
+				System.out.println("registration succesful");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
