@@ -15,6 +15,10 @@ public class PushGameNames extends PushProtocol {
         this.gameNames = gameNames;
     }
 
+    public ArrayList<String> getGameNames() {
+        return gameNames;
+    }
+
     @Override
     public String toString() {
         return "PushGameNames{" +

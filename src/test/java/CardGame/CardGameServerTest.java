@@ -1,6 +1,7 @@
 package CardGame;
 
 import CardGame.GameEngine.GameLobby;
+import CardGame.Pushes.PushGameNames;
 import CardGame.Requests.*;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseProtocol;
@@ -11,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,6 +36,7 @@ public class CardGameServerTest {
     FunctionDB functionDB;
     ClientThread clientThread;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
     User userTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
     Gson gson = new Gson();
 
@@ -42,7 +45,7 @@ public class CardGameServerTest {
         functionDB = new FunctionDB();
         server = new CardGameServer();
         clientThread = new ClientThread(server,null, new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games);
+                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games, gameNames);
     }
 
     // TESTS
@@ -432,7 +435,8 @@ public class CardGameServerTest {
                 new ConcurrentLinkedDeque<Socket>(),
                 new CopyOnWriteArrayList<User>(),
                 new FunctionDB(),
-                new CopyOnWriteArrayList<GameLobby>());
+                new CopyOnWriteArrayList<GameLobby>(),
+                new CopyOnWriteArrayList<String>());
 
         RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
 
@@ -463,8 +467,144 @@ public class CardGameServerTest {
         GameLobby game = this.clientThread.getGame(this.userTest);
         assertNull(game);
     }
+
+    @Test
+    public void CreateGameRequestPush03_test() {
+        int expected = 1;
+
+        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
+
+        // LOGIN
+
+        // Convert to json
+        String userJson = gson.toJson(requestLoginUser);
+
+        // handle the json object
+        ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
+
+        // We check the type is login user
+        int type = responseProtocol.getType();
+        assertEquals("Type should match login user", ProtocolTypes.LOGIN_USER, type);
+
+        // We check the passwords match as per the response
+        ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
+        int actual = responseLoginUser.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actual);
+
+        // We check the log in protocolId is the same.
+        int expectedID = requestLoginUser.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
+        // We check the user from the database is the same
+        User fromDB = responseLoginUser.getUser();
+        assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
+
+        User loggedInUser = this.clientThread.getLoggedInUser();
+
+        //CREATE GAME
+        String createGameJson = gson.toJson(requestCreateGame);
+
+        // Calling handle input will create game and add it to gameLobby list
+        ResponseProtocol responseCreateGame = this.clientThread.handleInput(createGameJson);
+
+        // We check the type is create game
+        int typeCreateGame = responseCreateGame.getType();
+        assertEquals("Type should match login user", ProtocolTypes.CREATE_GAME, typeCreateGame);
+
+        // We check we got a successful response
+        int actualCreateGame = responseCreateGame.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actualCreateGame);
+
+        // We check the protocolId is the same.
+        int expectedIDCreateGame = requestCreateGame.getProtocolId();
+        int actualIDCreateGame = responseCreateGame.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ",
+                expectedIDCreateGame, actualIDCreateGame);
+
+        // We check we created the correct game
+        GameLobby game = this.clientThread.getGame(this.userTest);
+        assertNotNull(game);
+
+        // We check the game list is pushed
+        PushGameNames push = this.clientThread.pushGameListToClient();
+        ArrayList<String> gameNames = push.getGameNames();
+
+        ArrayList<String> expectedGames = new ArrayList<>();
+        expectedGames.add(this.userTest.getUserName());
+
+        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
+    }
+
     @Test
     public void joinGame01_test() {
+        int expected = 1;
 
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
+        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+
+        // LOGIN
+
+        // Convert to json
+        String userJson = gson.toJson(requestLoginUser);
+
+        // handle the json object
+        ResponseProtocol responseProtocol = clientThread.handleInput(userJson);
+
+        // We check the type is login user
+        int type = responseProtocol.getType();
+        assertEquals("Type should match login user", ProtocolTypes.LOGIN_USER, type);
+
+        // We check the passwords match as per the response
+        ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseProtocol;
+        int actual = responseLoginUser.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actual);
+
+        // We check the log in protocolId is the same.
+        int expectedID = requestLoginUser.getProtocolId();
+        int actualID = responseProtocol.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
+        // We check the user from the database is the same
+        User fromDB = responseLoginUser.getUser();
+        assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
+
+        User loggedInUser = this.clientThread.getLoggedInUser();
+
+        //CREATE GAME
+        String createGameJson = gson.toJson(requestCreateGame);
+
+        // Calling handle input will create game and add it to gameLobby list
+        ResponseProtocol responseCreateGame = this.clientThread.handleInput(createGameJson);
+
+        // We check the type is create game
+        int typeCreateGame = responseCreateGame.getType();
+        assertEquals("Type should match login user", ProtocolTypes.CREATE_GAME, typeCreateGame);
+
+        // We check we got a successful response
+        int actualCreateGame = responseCreateGame.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actualCreateGame);
+
+        // We check the protocolId is the same.
+        int expectedIDCreateGame = requestCreateGame.getProtocolId();
+        int actualIDCreateGame = responseCreateGame.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ",
+                expectedIDCreateGame, actualIDCreateGame);
+
+        // We check we created the correct game
+        GameLobby game = this.clientThread.getGame(this.userTest);
+        assertNotNull(game);
+
+        // We check the game list is pushed
+        PushGameNames push = this.clientThread.pushGameListToClient();
+        ArrayList<String> gameNames = push.getGameNames();
+
+        ArrayList<String> expectedGames = new ArrayList<>();
+        expectedGames.add(this.userTest.getUserName());
+
+        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
+
+        // JOIN GAME
     }
 }
