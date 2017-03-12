@@ -11,10 +11,11 @@ import java.util.Map;
  * Created by tom on 09/03/17.
  */
 public class GameLobby {
-    String lobbyName;
-    ArrayList<Player> players;
-    BlackjackHand dealerHand;
+    private String lobbyName;
+    private ArrayList<Player> players;
+    private BlackjackHand dealerHand;
     private Map<String, Socket> playerSockets;
+    private Deck deck;
 
     /**
      * creates gamelobby with lobbyname set  : user1's lobby
@@ -27,6 +28,8 @@ public class GameLobby {
         this.players = new ArrayList<>();
         this.dealerHand = new BlackjackHand();
         this.playerSockets.put(user.getUserName(), socket);
+        // Create a deck
+        this.deck = new Deck();
     }
 
     /**
@@ -123,9 +126,8 @@ public class GameLobby {
      * tells everyone who still has to bet
      * once everyone has bet, calls startgame method
      *
-     * @param bet
      */
-    public synchronized void takeBets(int bet) {
+    public synchronized void takeBets() {
         // fill out
 
         for (Player p : players) {
@@ -143,19 +145,28 @@ public class GameLobby {
      * deals 2 card to dealer, 1 card face down, 1 card face up
      */
     public synchronized void startGame() {
+        // start the game and shuffle the deck
+        deck.shuffle();
 
-        //fill out
-        //
+        // For players:
+
         for (Player p : players) {
-            Card firstCard = new Deck().dealCard();
-            p.getPlayerHand().addCard(firstCard);
-            Card secondCard = new Deck().dealCard();
-            p.getPlayerHand().addCard(secondCard);
+            Card firstCard = deck.dealCard();
+            firstCard.setFaceUp(true);
+            p.addCardToPlayerHand(firstCard);
+            Card secondCard = deck.dealCard();
+            secondCard.setFaceUp(true);
+            p.addCardToPlayerHand(secondCard);
         }
-        Card dealerFirstCard = new Deck().dealCard();
+
+        // For the dealer:
+
+        Card dealerFirstCard = deck.dealCard();
+        dealerFirstCard.setFaceUp(false);
         dealerHand.addCard(dealerFirstCard);
-        dealerHand.getCard(0).setFaceUp(false);
-        Card dealerSecondCard = new Deck().dealCard();
+
+        Card dealerSecondCard = deck.dealCard();
+        dealerSecondCard.setFaceUp(true);
         dealerHand.addCard(dealerSecondCard);
 
     }
@@ -170,8 +181,8 @@ public class GameLobby {
      */
     public synchronized boolean hit(User user) {
         Player player = getPlayer(user);
-        Card newCard = new Deck().dealCard();
-        player.getPlayerHand().addCard(newCard);
+        Card newCard = deck.dealCard();
+        player.addCardToPlayerHand(newCard);
         player.setFinishedRound(true);
         return player.getPlayerHand().getBlackjackValue() <= 21;
     }
@@ -189,7 +200,7 @@ public class GameLobby {
         // sets player to finished round
         Player player = getPlayer(user);
         player.setBet(player.getBet() * 2);
-        return true;
+        return hit(user);
     }
 
     public String getLobbyName() {
