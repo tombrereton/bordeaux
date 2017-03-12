@@ -264,7 +264,7 @@ public class ClientThread implements Runnable {
 
                 // We add the user to the current thread and the list of current users
                 this.user = existingUser;
-                addUsertoUsers(this.user);
+                this.addUsertoUsers(this.user);
             } else {
                 response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
             }

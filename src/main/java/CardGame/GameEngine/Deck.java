@@ -12,7 +12,6 @@ import java.util.Random;
  */
 public class Deck {
 
-    private Card[] deck;   // An array of 52 Cards, representing the deck.
     private int cardsUsed; // How many cards have been dealt from the deck.
     private ArrayList<Card> deckOfCards;
 

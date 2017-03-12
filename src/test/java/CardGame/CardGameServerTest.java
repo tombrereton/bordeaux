@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.CREATE_GAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -58,7 +59,7 @@ public class CardGameServerTest {
 
         // We expect the user in the database
         String expected = "duplicate username in database.";
-        int expectedSuccess = ProtocolMessages.FAIL;
+        int expectedSuccess = FAIL;
 
         // Create user and requset object
         User user = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
@@ -97,8 +98,8 @@ public class CardGameServerTest {
     public void registerUser02_test() {
 
         // We expect the user in the database
-        String expected = ProtocolMessages.EMPTY_INSERT;
-        int expectedSuccess = ProtocolMessages.FAIL;
+        String expected = EMPTY_INSERT;
+        int expectedSuccess = FAIL;
 
         // Create user and requset object
         User user = new User("", "", "", "");
@@ -137,8 +138,8 @@ public class CardGameServerTest {
     public void registerUser03_test() {
 
         // We expect the user in the database
-        String expected = ProtocolMessages.EMPTY_INSERT;
-        int expectedSuccess = ProtocolMessages.FAIL;
+        String expected = EMPTY_INSERT;
+        int expectedSuccess = FAIL;
 
         // Create user and requset object
         User user = new User();
@@ -249,6 +250,10 @@ public class CardGameServerTest {
         int expectedID = request.getProtocolId();
         int actualID = responseProtocol.getProtocolId();
         assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
+        // We check we get password mismatch error
+        String errorMsg = responseLoginUser.getErrorMsg();
+        assertEquals("Should return password mismatch error ", PASSWORD_MISMATCH, errorMsg);
     }
 
     /**
@@ -409,5 +414,10 @@ public class CardGameServerTest {
         // We check we created the correct game
         GameLobby game = this.clientThread.getGame(this.userTest);
         assertNotNull(game);
+    }
+
+    @Test
+    public void joinGame01_test() {
+
     }
 }
