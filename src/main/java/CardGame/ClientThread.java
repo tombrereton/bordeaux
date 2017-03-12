@@ -75,6 +75,7 @@ public class ClientThread implements Runnable {
                 String jsonInString = inputStream.readUTF();
 
                 if (!jsonInString.isEmpty()) {
+
                     ResponseProtocol response = handleInput(jsonInString);
                     System.out.println(response);
 

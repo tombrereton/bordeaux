@@ -1,5 +1,7 @@
 package CardGame.Responses;
 
+import com.google.gson.Gson;
+
 /**
  * Created by tom on 06/03/17.
  */
@@ -48,5 +50,29 @@ public class ResponseProtocol {
                 ", requestSuccess=" + requestSuccess +
                 ", errorMsg='" + errorMsg + '\'' +
                 '}';
+    }
+
+    /**
+     * We use a method to create a ResponseProtocol from
+     * a string input, where the string must be a json string.
+     *
+     * @param input
+     * @return
+     */
+    public static ResponseProtocol decode(String input){
+        Gson gson = new Gson();
+        return gson.fromJson(input, ResponseProtocol.class);
+    }
+
+    /**
+     * We use a method to create a json string from
+     * the responseProtocol object.
+     *
+     * @param response
+     * @return
+     */
+    public static String encode(ResponseProtocol response){
+        Gson gson = new Gson();
+        return gson.toJson(response);
     }
 }

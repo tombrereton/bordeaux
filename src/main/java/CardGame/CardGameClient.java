@@ -1,23 +1,23 @@
 package CardGame;
 
-import CardGame.Requests.*;
+import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestProtocol;
 import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.*;
-
+import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseProtocol;
+import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.ResponseSendMessage;
 import com.google.gson.Gson;
-
-import static CardGame.ProtocolMessages.FAIL;
-import static CardGame.ProtocolMessages.UNKNOWN_ERROR;
-import static CardGame.ProtocolTypes.LOGIN_USER;
-import static CardGame.ProtocolTypes.REGISTER_USER;
-import static CardGame.ProtocolTypes.SEND_MESSAGE;
-import static CardGame.ProtocolTypes.UNKNOWN_TYPE;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import static CardGame.ProtocolMessages.FAIL;
+import static CardGame.ProtocolMessages.UNKNOWN_ERROR;
+import static CardGame.ProtocolTypes.*;
 
 /**
  * TODO: fill this out.
@@ -64,9 +64,9 @@ public class CardGameClient {
             e.printStackTrace();
         }
     }
-    
+
     public ResponseProtocol sendRequest(RequestProtocol rp) throws IOException{
-    	
+
     		DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             Gson gson = new Gson();
@@ -78,46 +78,46 @@ public class CardGameClient {
             System.out.println("before read");
             	jsonInString = inputStream.readUTF();
             	System.out.println("after read");
-            
+
             return handleResponse(jsonInString);
-            
-            
-            
-    	
-    		
-    	
-    	
-    	
+
+
+
+
+
+
+
+
     }
     public ResponseRegisterUser sendRequestRegisterUser(User user) throws IOException{
     	RequestRegisterUser request = new RequestRegisterUser(user);
     	ResponseProtocol response = sendRequest(request);
 		System.out.println(response);
-		
+
 		Gson gson = new Gson();
 		String s = gson.toJson(response);
 		ResponseRegisterUser rru = gson.fromJson(s, ResponseRegisterUser.class);
 		return rru;
-    	
+
     }
-    
+
     public ResponseLoginUser sendRequestLoginUser(User user) throws IOException{
     	RequestLoginUser request = new RequestLoginUser(user);
     	ResponseProtocol response = sendRequest(request);
 		System.out.println(response);
-		
+
 		Gson gson = new Gson();
 		String s = gson.toJson(response);
 		ResponseLoginUser rlu = gson.fromJson(s, ResponseLoginUser.class);
 		return rlu;
-    	
+
     }
-    
+
     public ResponseProtocol handleResponse(String str){
     	Gson gson = new Gson();
     	ResponseProtocol rp = gson.fromJson(str, ResponseProtocol.class);
     	int protocolId = rp.getProtocolId();
-int responseType = rp.getType();     	
+int responseType = rp.getType();
     	if (responseType == REGISTER_USER) {
     		return gson.fromJson(str, ResponseRegisterUser.class);
 
@@ -130,23 +130,23 @@ int responseType = rp.getType();
             return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
-    
+
     public static void main(String[] args){
     	CardGameClient cgc = new CardGameClient();
     	User user = new User("ILoveTerryWogan","terry","Barry","Moonpie");
-    	
+
 		try {
 			ResponseRegisterUser rru = cgc.sendRequestRegisterUser(user);
 			System.out.println(rru);
 			ResponseLoginUser rlu = cgc.sendRequestLoginUser(user);
 			System.out.println(rlu);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
-			
+
 		}
-    	
-    	
+
+
     }
 
 
