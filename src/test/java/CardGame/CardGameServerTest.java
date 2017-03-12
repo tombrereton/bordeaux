@@ -18,7 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.CREATE_GAME;
-import static CardGame.Requests.RequestProtocol.encodeRequest;
 import static org.junit.Assert.*;
 
 /**
@@ -609,100 +608,5 @@ public class CardGameServerTest {
         assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
 
         // JOIN GAME
-        RequestJoinGame requestJoinGame = new RequestJoinGame(userTest.getUserName(), userTestTwo.getUserName());
-        ResponseProtocol responseJoin = this.clientThread.handleInput(encodeRequest(requestJoinGame));
-
-        // we check for successful response
-        int successJoin = responseJoin.getRequestSuccess();
-        assertEquals("Should return success join response  ", SUCCESS, successJoin);
     }
-
-    /**
-     * We test a bet request for the blackjack game
-     */
-    @Test
-    public void bet01_test() {
-        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestBet));
-
-        // We check the bet was successful
-        int successBet = responseProtocol.getRequestSuccess();
-        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet);
-    }
-
-    /**
-     * We test a hit request for the blackjack game
-     */
-    @Test
-    public void hit01_test() {
-        RequestHit requestHit = new RequestHit(userTest.getUserName());
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestHit));
-
-        // we check the hit was successful
-        int successHit = responseProtocol.getRequestSuccess();
-        assertEquals("Should return successful hit response matching success ", SUCCESS, successHit);
-    }
-
-    /**
-     * We test a double bet request for the blackjack game
-     */
-    @Test
-    public void double01_test() {
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest.getUserName());
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestDoubleBet));
-
-        // we check the double bet was successful
-        int successDouble = responseProtocol.getRequestSuccess();
-        assertEquals("Should return successful double response matching success ", SUCCESS, successDouble);
-
-    }
-
-    /**
-     * We test a stand request for the blackjack game
-     */
-    @Test
-    public void stand01_test() {
-        RequestStand requestStand = new RequestStand();
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestStand));
-
-        // we check stand was successful
-        int successStand = responseProtocol.getRequestSuccess();
-
-        assertEquals("Should return successful stand response matching success ", SUCCESS, successStand);
-    }
-
-    /**
-     * We test a quit game request for a user leaving a blackjack game
-     */
-    @Test
-    public void quitGame01_test() {
-        RequestQuitGame requestQuitGame = new RequestQuitGame();
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestQuitGame));
-
-        // we check the user quit the game successfully
-        int successQuit = responseProtocol.getRequestSuccess();
-
-        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successQuit);
-    }
-
-    /**
-     * We test the user can log out of the client
-     */
-    @Test
-    public void logOut01_test() {
-        RequestLogOut requestLogOut = new RequestLogOut();
-
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLogOut));
-
-        // we check the user logged out successfully
-        int successLogout = responseProtocol.getRequestSuccess();
-
-        assertEquals("Should return successful logOut response matching success ", SUCCESS, successLogout);
-    }
-
 }
