@@ -38,6 +38,8 @@ public class CardGameServerTest {
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
     User userTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
+    User userTestTwo = new User("Aces", "apple", "Gary", "Smith");
+    User userNotReg = new User("something", "orange", "Sam", "Smith");
     Gson gson = new Gson();
 
     @Before

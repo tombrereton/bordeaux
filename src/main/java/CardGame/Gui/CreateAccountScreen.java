@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,12 +17,14 @@ public class CreateAccountScreen extends JPanel {
 	private JTextField usernameField;
 	private JTextField passwordField;
 	private JTextField emailField;
+    private ClientModel clientModel;
 
-	/**
+    /**
 	 * Create the application.
 	 */
-	public CreateAccountScreen() {
-		setBackground(new Color(46, 139, 87));
+	public CreateAccountScreen(ClientModel clientModel) {
+        this.clientModel = clientModel;
+        setBackground(new Color(46, 139, 87));
 		initialize();
 	}
 
@@ -123,6 +127,12 @@ public class CreateAccountScreen extends JPanel {
 		btnSignUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//If usernameField.getText() is unique create account and return to login screen
+
+
+                getClientModel().registerUser(usernameField.getText(), passwordField.getText(),
+                        firstnameField.getText(), lastnameField.getText());
+
+                // if successfully registered - change page:
 				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen);
 				//else display message that username is not unique
 			}
@@ -131,4 +141,7 @@ public class CreateAccountScreen extends JPanel {
 		add(btnSignUp);
 	}
 
+    public ClientModel getClientModel() {
+        return clientModel;
+    }
 }
