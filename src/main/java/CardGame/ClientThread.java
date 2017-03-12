@@ -57,6 +57,7 @@ public class ClientThread implements Runnable {
         this.games = games;
         this.gson = new Gson();
         this.gameNames = new ArrayList<>();
+        this.user = null;
     }
 
     /**
@@ -150,6 +151,10 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleCreateGame(int protocolId) {
+        if (this.getLoggedInUser() == null){
+            return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
+        }
+
         GameLobby newGame = new GameLobby(this.getLoggedInUser(), this.toClientSocket);
 
         this.getGames().add(newGame);
@@ -162,9 +167,9 @@ public class ClientThread implements Runnable {
         this.server.pushGameListToClient();
 
         if (this.getGame(this.getLoggedInUser()).equals(newGame)){
-            return new ResponseCreateGame(protocolId, CREATE_GAME, SUCCESS, gameName);
+            return new ResponseCreateGame(protocolId, SUCCESS, gameName);
         } else {
-            return new ResponseCreateGame(protocolId, CREATE_GAME, FAIL, null);
+            return new ResponseCreateGame(protocolId, FAIL, null);
         }
     }
 
@@ -183,7 +188,7 @@ public class ClientThread implements Runnable {
         RequestGetMessages requestGetMessages = this.gson.fromJson(JSONInput, RequestGetMessages.class);
         ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
 
-        return new ResponseGetMessages(protocolId, GET_MESSAGE, SUCCESS, messagesToClient);
+        return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient);
     }
 
     /**
@@ -264,7 +269,7 @@ public class ClientThread implements Runnable {
 
                 // We add the user to the current thread and the list of current users
                 this.user = existingUser;
-                addUsertoUsers(this.user);
+                this.addUsertoUsers(this.user);
             } else {
                 response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
             }

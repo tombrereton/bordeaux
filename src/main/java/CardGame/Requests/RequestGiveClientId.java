@@ -1,17 +1,17 @@
 package CardGame.Requests;
 
-import CardGame.ProtocolTypes;
+import static CardGame.ProtocolTypes.CLIENT_ID;
 
 /**
  * Created by tom on 07/03/17.
  */
 public class RequestGiveClientId extends RequestProtocol{
 
-    public RequestGiveClientId(int protocolId, int type) {
-        super(protocolId, ProtocolTypes.CLIENT_ID);
+    public RequestGiveClientId(int protocolId) {
+        super(protocolId, CLIENT_ID);
     }
 
     public RequestGiveClientId() {
-        super(ProtocolTypes.CLIENT_ID);
+        super(CLIENT_ID);
     }
 }

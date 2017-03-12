@@ -7,8 +7,7 @@ import CardGame.User;
  * Created by tom on 06/03/17.
  */
 public class ResponseLoginUser extends ResponseProtocol {
-    User user;
-
+    private User user;
 
     public ResponseLoginUser(int protocolId, int requestSuccess, User user) {
         super(protocolId, ProtocolTypes.LOGIN_USER, requestSuccess); // type is 1 for login

@@ -14,8 +14,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static CardGame.ProtocolTypes.PUSH_GAME_NAMES;
-
 /**
  * This class runs a server for a
  * blackjack card game and chat client.
@@ -96,7 +94,7 @@ public class CardGameServer {
     public synchronized void pushGameListToClient(){
         DataOutputStream outputStream;
 
-        PushGameNames pushGameNames = new PushGameNames(PUSH_GAME_NAMES, getGameNames());
+        PushGameNames pushGameNames = new PushGameNames(getGameNames());
         String jsonOutString = this.gson.toJson(pushGameNames);
 
         if (!this.socketList.isEmpty()){

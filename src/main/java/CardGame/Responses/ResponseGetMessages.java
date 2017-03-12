@@ -4,19 +4,21 @@ import CardGame.MessageObject;
 
 import java.util.ArrayList;
 
+import static CardGame.ProtocolTypes.GET_MESSAGE;
+
 /**
  * Created by tom on 11/03/17.
  */
 public class ResponseGetMessages extends ResponseProtocol {
     private ArrayList<MessageObject> messages;
 
-    public ResponseGetMessages(int protocolId, int type, int requestSuccess, ArrayList<MessageObject> messages) {
-        super(protocolId, type, requestSuccess);
+    public ResponseGetMessages(int protocolId, int requestSuccess, ArrayList<MessageObject> messages) {
+        super(protocolId, GET_MESSAGE, requestSuccess);
         this.messages = messages;
     }
 
-    public ResponseGetMessages(int protocolId, int type, int requestSuccess, ArrayList<MessageObject> messages, String errorMsg) {
-        super(protocolId, type, requestSuccess, errorMsg);
+    public ResponseGetMessages(int protocolId, int requestSuccess, ArrayList<MessageObject> messages, String errorMsg) {
+        super(protocolId, GET_MESSAGE, requestSuccess, errorMsg);
         this.messages = messages;
     }
 
