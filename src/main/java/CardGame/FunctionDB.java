@@ -1,12 +1,6 @@
 package CardGame;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * CREATE TABLE users (
@@ -119,12 +113,7 @@ public class FunctionDB {
         stat.setString(3, user.getFirstName());
         stat.setString(4, user.getLastName());
         int update = stat.executeUpdate();
-        free(stat, con);
-        if (update > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return update > 0;
 
     }
 
@@ -140,7 +129,6 @@ public class FunctionDB {
             user.setFirstName(rs.getString(3));
             user.setLastName(rs.getString(4));
         }
-        free(rs, stat, con);
         return user;
 
     }
@@ -157,7 +145,6 @@ public class FunctionDB {
             user.setFirstName(rs.getString(3));
             user.setLastName(rs.getString(4));
         }
-        free(rs, stat, con);
 
         return user;
     }
@@ -167,13 +154,7 @@ public class FunctionDB {
         PreparedStatement stat = con.prepareStatement(sql);
         stat.setString(1, username);
         ResultSet rs = stat.executeQuery();
-        if (rs.next() == false) {
-            free(rs, stat, con);
-            return false;
-        } else {
-            free(rs, stat, con);
-            return true;
-        }
+        return rs.next() != false;
     }
 
     public synchronized boolean insertNewGameIntoDatabase(int timelength, int totalpot) throws SQLException {
@@ -182,12 +163,7 @@ public class FunctionDB {
         stat.setInt(1, timelength);
         stat.setInt(2, totalpot);
         int update = stat.executeUpdate();
-        free(stat, con);
-        if (update > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return update > 0;
     }
 
     public synchronized int insertGameOutcomeIntoDatabse(String outcomes) throws SQLException {
@@ -201,7 +177,6 @@ public class FunctionDB {
             rs.close();
             return result;
         }
-        free(stat, con);
         // if any else happen throw a wrong result
         return -1;
     }
@@ -212,13 +187,8 @@ public class FunctionDB {
         stat.setInt(1, outcome_id);
         stat.setString(2, outcomes);
         ResultSet rs = stat.executeQuery();
-        free(stat, con);
         int update = stat.executeUpdate();
-        if (update > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return update > 0;
     }
 
     public synchronized boolean insertGameStatsIntoDatabase(int gameid, int userid, int chip_amount_changed) throws SQLException {
@@ -231,12 +201,7 @@ public class FunctionDB {
         stat.setInt(3, outcomeid);
         stat.setInt(4, chip_amount_changed);
         int update = stat.executeUpdate();
-        free(stat, con);
-        if (update > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return update > 0;
     }
 
 
