@@ -18,6 +18,7 @@ public class ProtocolMessages {
     public static final String EMPTY_INSERT = "cannot insert empty object into database.";
     public static final String NO_CLIENTS = "no clients connected.";
     public static final String NOT_LOGGED_IN = "user not logged in.";
+    public static final String GAME_ALREADY_EXISTS = "game already exists.";
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 

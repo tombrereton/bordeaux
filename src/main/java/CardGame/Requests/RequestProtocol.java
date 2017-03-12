@@ -42,7 +42,7 @@ public class RequestProtocol {
      * @param input
      * @return
      */
-    public static RequestProtocol decode(String input){
+    public static RequestProtocol decodeRequest(String input){
         Gson gson = new Gson();
         return gson.fromJson(input, RequestProtocol.class);
     }
@@ -54,7 +54,7 @@ public class RequestProtocol {
      * @param request
      * @return
      */
-    public static String encode(RequestProtocol request){
+    public static String encodeRequest(RequestProtocol request){
         Gson gson = new Gson();
         return gson.toJson(request);
     }

@@ -1,10 +1,8 @@
 package CardGame;
 
 import CardGame.GameEngine.GameLobby;
-import CardGame.Pushes.PushGameNames;
 import com.google.gson.Gson;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,7 +23,6 @@ public class CardGameServer {
     private ServerSocket serverSocket;
     private final int numberOfThreads = 10;
     protected FunctionDB functionDB;
-    private ArrayList<String> gameNames;
     private Gson gson;
 
     // Shared data structures
@@ -33,10 +30,10 @@ public class CardGameServer {
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
-
+    private volatile CopyOnWriteArrayList<String> gameNames;
 
     public CardGameServer() {
-        this.gameNames = new ArrayList<>();
+        this.gameNames = new CopyOnWriteArrayList<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
         this.socketList = new ConcurrentLinkedDeque<>();
@@ -63,7 +60,7 @@ public class CardGameServer {
 
 
                 threadPool.execute(new ClientThread(this,socket, this.messageQueue,
-                        this.socketList, this.users, this.functionDB, this.games));
+                        this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,39 +72,9 @@ public class CardGameServer {
      * @return
      */
     public synchronized ArrayList<String> getGameNames() {
-        return gameNames;
+        return new ArrayList<>(this.gameNames);
     }
 
-    /**
-     * This method updates the gameNames list with the
-     * current games in games.
-     */
-    public synchronized void updateGameNames(){
-
-        if (this.gameNames.size() != 0){
-            for (GameLobby game : games){
-                this.gameNames.add(game.getLobbyName());
-            }
-        }
-    }
-
-    public synchronized void pushGameListToClient(){
-        DataOutputStream outputStream;
-
-        PushGameNames pushGameNames = new PushGameNames(getGameNames());
-        String jsonOutString = this.gson.toJson(pushGameNames);
-
-        if (!this.socketList.isEmpty()){
-            for (Socket sock : this.socketList){
-                try {
-                    outputStream = new DataOutputStream(sock.getOutputStream());
-                    outputStream.writeUTF(jsonOutString);
-                } catch (IOException e) {
-                    System.out.println("Failed to send out list of game names");
-                }
-            }
-        }
-    }
 
 
     public static void main(String[] args) throws IOException {

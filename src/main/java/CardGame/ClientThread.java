@@ -1,6 +1,8 @@
 package CardGame;
 
 import CardGame.GameEngine.GameLobby;
+import CardGame.GameEngine.Hand;
+import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -12,11 +14,13 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
+import static CardGame.Pushes.PushProtocol.encodePush;
 
 /**
  * This class implements the Runnable interface and
@@ -33,7 +37,6 @@ public class ClientThread implements Runnable {
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
     private Gson gson;
-    private ArrayList<String> gameNames;
     private CardGameServer server;
     private String gameJoined;
 
@@ -42,11 +45,13 @@ public class ClientThread implements Runnable {
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
+    private volatile CopyOnWriteArrayList<String> gameNames;
 
 
     public ClientThread(CardGameServer server, Socket toClientSocket, ConcurrentLinkedDeque<MessageObject> messageQueue,
                         ConcurrentLinkedDeque<Socket> socketList, CopyOnWriteArrayList<User> users,
-                        FunctionDB functionsDB, CopyOnWriteArrayList<GameLobby> games) {
+                        FunctionDB functionsDB, CopyOnWriteArrayList<GameLobby> games,
+                        CopyOnWriteArrayList<String> gameNames) {
         this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
@@ -55,8 +60,8 @@ public class ClientThread implements Runnable {
         this.users = users;
         this.functionDB = functionsDB;
         this.games = games;
+        this.gameNames = gameNames;
         this.gson = new Gson();
-        this.gameNames = new ArrayList<>();
         this.user = null;
     }
 
@@ -147,30 +152,148 @@ public class ClientThread implements Runnable {
     /**
      * We use a method to create a new game of blackjack and add it to the games list.
      * This method returns a response containing a list of the current games.
+     *
      * @param protocolId
      * @return
      */
     private ResponseProtocol handleCreateGame(int protocolId) {
-        if (this.getLoggedInUser() == null){
+        if (this.getLoggedInUser() == null) {
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
+        } else if (getGame(getLoggedInUser()) != null) {
+            return new ResponseCreateGame(protocolId, FAIL,
+                    getGame(getLoggedInUser()).getLobbyName(), GAME_ALREADY_EXISTS);
         }
 
-        GameLobby newGame = new GameLobby(this.getLoggedInUser(), this.toClientSocket);
+        GameLobby newGame = createGame();
+        String gameName = newGame.getLobbyName();
 
-        this.getGames().add(newGame);
-        this.gameNames.add(newGame.getLobbyName());
-
-        String gameName = this.gameNames.get(this.gameNames.size()-1);
-        this.gameJoined = gameName;
-
-        this.server.updateGameNames();
-        this.server.pushGameListToClient();
-
-        if (this.getGame(this.getLoggedInUser()).equals(newGame)){
+        if (isNewGameExists(newGame)) {
+            this.gameJoined = gameName;
+            joinGame(this.gameJoined);
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
         } else {
             return new ResponseCreateGame(protocolId, FAIL, null);
         }
+    }
+
+    private boolean isNewGameExists(GameLobby newGame) {
+        return this.getGame(this.getLoggedInUser()).equals(newGame);
+    }
+
+    /**
+     * This method pushes all the player hands to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerHands() {
+        Map<String, Hand> playerHands = this.getGame(gameJoined).getPlayerHands();
+
+        PushPlayerHands push = new PushPlayerHands(playerHands);
+
+        return pushToPlayers(push);
+
+    }
+
+    /**
+     * This method pushes the dealer hand to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushDealerHand() {
+        Hand dealerHand = this.getGame(gameJoined).getDealerHand();
+
+        PushDealerHand push = new PushDealerHand(dealerHand);
+
+        return pushToPlayers(push);
+    }
+
+    /**
+     * This method pushes all the player budgets to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerBudgets() {
+        Map<String, Integer> playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
+
+        PushPlayerBudgets push = new PushPlayerBudgets(playerBudgets);
+
+        return pushToPlayers(push);
+    }
+
+    /**
+     * This method pushes all the player names to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerNames() {
+        ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
+
+        PushPlayerNames push = new PushPlayerNames(playerNames);
+
+        return pushToPlayers(push);
+    }
+
+    /**
+     * This method takes in any PushProtocol subtype and
+     * pushes it to all the players in the game.
+     *
+     * @param push
+     * @param <T>
+     * @return True if push successful, false if not
+     */
+    private <T extends PushProtocol> boolean pushToPlayers(T push) {
+        DataOutputStream outputStream = null;
+        Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
+
+        if (!this.socketList.isEmpty()) {
+            try {
+                for (Map.Entry<String, Socket> entry : playerSockets.entrySet()) {
+                    outputStream = new DataOutputStream(entry.getValue().getOutputStream());
+                    outputStream.writeUTF(encodePush(push));
+                }
+                return true;
+            } catch (IOException e) {
+                System.out.println("Failed to send out list of game names");
+                return false;
+            } finally {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    private void joinGame(String lobbyname) {
+        getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
+        pushDealerHand();
+        pushPlayerBudgets();
+        pushPlayerHands();
+        pushPlayerNames();
+    }
+
+    /**
+     * This method creates a game with the name of the logged in user.
+     * It adds the new game to the list of games, updates the gamesNames, and pushes
+     * the gamesList to all clients.
+     *
+     * @return
+     */
+    private GameLobby createGame() {
+        GameLobby newGame = new GameLobby(this.getLoggedInUser(), this.toClientSocket);
+
+        this.getGames().add(newGame);
+
+        this.updateGameNames();
+        this.pushGameListToClient();
+
+        return newGame;
     }
 
 
@@ -317,6 +440,38 @@ public class ClientThread implements Runnable {
     }
 
 
+    /**
+     * This method updates the gameNames list with the
+     * current games in games.
+     */
+    public synchronized void updateGameNames() {
+
+        if (this.games.size() != 0) {
+            for (GameLobby game : games) {
+                this.gameNames.add(game.getLobbyName());
+            }
+        }
+    }
+
+    public synchronized PushGameNames pushGameListToClient() {
+        DataOutputStream outputStream;
+
+        PushGameNames pushGameNames = new PushGameNames(getGameNames());
+
+        if (!this.socketList.isEmpty()) {
+            for (Socket sock : this.socketList) {
+                try {
+                    outputStream = new DataOutputStream(sock.getOutputStream());
+                    outputStream.writeUTF(encodePush(pushGameNames));
+                } catch (IOException e) {
+                    System.out.println("Failed to send out list of game names");
+                } finally {
+                    return pushGameNames;
+                }
+            }
+        }
+        return pushGameNames;
+    }
 
 
     /**
@@ -376,13 +531,29 @@ public class ClientThread implements Runnable {
         return games;
     }
 
-    public GameLobby getGame(User user){
-        for (GameLobby game : games){
-            if (game.getLobbyName().equals(user.getUserName())){
+    public ArrayList<String> getGameNames() {
+        return new ArrayList<>(this.gameNames);
+    }
+
+    public String getGameJoined() {
+        return gameJoined;
+    }
+
+    public GameLobby getGame(User user) {
+        for (GameLobby game : games) {
+            if (game.getLobbyName().equals(user.getUserName())) {
                 return game;
             }
         }
+        return null;
+    }
 
+    public GameLobby getGame(String lobbyName) {
+        for (GameLobby game : games) {
+            if (game.getLobbyName().equals(lobbyName)) {
+                return game;
+            }
+        }
         return null;
     }
 }

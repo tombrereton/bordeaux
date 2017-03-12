@@ -8,9 +8,15 @@ import com.google.gson.Gson;
 public class PushProtocol {
 
     protected int type;
+    private String errorMsg;
 
     public PushProtocol(int type) {
         this.type = type;
+    }
+
+    public PushProtocol(int type, String errorMsg){
+        this.type = type;
+        this.errorMsg = errorMsg;
     }
 
     public int getType() {
@@ -32,7 +38,7 @@ public class PushProtocol {
      * @param input
      * @return
      */
-    public static PushProtocol decode(String input){
+    public static PushProtocol decodePush (String input){
         Gson gson = new Gson();
         return gson.fromJson(input, PushProtocol.class);
     }
@@ -44,7 +50,7 @@ public class PushProtocol {
      * @param push
      * @return
      */
-    public static String encode(PushProtocol push){
+    public static String encodePush (PushProtocol push){
         Gson gson = new Gson();
         return gson.toJson(push);
     }

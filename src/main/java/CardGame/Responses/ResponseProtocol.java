@@ -59,7 +59,7 @@ public class ResponseProtocol {
      * @param input
      * @return
      */
-    public static ResponseProtocol decode(String input) {
+    public static ResponseProtocol decodeResponse(String input) {
         Gson gson = new Gson();
         return gson.fromJson(input, ResponseProtocol.class);
     }
@@ -71,7 +71,7 @@ public class ResponseProtocol {
      * @param response
      * @return
      */
-    public static String encode(ResponseProtocol response) {
+    public static String encodeResponse(ResponseProtocol response) {
         Gson gson = new Gson();
         return gson.toJson(response);
     }

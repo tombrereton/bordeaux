@@ -16,6 +16,7 @@ public class GameLobby {
     private BlackjackHand dealerHand;
     private Map<String, Socket> playerSockets;
     private Deck deck;
+    private Map<String, Integer> playerBudgets;
 
     /**
      * creates gamelobby with lobbyname set  : user1's lobby
@@ -23,11 +24,12 @@ public class GameLobby {
      * @param user user1's name
      */
     public GameLobby(User user, Socket socket) {
-        this.playerSockets = new HashMap<>();
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
         this.dealerHand = new BlackjackHand();
+        this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
+        this.playerBudgets = new HashMap<>();
         // Create a deck
         this.deck = new Deck();
     }
@@ -213,6 +215,38 @@ public class GameLobby {
 
     public BlackjackHand getDealerHand() {
         return dealerHand;
+    }
+
+    public Map<String, Hand> getPlayerHands(){
+        Map<String, Hand> playerHands = new HashMap<>();
+
+        for (Player player : this.getPlayers()){
+            playerHands.put(player.getUsername(), player.getPlayerHand());
+        }
+        return playerHands;
+    }
+
+    public Map<String, Integer> getPlayerBudgets() {
+        Map<String, Integer> playerBudgets = new HashMap<>();
+
+        for (Player player: getPlayers()){
+            playerBudgets.put(player.getUsername(), player.getBudget());
+        }
+        return playerBudgets;
+    }
+
+    public ArrayList<String> getPlayerNames(){
+        ArrayList<String> playerNames = new ArrayList<>();
+
+        for (Player player : getPlayers()){
+            playerNames.add(player.getUsername());
+        }
+
+        return playerNames;
+    }
+
+    public Map<String, Socket> getPlayerSockets() {
+        return playerSockets;
     }
 
     @Override
