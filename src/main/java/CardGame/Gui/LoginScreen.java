@@ -1,11 +1,14 @@
 package CardGame.Gui;
 
 import CardGame.ClientModel;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static CardGame.Gui.ScreenTypes.HOMESCREEN;
 
 /**
  * Login Screen
@@ -20,13 +23,15 @@ public class LoginScreen extends JPanel {
 	private JTextField usernameField;
 	private JPasswordField passwordField;
 	private ClientModel clientModel;
+	private ScreenFactory screenFactory;
 
 
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(ClientModel clientModel) {
+	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
+		this.screenFactory = screenFactory;
 		initialize();
 	}
 
@@ -68,7 +73,17 @@ public class LoginScreen extends JPanel {
 		btnLogin.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
+
+				// TODO change to handle password fields later
+			    ResponseProtocol response = getClientModel().login(usernameField.getText(), String.valueOf(passwordField.getPassword()));
+
+			    // If response say success, change screen
+			    if (response.getRequestSuccess() == 1){
+			    	screenFactory.screenFactory(HOMESCREEN);
+					ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
+				}
+
+
 			}
 		});
 		
@@ -100,5 +115,8 @@ public class LoginScreen extends JPanel {
 		lblLogin.setBounds(314, 115, 396, 57);
 		add(lblLogin);
 	}
-		
+
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }

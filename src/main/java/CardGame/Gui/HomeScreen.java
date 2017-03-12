@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,10 +14,13 @@ import java.awt.event.ActionListener;
  */
 public class HomeScreen extends JPanel {
 
+	private ClientModel clientModel;
+
 	/**
 	 * Create the application.
 	 */
-	public HomeScreen() {
+	public HomeScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 
@@ -44,7 +49,8 @@ public class HomeScreen extends JPanel {
 		/**
 		 * Title label
 		 */
-		JLabel lblWelcome = new JLabel("Welcome Username"); //get the username
+		String username = clientModel.getUser().getUserName();
+		JLabel lblWelcome = new JLabel("Welcome " + username); //get the username
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
