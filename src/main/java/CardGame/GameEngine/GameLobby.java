@@ -124,9 +124,8 @@ public class GameLobby {
      * tells everyone who still has to bet
      * once everyone has bet, calls startgame method
      *
-     * @param bet
      */
-    public synchronized void takeBets(int bet) {
+    public synchronized void takeBets() {
         // fill out
 
         for (Player p : players) {
