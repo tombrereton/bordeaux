@@ -2,19 +2,19 @@ package CardGame.Pushes;
 
 import CardGame.GameEngine.Hand;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by tom on 11/03/17.
  */
 public class PushPlayerHands extends PushProtocol {
-    ArrayList<Hand> hands;
-    public PushPlayerHands(int type, ArrayList<Hand> hands) {
+    private Map<String, Hand> playerHands;
+    public PushPlayerHands(int type, Map<String, Hand> playerHands) {
         super(type);
-        this.hands = hands;
+        this.playerHands = playerHands;
     }
 
-    public ArrayList<Hand> getHands() {
-        return hands;
+    public Map<String, Hand> getPlayerHands() {
+        return playerHands;
     }
 }

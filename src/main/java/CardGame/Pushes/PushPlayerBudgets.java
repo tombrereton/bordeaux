@@ -1,19 +1,19 @@
 package CardGame.Pushes;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by tom on 11/03/17.
  */
 public class PushPlayerBudgets extends PushProtocol {
-    ArrayList<Integer> playerBudgets;
+    private Map<String, Integer> playerBudgets;
 
-    public PushPlayerBudgets(int type, ArrayList<Integer> playerBudgets) {
+    public PushPlayerBudgets(int type, Map<String, Integer> playerBudgets) {
         super(type);
         this.playerBudgets = playerBudgets;
     }
 
-    public ArrayList<Integer> getPlayerBudgets() {
+    public Map<String, Integer> getPlayerBudgets() {
         return playerBudgets;
     }
 }
