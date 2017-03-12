@@ -9,12 +9,26 @@ import static CardGame.ProtocolTypes.STAND;
  * Created by tom on 12/03/17.
  */
 public class RequestStand extends RequestProtocol {
+    private String username;
 
-    public RequestStand(int protocolId) {
+    public RequestStand(int protocolId, String username) {
         super(protocolId, STAND);
+        this.username = username;
     }
 
     public RequestStand() {
         super(STAND);
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String toString() {
+        return "RequestStand{" +
+                "username='" + username + '\'' +
+                "} " + super.toString();
     }
 }
