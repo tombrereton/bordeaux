@@ -1,17 +1,19 @@
 package CardGame.Pushes;
 
+import java.util.Map;
+
 /**
  * Created by tom on 11/03/17.
  */
 public class PushAreAllPlayersFinished extends PushProtocol {
-    private boolean playersFinished;
+    private Map<String, Boolean> playersFinished;
 
-    public PushAreAllPlayersFinished(int type, boolean playersFinished) {
+    public PushAreAllPlayersFinished(int type, Map<String, Boolean> playersFinished) {
         super(type);
         this.playersFinished = playersFinished;
     }
 
-    public boolean isPlayersFinished() {
+    public Map<String, Boolean> getPlayersFinished() {
         return playersFinished;
     }
 }
