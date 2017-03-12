@@ -4,6 +4,9 @@ import CardGame.GameEngine.Card;
 import CardGame.GameEngine.Deck;
 import CardGame.GameEngine.GameLobby;
 import CardGame.GameEngine.Player;
+
+import org.junit.Before;
+
 import org.junit.Test;
 
 import java.net.Socket;
@@ -21,7 +24,9 @@ public class GameLobbyTest {
     Socket s = new Socket();
     // SET UP
     User user = new User("TestUser1");
+
     GameLobby gameLobby = new GameLobby(user,s);
+
 
     @Test
     public void getLobbyNameTest(){

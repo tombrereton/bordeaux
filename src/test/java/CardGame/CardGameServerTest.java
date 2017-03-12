@@ -207,6 +207,15 @@ public class CardGameServerTest {
         // We check the user from the database is the same
         User fromDB = responseLoginUser.getUser();
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
+
+        // We check user is added to users on thread
+        int userSize = this.clientThread.getUsers().size();
+        assertEquals("Should return size of 1 ", 1, userSize);
+
+        // We check correct user is added to users on thread
+//        List<User> usersOnThread = this.clientThread.getUsers();
+        User userOnThread = this.clientThread.getUserFromUsers(0);
+        assertEquals("Should return user matching userTest ", this.userTest, userOnThread);
     }
 
     /**

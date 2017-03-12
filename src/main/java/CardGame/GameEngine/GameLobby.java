@@ -4,6 +4,7 @@ import CardGame.User;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,6 +23,7 @@ public class GameLobby {
      * @param user user1's name
      */
     public GameLobby(User user, Socket socket) {
+        this.playerSockets = new HashMap<>();
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
         this.dealerHand = new BlackjackHand();

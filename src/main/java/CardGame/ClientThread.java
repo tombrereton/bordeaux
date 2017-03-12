@@ -252,16 +252,17 @@ public class ClientThread implements Runnable {
         // retrieve user from database and check passwords match
         try {
             // retrieve user
-            User existingUser = this.functionDB.retrieveUserFromDatabase(this.user.getUserName());
+            User tempUser = requestLoginUser.getUser();
+            User existingUser = this.functionDB.retrieveUserFromDatabase(tempUser.getUserName());
 
             // check if passwords match
             if (existingUser.getPassword() == null || existingUser.getUserName() == null) {
                 response = new ResponseLoginUser(protocolId, FAIL, null, NON_EXIST);
-            } else if (existingUser.getPassword().equals(this.user.getPassword())) {
+            } else if (existingUser.checkPassword(tempUser)) {
                 response = new ResponseLoginUser(protocolId, SUCCESS, existingUser);
 
                 // We add the user to the current thread and the list of current users
-                this.user = requestLoginUser.getUser();
+                this.user = existingUser;
                 addUsertoUsers(this.user);
             } else {
                 response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
