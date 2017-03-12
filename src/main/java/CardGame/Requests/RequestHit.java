@@ -10,12 +10,26 @@ import static CardGame.ProtocolTypes.HIT;
  * Created by tom on 12/03/17.
  */
 public class RequestHit extends RequestProtocol {
+    String username;
 
-    public RequestHit(int protocolId) {
+    public RequestHit(int protocolId, String username) {
         super(protocolId, HIT);
+        this.username = username;
     }
 
-    public RequestHit() {
+    public RequestHit(String username) {
         super(HIT);
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String toString() {
+        return "RequestHit{" +
+                "username='" + username + '\'' +
+                "} " + super.toString();
     }
 }
