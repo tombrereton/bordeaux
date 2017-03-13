@@ -35,4 +35,11 @@ public class MessageObject {
         DateFormat df = new SimpleDateFormat("hh:mm:ss");
         return "(" + df.format(timeStamp) + ")" + userName + ": " + message;
     }
+
+
+    public boolean isEmpty() {
+        return this.userName.equals("") || this.userName == null ||
+                this.message.equals("") || this.message == null ||
+                this.timeStamp.equals("") || this.timeStamp == null;
+    }
 }

@@ -88,12 +88,18 @@ public class User {
                 '}';
     }
 
-    public boolean isUserEmpty() {
+    public boolean isEmpty() {
         return this.getUserName().equals("") ||
                 this.getPassword().equals("") ||
                 this.getFirstName().equals("") ||
                 this.getLastName().equals("");
     }
+
+    public boolean isUserNull() {
+        return this.getUserName() == null || this.getPassword() == null ||
+                this.getFirstName() == null || this.getLastName() == null;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -105,7 +111,7 @@ public class User {
                 this.getLastName().equals(user.getLastName());
     }
 
-    public boolean checkPassword(User user){
+    public boolean checkPassword(User user) {
         return this.getUserName().equals(user.getUserName()) &&
                 this.getPassword().equals(user.getPassword());
     }

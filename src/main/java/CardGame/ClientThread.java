@@ -190,7 +190,7 @@ public class ClientThread implements Runnable {
             return new ResponseQuitGame(protocolId, FAIL, NO_GAMES);
 
         } else if (getGame(gameToQuit) == null) {
-            // return fail if game to join does not exist
+            // return fail if game to quit does not exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAME);
 
         } else {
@@ -243,6 +243,7 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleCreateGame(int protocolId) {
+        // TODO: clean this code
         if (this.getLoggedInUser() == null) {
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
         } else if (getGame(getLoggedInUser()) != null) {
@@ -434,19 +435,28 @@ public class ClientThread implements Runnable {
         ResponseProtocol response = null;
 
         RequestSendMessage requestSendMessage = this.gson.fromJson(JSONInput, RequestSendMessage.class);
-        MessageObject message = requestSendMessage.getMessageObject();
-        try {
-            addToMessageQueue(message);
-            response = new ResponseSendMessage(protocolId, SUCCESS);
-        } catch (IOException e) {
-            if (e.getMessage().equals(NO_CLIENTS)) {
-                response = new ResponseSendMessage(protocolId, FAIL, NO_CLIENTS);
-            } else {
-                response = new ResponseSendMessage(protocolId, FAIL);
-            }
-        } finally {
-            return response;
+        MessageObject messageFromRequest = requestSendMessage.getMessageObject();
+
+        if (getLoggedInUser() == null) {
+            // return fail if user not logged in
+            return new ResponseSendMessage(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (gameJoined.isEmpty()) {
+            // return fail if user has not joined a game
+            return new ResponseSendMessage(protocolId, FAIL, NO_GAME_JOINED);
+        } else if (messageFromRequest.isEmpty()) {
+            // return fail for empty message
+            return new ResponseSendMessage(protocolId, FAIL, EMPTY_MSG);
+        } else if (!messageFromRequest.isEmpty()) {
+            // add message from request to message queue
+            addToMessageQueue(messageFromRequest);
+            // return success if message is not empty
+            return new ResponseSendMessage(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseSendMessage(protocolId, FAIL, UNKNOWN_ERROR);
         }
+
+
     }
 
     /**
@@ -459,34 +469,41 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleLoginUser(String JSONInput, int protocolId) {
-        ResponseProtocol response = null;
-
-        // We deserialise it again but as a RequestRegisterUser object
+        // We deserialize it again but as a RequestRegisterUser object
         RequestLoginUser requestLoginUser = this.gson.fromJson(JSONInput, RequestLoginUser.class);
 
-        // retrieve user from database and check passwords match
+        User userFromDatabase = null;
+        User userFromRequest = requestLoginUser.getUser();
+
         try {
-            // retrieve user
-            User tempUser = requestLoginUser.getUser();
-            User existingUser = this.functionDB.retrieveUserFromDatabase(tempUser.getUserName());
-
-            // check if passwords match
-            if (existingUser.getPassword() == null || existingUser.getUserName() == null) {
-                response = new ResponseLoginUser(protocolId, FAIL, null, NON_EXIST);
-            } else if (existingUser.checkPassword(tempUser)) {
-                response = new ResponseLoginUser(protocolId, SUCCESS, existingUser);
-
-                // We add the user to the current thread and the list of current users
-                this.user = existingUser;
-                this.addUsertoUsers(this.user);
-            } else {
-                response = new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
-            }
-
+            // retrieve user from database
+            userFromDatabase = this.functionDB.retrieveUserFromDatabase(userFromRequest.getUserName());
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            return response;
+        }
+
+        if (!isLoggedInUserNull()) {
+            // return fail if already logged in
+            return new ResponseLoginUser(protocolId, FAIL, null, ALREADY_LOGGED_IN);
+        } else if (userFromRequest.getUserName().equals("") || userFromRequest.getPassword().equals("")) {
+            // return fail if user from request is empty
+            return new ResponseLoginUser(protocolId, FAIL, null, USERNAME_MISMATCH);
+        } else if (userFromDatabase == null) {
+            // return fail if user does not exist in database
+            return new ResponseLoginUser(protocolId, FAIL, null, NON_EXIST);
+        } else if (!userFromRequest.checkPassword(userFromDatabase)) {
+            // return fail if passwords mismatch
+            return new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
+        } else if (userFromRequest.checkPassword(userFromDatabase)) {
+            // if username and password match, we set this.user to user
+            // and add user to users
+            this.user = userFromDatabase;
+            this.addUsertoUsers(this.user);
+            // return success if password and username match
+            return new ResponseLoginUser(protocolId, SUCCESS, userFromDatabase);
+        } else {
+            // return fail for unknown error
+            return new ResponseLoginUser(protocolId, FAIL, null, UNKNOWN_ERROR);
         }
     }
 
@@ -499,32 +516,45 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleRegisterUser(String JSONInput, int protocolId) {
-        ResponseProtocol response = null;
+        boolean successRegister = false;
+        String sqlState = null;
 
-        // We deserialise it again but as a RequestRegisterUser object
+        // We deserialize the request again but as a RequestRegisterUser object
         RequestRegisterUser requestRegisterUser = this.gson.fromJson(JSONInput, RequestRegisterUser.class);
-        this.user = requestRegisterUser.getUser();
+        User userFromRequest = requestRegisterUser.getUser();
 
-        // Try to insert into database
         try {
-            if (this.user.getUserName() == null || this.user.isUserEmpty()) {
-                response = new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
-            } else {
-                boolean success = this.functionDB.insertUserIntoDatabase(this.user);
-                response = new ResponseRegisterUser(protocolId, SUCCESS);
-            }
+            // we try to insert user into database
+            successRegister = this.functionDB.insertUserIntoDatabase(userFromRequest);
         } catch (SQLException e) {
-            String sqlState = e.getSQLState();
+            sqlState = e.getSQLState();
             if (sqlState.equalsIgnoreCase("23505")) {
-                response = new ResponseRegisterUser(protocolId, FAIL, DUPE_USERNAME);
+                System.out.println(DUPE_USERNAME);
             } else {
-                response = new ResponseRegisterUser(protocolId, FAIL);
+                System.out.println(e.getSQLState() + ": " + e.getMessage());
             }
-        } finally {
-            return response;
+        }
+
+        if (userFromRequest.isUserNull()) {
+            // return fail if request user is null
+            return new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
+        } else if (userFromRequest.isEmpty()) {
+            // return fail if request user is empty
+            return new ResponseRegisterUser(protocolId, FAIL, EMPTY_INSERT);
+        } else if (sqlState.equalsIgnoreCase("23505")) {
+            // return fail if user already in database
+            return new ResponseRegisterUser(protocolId, FAIL, DUPE_USERNAME);
+        } else if (isLoggedInUserNull()) {
+            // return fail if user already logged in
+            return new ResponseRegisterUser(protocolId, FAIL, ALREADY_LOGGED_IN);
+        } else if (successRegister) {
+            // return success if user inserted into database
+            return new ResponseRegisterUser(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseRegisterUser(protocolId, FAIL, UNKNOWN_ERROR);
         }
     }
-
 
     /**
      * This method updates the gameNames list with the
@@ -566,7 +596,7 @@ public class ClientThread implements Runnable {
      * @param
      * @throws IOException
      */
-    public void addToMessageQueue(MessageObject msg) throws IOException {
+    public void addToMessageQueue(MessageObject msg) {
         this.messageQueue.add(msg);
     }
 
@@ -595,6 +625,14 @@ public class ClientThread implements Runnable {
 
     public User getLoggedInUser() {
         return user;
+    }
+
+    public boolean isLoggedInUserNull() {
+        return user == null;
+    }
+
+    public boolean isLoggedInUserEmpty() {
+        return user.isEmpty();
     }
 
     public User getUser() {
