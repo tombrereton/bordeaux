@@ -1,5 +1,7 @@
 package CardGame.Pushes;
 
+import CardGame.ProtocolTypes;
+
 import java.util.ArrayList;
 
 /**
@@ -8,8 +10,19 @@ import java.util.ArrayList;
 public class PushGameNames extends PushProtocol {
     private ArrayList<String> gameNames;
 
-    public PushGameNames(int type, ArrayList<String> gameNames) {
-        super(type);
+    public PushGameNames(ArrayList<String> gameNames) {
+        super(ProtocolTypes.PUSH_GAME_NAMES);
         this.gameNames = gameNames;
+    }
+
+    public ArrayList<String> getGameNames() {
+        return gameNames;
+    }
+
+    @Override
+    public String toString() {
+        return "PushGameNames{" +
+                "gameNames=" + gameNames +
+                "} " + super.toString();
     }
 }

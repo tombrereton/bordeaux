@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,12 +19,14 @@ public class LoginScreen extends JPanel {
 	 */
 	private JTextField usernameField;
 	private JPasswordField passwordField;
+	private ClientModel clientModel;
 
 
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen() {
+	public LoginScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 

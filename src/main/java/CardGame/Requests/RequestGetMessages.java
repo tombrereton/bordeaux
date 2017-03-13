@@ -1,5 +1,7 @@
 package CardGame.Requests;
 
+import static CardGame.ProtocolTypes.GET_MESSAGE;
+
 /**
  * A request for messages, where the offset specifies how many
  * messages it requires.
@@ -11,13 +13,13 @@ package CardGame.Requests;
 public class RequestGetMessages extends RequestProtocol {
     private int offset;
 
-    public RequestGetMessages(int protocolId, int type, int offset) {
-        super(protocolId, type);
+    public RequestGetMessages(int protocolId, int offset) {
+        super(protocolId, GET_MESSAGE);
         this.offset = offset;
     }
 
-    public RequestGetMessages(int type, int offset) {
-        super(type);
+    public RequestGetMessages(int offset) {
+        super(GET_MESSAGE);
         this.offset = offset;
     }
 
