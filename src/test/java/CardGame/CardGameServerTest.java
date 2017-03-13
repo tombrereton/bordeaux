@@ -801,8 +801,12 @@ public class CardGameServerTest {
      */
     @Test
     public void logOut01_test() {
-        RequestLogOut requestLogOut = new RequestLogOut();
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseLogin = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
+        // LOG OUT
+        RequestLogOut requestLogOut = new RequestLogOut(this.userTest.getUserName());
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLogOut));
 
         // we check the user logged out successfully

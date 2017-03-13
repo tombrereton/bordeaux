@@ -143,6 +143,8 @@ public class ClientThread implements Runnable {
                 return handleRegisterUser(JSONInput, protocolId);
             case LOGIN_USER:
                 return handleLoginUser(JSONInput, protocolId);
+            case LOG_OUT_USER:
+                return handleLogoutUser(JSONInput, protocolId);
             case SEND_MESSAGE:
                 return handleSendMessage(JSONInput, protocolId);
             case GET_MESSAGE:
@@ -156,6 +158,50 @@ public class ClientThread implements Runnable {
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * This method logs a user out of the client.
+     *
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleLogoutUser(String jsonInput, int protocolId) {
+        RequestLogOut requestLogOut = gson.fromJson(jsonInput, RequestLogOut.class);
+        String userFromRequest = requestLogOut.getUsername();
+
+        if (isLoggedInUserNull()){
+            // return fail if logged in user is null
+            return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null){
+            // return fail if request user is null
+            return new ResponseLogOut(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)){
+            // return fail if request user does not match logged in user
+            return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (getLoggedInUser().getUserName().equals(userFromRequest)){
+            // log user out
+            logUserOut();
+            // return success if request user matches logged in user
+            return new ResponseLogOut(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseLogOut(protocolId, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * This method sets user to null and removes
+     * user from users.
+     */
+    private void logUserOut() {
+        // set logged in user to null
+        User tempUser = getLoggedInUser();
+        user = null;
+
+        // remove user from users
+        removeUserFromUsers(tempUser);
     }
 
     /**
@@ -176,25 +222,29 @@ public class ClientThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseQuitGame(protocolId, FAIL, NOT_LOGGED_IN);
-
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseQuitGame(protocolId, FAIL, USERNAME_MISMATCH);
-
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAMES);
-
         } else if (getGame(gameToQuit) == null) {
             // return fail if game to quit does not exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAME);
-
         } else {
             quitGame(gameToQuit, requestUsername);
             return new ResponseQuitGame(protocolId, SUCCESS);
         }
     }
 
+    /**
+     * This method removes the user from the game and sets
+     * game joined to null.
+     *
+     * @param gameToQuit
+     * @param requestUsername
+     * @return
+     */
     private boolean quitGame(String gameToQuit, String requestUsername) {
         getGame(gameToQuit).removePlayer(requestUsername);
         this.gameJoined = null;
@@ -202,6 +252,13 @@ public class ClientThread implements Runnable {
         return getGame(gameToQuit).getPlayer(requestUsername) == null;
     }
 
+    /**
+     * This method joins the user to the game sent in the request.
+     *
+     * @param JSONinput
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleJoinGame(String JSONinput, int protocolId) {
         RequestJoinGame requestJoinGame = this.gson.fromJson(JSONinput, RequestJoinGame.class);
 
@@ -211,19 +268,15 @@ public class ClientThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseJoinGame(protocolId, FAIL, NOT_LOGGED_IN);
-
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseJoinGame(protocolId, FAIL, USERNAME_MISMATCH);
-
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAMES);
-
         } else if (getGame(gameToJoin) == null) {
             // return fail if game to join does not exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAME);
-
         } else {
             this.gameJoined = gameToJoin;
             joinGame(gameToJoin);
