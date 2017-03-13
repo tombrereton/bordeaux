@@ -43,7 +43,7 @@ public class GameLobby {
     }
 
     /**
-     * return true if player has values greater than dealer but player is not bust
+     * return true if player has listOfGames greater than dealer but player is not bust
      * return false if player has value less than dealer but dealer is not bust
      *
      * @param player
