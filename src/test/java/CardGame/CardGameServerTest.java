@@ -720,12 +720,20 @@ public class CardGameServerTest {
      */
     @Test
     public void bet01_test() {
-        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestBet));
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
 
         // We check the bet was successful
-        int successBet = responseProtocol.getRequestSuccess();
+        int successBet = responseBet.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, successBet);
     }
 

@@ -155,10 +155,70 @@ public class ClientThread implements Runnable {
                 return handleJoinGame(JSONInput, protocolId);
             case QUIT_GAME:
                 return handleQuitGame(JSONInput, protocolId);
+            case BET:
+                return handleBet(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
+
+    private ResponseProtocol handleBet(String jsonInput, int protocolId) {
+        RequestBet requestBet = gson.fromJson(jsonInput, RequestBet.class);
+        String userFromRequest = requestBet.getUsername();
+        int betAmount = requestBet.getBetAmount();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseLogOut(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (!isBetWithinBudget(betAmount)){
+            // return fail if bet amount is not within budget
+            return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetWithinBudget(betAmount)){
+            // make bet and push it to all players
+            makeBet(betAmount);
+            // return success if bet within budget
+            return new ResponseBet(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * This method checks that the bet sent in the request is
+     * within the player budget. Returns true if it is, false if not.
+     * @param betAmount
+     * @return
+     */
+    private boolean isBetWithinBudget(int betAmount) {
+        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+    }
+
+    /**
+     * This method sets the bet for the logged in user and sets
+     * the player to isFinishedRound to true. The method
+     * then pushes bets, budgets and playersFinished to all clients
+     * in the same game.
+     *
+     * @param betAmount
+     */
+    private void makeBet(int betAmount) {
+        // set player bet
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
+
+        // push update to all users
+        pushPlayerBets();
+        pushPlayerBudgets();
+        pushAreAllPlayersFinished();
+    }
+
 
     /**
      * This method logs a user out of the client.
@@ -171,16 +231,16 @@ public class ClientThread implements Runnable {
         RequestLogOut requestLogOut = gson.fromJson(jsonInput, RequestLogOut.class);
         String userFromRequest = requestLogOut.getUsername();
 
-        if (isLoggedInUserNull()){
+        if (isLoggedInUserNull()) {
             // return fail if logged in user is null
             return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
-        } else if (userFromRequest == null){
+        } else if (userFromRequest == null) {
             // return fail if request user is null
             return new ResponseLogOut(protocolId, FAIL, EMPTY);
-        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)){
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (getLoggedInUser().getUserName().equals(userFromRequest)){
+        } else if (getLoggedInUser().getUserName().equals(userFromRequest)) {
             // log user out
             logUserOut();
             // return success if request user matches logged in user
@@ -298,21 +358,21 @@ public class ClientThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if not logged in
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
-        } else if (requestUsername == null){
+        } else if (requestUsername == null) {
             // return fail if request user is null
             return new ResponseCreateGame(protocolId, FAIL, null, EMPTY);
-        } else if (!requestUsername.equals(getLoggedInUser().getUserName())){
+        } else if (!requestUsername.equals(getLoggedInUser().getUserName())) {
             // return fail if request user does not match logged in user
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
-        } else if (getGame(requestUsername) != null){
+        } else if (getGame(requestUsername) != null) {
             // return fail if game with request game name already exists
             return new ResponseCreateGame(protocolId, FAIL,
                     getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
-        } else if (gameJoined != null){
+        } else if (gameJoined != null) {
             // return fail if already in a game
             return new ResponseCreateGame(protocolId, FAIL,
                     getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
-        } else if (getGame(requestUsername) == null){
+        } else if (getGame(requestUsername) == null) {
             // create game if game does not exist
             GameLobby newGame = createGame();
             String gameName = newGame.getLobbyName();
@@ -324,12 +384,40 @@ public class ClientThread implements Runnable {
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
         } else {
-           // return fail for unknown error
+            // return fail for unknown error
             return new ResponseCreateGame(protocolId, FAIL, null);
         }
     }
 
+    /**
+     * This method pushes all the player bets to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerBets() {
+        Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
 
+        PushPlayerBets push = new PushPlayerBets(playerBets);
+
+        return pushToPlayers(push);
+
+    }
+
+    /**
+     * This method pushes all the player statuses for if they have finished their move to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushAreAllPlayersFinished() {
+        Map<String, Boolean> playersFinished = this.getGame(gameJoined).getPlayersFinished();
+
+        PushAreAllPlayersFinished push = new PushAreAllPlayersFinished(playersFinished);
+
+        return pushToPlayers(push);
+
+    }
     /**
      * This method pushes all the player hands to
      * all the clients joined in the same game for this thread.
