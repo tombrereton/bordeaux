@@ -8,12 +8,14 @@ import static CardGame.ProtocolTypes.CREATE_GAME;
 public class RequestCreateGame extends RequestProtocol {
     String username;
 
-    public RequestCreateGame() {
+    public RequestCreateGame(String username) {
         super(CREATE_GAME);
+        this.username = username;
     }
 
-    public RequestCreateGame(int protocolId) {
+    public RequestCreateGame(int protocolId, String username) {
         super(protocolId, CREATE_GAME);
+        this.username = username;
     }
 
     public String getUsername() {
