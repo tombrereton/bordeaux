@@ -217,6 +217,14 @@ public class ClientThread implements Runnable {
         pushPlayerBets();
         pushPlayerBudgets();
         pushAreAllPlayersFinished();
+
+        if(getGame(gameJoined).allPlayersFinished()){
+            // if all players finished deal cards to players and dealer i.e. start game
+            getGame(gameJoined).startGame();
+            // if all finished push hands
+            pushPlayerHands();
+        }
+
     }
 
 
