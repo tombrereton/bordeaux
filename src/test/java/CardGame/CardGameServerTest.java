@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
-import static CardGame.ProtocolTypes.CREATE_GAME;
 import static CardGame.Requests.RequestProtocol.encodeRequest;
 import static org.junit.Assert.*;
 
@@ -372,7 +371,7 @@ public class CardGameServerTest {
     public void CreateGameRequest01_test() {
         int expected = 1;
 
-        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(this.userTest.getUserName());
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
 
         // LOGIN
@@ -445,7 +444,7 @@ public class CardGameServerTest {
                 new CopyOnWriteArrayList<GameLobby>(),
                 new CopyOnWriteArrayList<String>());
 
-        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
 
         //CREATE GAME
         String createGameJson = gson.toJson(requestCreateGame);
@@ -479,7 +478,7 @@ public class CardGameServerTest {
     public void CreateGameRequestPush03_test() {
         int expected = 1;
 
-        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
 
         // LOGIN
@@ -552,7 +551,7 @@ public class CardGameServerTest {
         int expected = 1;
 
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
-        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
 
         // LOGIN
 
@@ -636,7 +635,7 @@ public class CardGameServerTest {
         int expected = 1;
 
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
-        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
         RequestLoginUser requestLoginUser1 = new RequestLoginUser(this.userTestTwo);
 
         // LOGIN
@@ -721,12 +720,20 @@ public class CardGameServerTest {
      */
     @Test
     public void bet01_test() {
-        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestBet));
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
 
         // We check the bet was successful
-        int successBet = responseProtocol.getRequestSuccess();
+        int successBet = responseBet.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, successBet);
     }
 
@@ -784,11 +791,11 @@ public class CardGameServerTest {
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
-        RequestCreateGame requestCreateGame = new RequestCreateGame();
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
         ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
 
         // QUIT GAME
-        RequestQuitGame requestQuitGame = new RequestQuitGame();
+        RequestQuitGame requestQuitGame = new RequestQuitGame(userTest.getUserName(), userTest.getUserName());
         ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestQuitGame));
 
         // we check the user quit the game successfully
@@ -802,8 +809,12 @@ public class CardGameServerTest {
      */
     @Test
     public void logOut01_test() {
-        RequestLogOut requestLogOut = new RequestLogOut();
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseLogin = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
+        // LOG OUT
+        RequestLogOut requestLogOut = new RequestLogOut(this.userTest.getUserName());
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLogOut));
 
         // we check the user logged out successfully

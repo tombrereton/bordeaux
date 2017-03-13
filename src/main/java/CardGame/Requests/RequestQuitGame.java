@@ -19,7 +19,7 @@ public class RequestQuitGame extends RequestProtocol {
         this.username = username;
     }
 
-    public RequestQuitGame() {
+    public RequestQuitGame(String gameToQuit, String username) {
         super(QUIT_GAME);
         this.gameToQuit = gameToQuit;
         this.username = username;

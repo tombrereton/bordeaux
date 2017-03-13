@@ -22,6 +22,13 @@ public class User {
         this.emailAddress = emailAddress;
     }
 
+    public User(String userName, String password, String firstName, String lastName) {
+        this.userName = userName;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
@@ -29,6 +36,9 @@ public class User {
 
     public User(String userName) {
         this.userName = userName;
+    }
+
+    public User(){
     }
 
     public String getUserName() {
@@ -87,7 +97,6 @@ public class User {
         return this.getUserName().equals("") ||
                 this.getPassword().equals("") ||
                 this.getFirstName().equals("") ||
-                this.getEmailAddress().equals("") ||
                 this.getLastName().equals("");
         
     }
@@ -105,7 +114,6 @@ public class User {
         return this.getUserName().equals(user.getUserName()) &&
                 this.getPassword().equals(user.getPassword()) &&
                 this.getFirstName().equals(user.getFirstName()) &&
-                this.getEmailAddress().equals(user.getEmailAddress()) &&
                 this.getLastName().equals(user.getLastName());
     }
 

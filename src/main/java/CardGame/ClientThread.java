@@ -22,6 +22,7 @@ import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
 import static CardGame.Pushes.PushProtocol.encodePush;
 import static CardGame.Requests.RequestProtocol.decodeRequest;
+import static CardGame.Responses.ResponseProtocol.encodeResponse;
 
 /**
  * This class implements the Runnable interface and
@@ -77,33 +78,28 @@ public class ClientThread implements Runnable {
      */
     @Override
     public void run() {
-
         try {
             while (clientAlive) {
+                // We read in the request from the client and handle it
                 ResponseProtocol response = handleInput(inputStream.readUTF());
-                System.out.println(response);
 
-                String jsonOutString = this.gson.toJson(response);
-
-                outputStream.writeUTF(jsonOutString);
+                // We write the response to the client
+                outputStream.writeUTF(encodeResponse(response));
                 outputStream.flush();
+                System.out.println(response);
             }
-
         } catch (EOFException e) {
             System.out.println("Client likely disconnected.: " + e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
         } finally {
             try {
-                Thread.sleep(10);
                 closeConnections();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
-
     }
 
     private void connectStreams() {
@@ -135,7 +131,7 @@ public class ClientThread implements Runnable {
      */
     public ResponseProtocol handleInput(String JSONInput) {
 
-        // Deserialise request object
+        // Deserialize request object
         RequestProtocol request = decodeRequest(JSONInput);
 
         // Get packet ID and its type
@@ -147,19 +143,133 @@ public class ClientThread implements Runnable {
                 return handleRegisterUser(JSONInput, protocolId);
             case LOGIN_USER:
                 return handleLoginUser(JSONInput, protocolId);
+            case LOG_OUT_USER:
+                return handleLogoutUser(JSONInput, protocolId);
             case SEND_MESSAGE:
                 return handleSendMessage(JSONInput, protocolId);
             case GET_MESSAGE:
                 return handleGetMessages(JSONInput, protocolId);
             case CREATE_GAME:
-                return handleCreateGame(protocolId);
+                return handleCreateGame(JSONInput, protocolId);
             case JOIN_GAME:
                 return handleJoinGame(JSONInput, protocolId);
             case QUIT_GAME:
                 return handleQuitGame(JSONInput, protocolId);
+            case BET:
+                return handleBet(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    private ResponseProtocol handleBet(String jsonInput, int protocolId) {
+        RequestBet requestBet = gson.fromJson(jsonInput, RequestBet.class);
+        String userFromRequest = requestBet.getUsername();
+        int betAmount = requestBet.getBetAmount();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseLogOut(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (!isBetWithinBudget(betAmount)){
+            // return fail if bet amount is not within budget
+            return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetWithinBudget(betAmount)){
+            // make bet and push it to all players
+            makeBet(betAmount);
+            // return success if bet within budget
+            return new ResponseBet(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * This method checks that the bet sent in the request is
+     * within the player budget. Returns true if it is, false if not.
+     * @param betAmount
+     * @return
+     */
+    private boolean isBetWithinBudget(int betAmount) {
+        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+    }
+
+    /**
+     * This method sets the bet for the logged in user and sets
+     * the player to isFinishedRound to true. The method
+     * then pushes bets, budgets and playersFinished to all clients
+     * in the same game.
+     *
+     * @param betAmount
+     */
+    private void makeBet(int betAmount) {
+        // set player bet
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
+
+        // push update to all users
+        pushPlayerBets();
+        pushPlayerBudgets();
+        pushAreAllPlayersFinished();
+
+        if(getGame(gameJoined).allPlayersFinished()){
+            // if all players finished deal cards to players and dealer i.e. start game
+            getGame(gameJoined).startGame();
+            // if all finished push hands
+            pushPlayerHands();
+        }
+
+    }
+
+
+    /**
+     * This method logs a user out of the client.
+     *
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleLogoutUser(String jsonInput, int protocolId) {
+        RequestLogOut requestLogOut = gson.fromJson(jsonInput, RequestLogOut.class);
+        String userFromRequest = requestLogOut.getUsername();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseLogOut(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // log user out
+            logUserOut();
+            // return success if request user matches logged in user
+            return new ResponseLogOut(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseLogOut(protocolId, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * This method sets user to null and removes
+     * user from users.
+     */
+    private void logUserOut() {
+        // set logged in user to null
+        User tempUser = getLoggedInUser();
+        user = null;
+
+        // remove user from users
+        removeUserFromUsers(tempUser);
     }
 
     /**
@@ -180,25 +290,29 @@ public class ClientThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseQuitGame(protocolId, FAIL, NOT_LOGGED_IN);
-
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseQuitGame(protocolId, FAIL, USERNAME_MISMATCH);
-
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAMES);
-
         } else if (getGame(gameToQuit) == null) {
             // return fail if game to quit does not exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAME);
-
         } else {
             quitGame(gameToQuit, requestUsername);
             return new ResponseQuitGame(protocolId, SUCCESS);
         }
     }
 
+    /**
+     * This method removes the user from the game and sets
+     * game joined to null.
+     *
+     * @param gameToQuit
+     * @param requestUsername
+     * @return
+     */
     private boolean quitGame(String gameToQuit, String requestUsername) {
         getGame(gameToQuit).removePlayer(requestUsername);
         this.gameJoined = null;
@@ -206,6 +320,13 @@ public class ClientThread implements Runnable {
         return getGame(gameToQuit).getPlayer(requestUsername) == null;
     }
 
+    /**
+     * This method joins the user to the game sent in the request.
+     *
+     * @param JSONinput
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleJoinGame(String JSONinput, int protocolId) {
         RequestJoinGame requestJoinGame = this.gson.fromJson(JSONinput, RequestJoinGame.class);
 
@@ -215,19 +336,15 @@ public class ClientThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseJoinGame(protocolId, FAIL, NOT_LOGGED_IN);
-
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseJoinGame(protocolId, FAIL, USERNAME_MISMATCH);
-
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAMES);
-
         } else if (getGame(gameToJoin) == null) {
             // return fail if game to join does not exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAME);
-
         } else {
             this.gameJoined = gameToJoin;
             joinGame(gameToJoin);
@@ -242,31 +359,73 @@ public class ClientThread implements Runnable {
      * @param protocolId
      * @return
      */
-    private ResponseProtocol handleCreateGame(int protocolId) {
-        // TODO: clean this code
-        if (this.getLoggedInUser() == null) {
+    private ResponseProtocol handleCreateGame(String JSONInput, int protocolId) {
+        RequestCreateGame request = gson.fromJson(JSONInput, RequestCreateGame.class);
+        String requestUsername = request.getUsername();
+
+        if (isLoggedInUserNull()) {
+            // return fail if not logged in
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
-        } else if (getGame(getLoggedInUser()) != null) {
+        } else if (requestUsername == null) {
+            // return fail if request user is null
+            return new ResponseCreateGame(protocolId, FAIL, null, EMPTY);
+        } else if (!requestUsername.equals(getLoggedInUser().getUserName())) {
+            // return fail if request user does not match logged in user
+            return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
+        } else if (getGame(requestUsername) != null) {
+            // return fail if game with request game name already exists
             return new ResponseCreateGame(protocolId, FAIL,
-                    getGame(getLoggedInUser()).getLobbyName(), GAME_ALREADY_EXISTS);
-        }
+                    getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
+        } else if (gameJoined != null) {
+            // return fail if already in a game
+            return new ResponseCreateGame(protocolId, FAIL,
+                    getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
+        } else if (getGame(requestUsername) == null) {
+            // create game if game does not exist
+            GameLobby newGame = createGame();
+            String gameName = newGame.getLobbyName();
 
-        GameLobby newGame = createGame();
-        String gameName = newGame.getLobbyName();
+            // join game
+            gameJoined = gameName;
+            joinGame(gameJoined);
 
-        if (isNewGameExists(newGame)) {
-            this.gameJoined = gameName;
-            joinGame(this.gameJoined);
+            // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
         } else {
+            // return fail for unknown error
             return new ResponseCreateGame(protocolId, FAIL, null);
         }
     }
 
-    private boolean isNewGameExists(GameLobby newGame) {
-        return this.getGame(this.getLoggedInUser()).equals(newGame);
+    /**
+     * This method pushes all the player bets to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerBets() {
+        Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
+
+        PushPlayerBets push = new PushPlayerBets(playerBets);
+
+        return pushToPlayers(push);
+
     }
 
+    /**
+     * This method pushes all the player statuses for if they have finished their move to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushAreAllPlayersFinished() {
+        Map<String, Boolean> playersFinished = this.getGame(gameJoined).getPlayersFinished();
+
+        PushAreAllPlayersFinished push = new PushAreAllPlayersFinished(playersFinished);
+
+        return pushToPlayers(push);
+
+    }
     /**
      * This method pushes all the player hands to
      * all the clients joined in the same game for this thread.
@@ -336,25 +495,26 @@ public class ClientThread implements Runnable {
         DataOutputStream outputStream = null;
         Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
 
-        if (!this.socketList.isEmpty()) {
+        if (this.socketList.isEmpty()) {
+            return false;
+        }
+
+        try {
+            for (Map.Entry<String, Socket> playerSocketEntry : playerSockets.entrySet()) {
+                outputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
+                outputStream.writeUTF(encodePush(push));
+            }
+            return true;
+        } catch (IOException e) {
+            System.out.println("Failed to send out list of game names");
+            return false;
+        } finally {
             try {
-                for (Map.Entry<String, Socket> entry : playerSockets.entrySet()) {
-                    outputStream = new DataOutputStream(entry.getValue().getOutputStream());
-                    outputStream.writeUTF(encodePush(push));
-                }
-                return true;
+                outputStream.close();
             } catch (IOException e) {
-                System.out.println("Failed to send out list of game names");
-                return false;
-            } finally {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                e.printStackTrace();
             }
         }
-        return false;
     }
 
     private void joinGame(String lobbyname) {
@@ -373,7 +533,7 @@ public class ClientThread implements Runnable {
      * @return
      */
     private GameLobby createGame() {
-        GameLobby newGame = new GameLobby(this.getLoggedInUser(), this.toClientSocket);
+        GameLobby newGame = new GameLobby(getLoggedInUser(), this.toClientSocket);
 
         this.getGames().add(newGame);
 
@@ -432,8 +592,6 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleSendMessage(String JSONInput, int protocolId) {
-        ResponseProtocol response = null;
-
         RequestSendMessage requestSendMessage = this.gson.fromJson(JSONInput, RequestSendMessage.class);
         MessageObject messageFromRequest = requestSendMessage.getMessageObject();
 
@@ -455,8 +613,6 @@ public class ClientThread implements Runnable {
             // return fail for unknown error
             return new ResponseSendMessage(protocolId, FAIL, UNKNOWN_ERROR);
         }
-
-
     }
 
     /**

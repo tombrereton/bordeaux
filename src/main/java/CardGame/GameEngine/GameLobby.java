@@ -133,15 +133,6 @@ public class GameLobby {
         }
     }
 
-    public synchronized void updatePlayer(Player player) {
-//        for(Player p: players){
-//            if(p.getUsername().equals(player.getUsername())){
-//                p.setBet(play);
-//            }
-//        }
-        // fill out
-    }
-
     public synchronized boolean allPlayersFinished() {
         for (Player p : players) {
             if (!p.isFinishedRound()) {
@@ -149,6 +140,34 @@ public class GameLobby {
             }
         }
         return true;
+    }
+
+    /**
+     * This method returns a map of all players and their budgets.
+     * @return
+     */
+    public synchronized Map<String, Integer> getPlayerBets(){
+        Map<String, Integer> playerBets = new HashMap<>();
+
+        for (Player player : players){
+            playerBets.put(player.getUsername(), player.getBet());
+        }
+
+        return playerBets;
+    }
+
+    /**
+     * This method returns a map of all players and their isFinishedRound status.
+     * @return
+     */
+    public synchronized Map<String, Boolean> getPlayersFinished(){
+        Map<String, Boolean> playersFinished = new HashMap<>();
+
+        for (Player player : players){
+            playersFinished.put(player.getUsername(), player.isFinishedRound());
+        }
+
+        return playersFinished;
     }
 
     /**
