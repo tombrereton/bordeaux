@@ -36,10 +36,12 @@ public class CardGameServerTest {
     CardGameServer server;
     FunctionDB functionDB;
     ClientThread clientThread;
+    ClientThread clientThreadTwo;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
     User userTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
-    User userTestTwo = new User("Aces", "apple", "Gary", "Smith");
+    User userTestTwo = new User("boris99", "dog", "Thomas", "Brereton");
     User userNotReg = new User("something", "orange", "Sam", "Smith");
     Gson gson = new Gson();
 
@@ -48,7 +50,9 @@ public class CardGameServerTest {
         functionDB = new FunctionDB();
         server = new CardGameServer();
         clientThread = new ClientThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), new CopyOnWriteArrayList<User>(), functionDB, games, gameNames);
+                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
+        clientThreadTwo = new ClientThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
+                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
     }
 
     // TESTS
@@ -540,6 +544,9 @@ public class CardGameServerTest {
         assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
     }
 
+    /**
+     * We test joining a game again on the same thread.
+     */
     @Test
     public void joinGame01_test() {
         int expected = 1;
@@ -612,6 +619,98 @@ public class CardGameServerTest {
         RequestJoinGame requestJoinGame = new RequestJoinGame(userTest.getUserName(), userTestTwo.getUserName());
         ResponseProtocol responseJoin = this.clientThread.handleInput(encodeRequest(requestJoinGame));
 
+        // we check for unsuccessful response
+        int successJoin = responseJoin.getRequestSuccess();
+        assertEquals("Should return success join response  ", FAIL, successJoin);
+
+        // we check for user not logged in error msg
+        String errorJoin = responseJoin.getErrorMsg();
+        assertEquals("Should return error message matching user not logged in ", USERNAME_MISMATCH, errorJoin);
+    }
+
+    /**
+     * We test for 1 thread creating a game, another thread joining that game.
+     */
+    @Test
+    public void joinGame02_test() {
+        int expected = 1;
+
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
+        RequestProtocol requestCreateGame = new RequestCreateGame(CREATE_GAME);
+        RequestLoginUser requestLoginUser1 = new RequestLoginUser(this.userTestTwo);
+
+        // LOGIN
+
+        // handle the json object
+        ResponseProtocol responseLogin = clientThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseLogin2 = clientThreadTwo.handleInput(encodeRequest(requestLoginUser1));
+
+        // We check the type is login user
+        int type = responseLogin.getType();
+        assertEquals("Type should match login user", ProtocolTypes.LOGIN_USER, type);
+
+        // We check the passwords match as per the response
+        ResponseLoginUser responseLoginUser = (ResponseLoginUser) responseLogin;
+        int actual = responseLoginUser.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actual);
+
+        // We check the log in protocolId is the same.
+        int expectedID = requestLoginUser.getProtocolId();
+        int actualID = responseLogin.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ", expectedID, actualID);
+
+        // We check the user from the database is the same
+        User fromDB = responseLoginUser.getUser();
+        assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
+
+        // SECOND USER
+
+        // We check the second user, userTestTwo
+        User loggedInUser = this.clientThreadTwo.getLoggedInUser();
+        assertEquals("Should return logged in user matching usertesttwo ", userTestTwo, loggedInUser);
+
+        // we check second user logged in
+        int successLogin2 = responseLogin2.getRequestSuccess();
+        assertEquals("Should return successful login matching success ", SUCCESS, successLogin2);
+
+        //CREATE GAME
+        String createGameJson = gson.toJson(requestCreateGame);
+
+        // Calling handle input will create game and add it to gameLobby list
+        ResponseProtocol responseCreateGame = this.clientThread.handleInput(createGameJson);
+
+        // We check the type is create game
+        int typeCreateGame = responseCreateGame.getType();
+        assertEquals("Type should match login user", ProtocolTypes.CREATE_GAME, typeCreateGame);
+
+        // We check we got a successful response
+        int actualCreateGame = responseCreateGame.getRequestSuccess();
+        assertEquals("Should return success of value 1, matching expected ", expected, actualCreateGame);
+
+        // We check the protocolId is the same.
+        int expectedIDCreateGame = requestCreateGame.getProtocolId();
+        int actualIDCreateGame = responseCreateGame.getProtocolId();
+        assertEquals("Should return the same protocol ID matching expectedID ",
+                expectedIDCreateGame, actualIDCreateGame);
+
+        // We check we created the correct game
+        GameLobby game = this.clientThread.getGame(this.userTest);
+        assertNotNull(game);
+
+        // We check the game list is pushed
+        PushGameNames push = this.clientThread.pushGameListToClient();
+        ArrayList<String> gameNames = push.getGameNames();
+
+        ArrayList<String> expectedGames = new ArrayList<>();
+        expectedGames.add(this.userTest.getUserName());
+
+        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
+
+        // SECOND USER JOIN GAME
+        String gameName = userTest.getUserName();
+        RequestJoinGame requestJoinGame = new RequestJoinGame(gameName, userTestTwo.getUserName());
+        ResponseProtocol responseJoin = this.clientThreadTwo.handleInput(encodeRequest(requestJoinGame));
+
         // we check for successful response
         int successJoin = responseJoin.getRequestSuccess();
         assertEquals("Should return success join response  ", SUCCESS, successJoin);
@@ -680,9 +779,17 @@ public class CardGameServerTest {
      */
     @Test
     public void quitGame01_test() {
-        RequestQuitGame requestQuitGame = new RequestQuitGame();
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestQuitGame));
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame();
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // QUIT GAME
+        RequestQuitGame requestQuitGame = new RequestQuitGame();
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestQuitGame));
 
         // we check the user quit the game successfully
         int successQuit = responseProtocol.getRequestSuccess();

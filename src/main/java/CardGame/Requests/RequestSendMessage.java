@@ -35,4 +35,5 @@ public class RequestSendMessage extends RequestProtocol {
                 "messageObject=" + messageObject +
                 "} " + super.toString();
     }
+
 }
