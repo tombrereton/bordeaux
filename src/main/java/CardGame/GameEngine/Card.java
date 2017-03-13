@@ -17,7 +17,7 @@ public class Card {
 
     public final static int ACE = 1,          // Codes for the non-numeric cards.
             JACK = 11,        //   Cards 2 through 10 have their
-            QUEEN = 12,       //   numerical values for their codes.
+            QUEEN = 12,       //   numerical listOfGames for their codes.
             KING = 13;
 
     private final int suit;   // The suit of this card, one of the constants
