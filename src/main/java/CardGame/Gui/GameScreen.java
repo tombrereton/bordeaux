@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 
 /**
- * GameScreen
+ * gameScreen
  * @author Alex
  *
  */
@@ -181,7 +181,7 @@ public class GameScreen extends JPanel {
 		JButton btnLeaveGame = new JButton("Leave Game");
 		btnLeaveGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LobbyScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
 			}
 		});
 		btnLeaveGame.setBackground(Color.WHITE);
