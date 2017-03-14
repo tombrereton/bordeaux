@@ -3,7 +3,7 @@ package CardGame.Responses;
 import static CardGame.ProtocolTypes.FOLD;
 
 /**
- * This class is a response to the Fold request. If the Hit
+ * This class is a response to the Fold request. If the Fold
  * was performed successfully in the gameLobby, we send a successful
  * response, otherwise not.
  *
