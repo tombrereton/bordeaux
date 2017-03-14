@@ -22,6 +22,8 @@ import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
 import static CardGame.Pushes.PushProtocol.encodePush;
 import static CardGame.Requests.RequestProtocol.decodeRequest;
+import static CardGame.Pushes.PushProtocol.encodePush;
+import static CardGame.Requests.RequestProtocol.decodeRequest;
 import static CardGame.Responses.ResponseProtocol.encodeResponse;
 
 /**
@@ -95,8 +97,11 @@ public class ClientThread implements Runnable {
             System.out.println(e.getStackTrace());
         } finally {
             try {
+                Thread.sleep(10);
                 closeConnections();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -613,6 +618,8 @@ public class ClientThread implements Runnable {
             // return fail for unknown error
             return new ResponseSendMessage(protocolId, FAIL, UNKNOWN_ERROR);
         }
+
+
     }
 
     /**
