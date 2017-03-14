@@ -80,7 +80,7 @@ public class LoginScreen extends JPanel {
 			    // If response say success, change screen
 			    if (response.getRequestSuccess() == 1){
 			    	screenFactory.screenFactory(HOMESCREEN);
-					ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
+					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 				}
 
 
@@ -98,7 +98,7 @@ public class LoginScreen extends JPanel {
 		btnCreateAccount.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnCreateAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.CreateAccountScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.createAccountScreen);
 			}
 		});
 		btnCreateAccount.setBounds(432, 418, 160, 30);
