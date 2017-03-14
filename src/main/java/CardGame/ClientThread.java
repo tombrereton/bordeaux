@@ -34,7 +34,7 @@ public class ClientThread implements Runnable {
     private Socket toClientSocket;
     private boolean clientAlive;
     private long clientID;
-    protected User user;
+    private User user;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
@@ -673,7 +673,7 @@ public class ClientThread implements Runnable {
      */
     private ResponseProtocol handleRegisterUser(String JSONInput, int protocolId) {
         boolean successRegister = false;
-        String sqlState = null;
+        String sqlState = "";
 
         // We deserialize the request again but as a RequestRegisterUser object
         RequestRegisterUser requestRegisterUser = this.gson.fromJson(JSONInput, RequestRegisterUser.class);
@@ -700,7 +700,7 @@ public class ClientThread implements Runnable {
         } else if (sqlState.equalsIgnoreCase("23505")) {
             // return fail if user already in database
             return new ResponseRegisterUser(protocolId, FAIL, DUPE_USERNAME);
-        } else if (isLoggedInUserNull()) {
+        } else if (!isLoggedInUserNull()) {
             // return fail if user already logged in
             return new ResponseRegisterUser(protocolId, FAIL, ALREADY_LOGGED_IN);
         } else if (successRegister) {
