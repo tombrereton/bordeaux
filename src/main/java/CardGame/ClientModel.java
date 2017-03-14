@@ -1,12 +1,15 @@
 package CardGame;
 
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
+import static CardGame.ProtocolMessages.SUCCESS;
+import CardGame.Pushes.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import static CardGame.ProtocolMessages.SUCCESS;
+import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseRegisterUser;
 /**
  * The observable class that contains all the information to be displayed on the client gui and methods for sending to server.
  * @author Lloyd
@@ -21,12 +24,16 @@ public class ClientModel extends Observable {
 	
 	//fields
 	User user;
+	ArrayList<User> users;
+	LinkedBlockingQueue<PushProtocol> pushRequestQueue;
+	
 	/**
 	 * Constructor.
 	 */
 	public ClientModel(){
 		this.connected = false;
 		this.loggedIn = false;
+		this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
 	}
 	/**
 	 * method that sends login request to server and updates loggedin and user fields.

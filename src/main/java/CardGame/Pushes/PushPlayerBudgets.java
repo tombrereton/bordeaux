@@ -1,8 +1,8 @@
 package CardGame.Pushes;
 
-import java.util.Map;
-
 import static CardGame.ProtocolTypes.PUSH_PLAYER_BUDGETS;
+
+import java.util.Map;
 
 /**
  * Created by tom on 11/03/17.
