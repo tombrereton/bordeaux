@@ -10,6 +10,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
+
+import java.io.IOException;
+import java.util.Observable;
+
+import static CardGame.ProtocolMessages.SUCCESS;
 /**
  * The observable class that contains all the information to be displayed on the client gui and methods for sending to server.
  * @author Lloyd
@@ -26,7 +31,7 @@ public class ClientModel extends Observable {
 	User user;
 	ArrayList<User> users;
 	LinkedBlockingQueue<PushProtocol> pushRequestQueue;
-	
+
 	/**
 	 * Constructor.
 	 */

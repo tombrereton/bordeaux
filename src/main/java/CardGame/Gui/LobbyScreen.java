@@ -5,6 +5,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Lobby Screen
@@ -12,12 +13,16 @@ import java.awt.event.ActionListener;
  *
  */
 public class LobbyScreen extends JPanel{
+//    public String[] listOfGames;
+    public ArrayList<String> listOfGames;
 
 	/**
 	 * Create the application.
 	 */
 	public LobbyScreen() {
 		initialize();
+		this.listOfGames = new ArrayList<>();
+		listOfGames.add("test game");
 	}
 
 	/**
@@ -46,27 +51,33 @@ public class LobbyScreen extends JPanel{
 				ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
 			}
 		});
-		btnBack.setBounds(40, 526, 89, 23);
+		btnBack.setBounds(40, 515, 150, 23);
 		add(btnBack);
-		
+
+        /**
+         * List of games
+         */
 		JList list = new JList();
 		list.setVisibleRowCount(20);
 		list.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		list.setFont(new Font("Soho Std", Font.PLAIN, 18));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setModel(new AbstractListModel() {
-			String[] values = new String[] {"MyGame", "AnotherGame","ExampleGame"};
-			public int getSize() {
-				return values.length;
+
+            public int getSize() {
+				return listOfGames.size();
 			}
 			public Object getElementAt(int index) {
-				return values[index];
+				return listOfGames.get(index);
 			}
 		});
 		list.setBounds(40, 56, 946, 444);
 		add(list);
-		
-		JButton button = new JButton("Join");
+
+		/**
+		 * Join button
+		 */
+		JButton button = new JButton("Join game");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScreenFactory.setPane(ScreenFactory.frame.GameScreen);
@@ -74,7 +85,23 @@ public class LobbyScreen extends JPanel{
 		});
 		button.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		button.setBackground(Color.WHITE);
-		button.setBounds(897, 526, 89, 23);
+		button.setBounds(836, 515, 150, 23);
 		add(button);
+
+        /**
+         * Create game button
+         */
+        JButton createGameButton = new JButton("Create game");
+        createGameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // TODO: make this show in the list
+                listOfGames.add("Test");
+                ScreenFactory.setPane(ScreenFactory.frame.LobbyScreen);
+            }
+        });
+        createGameButton.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        createGameButton.setBackground(Color.WHITE);
+        createGameButton.setBounds(428, 515, 150, 23);
+        add(createGameButton);
 	}
 }

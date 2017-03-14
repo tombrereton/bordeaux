@@ -25,6 +25,8 @@ public class ProtocolMessages {
     public static final String NO_GAME = "game requested does not exist.";
     public static final String NO_GAME_JOINED = "user is not in a game.";
     public static final String EMPTY_MSG = "message sent is empty or null.";
+    public static final String EMPTY = "protocol sent contains empty or null elements.";
+    public static final String BET_NOT_IN_BUDGET = "bet not within player budget.";
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 

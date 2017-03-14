@@ -180,7 +180,7 @@
 //        TextIO.putln("Dealer's total is " + dealerHand.getBlackjackValue());
 //
 //          /* If we get to this point, both players have 21 or less.  We
-//             can determine the winner by comparing the values of their hands. */
+//             can determine the winner by comparing the listOfGames of their hands. */
 //
 //        TextIO.putln();
 //        if (dealerHand.getBlackjackValue() == userHand.getBlackjackValue()) {

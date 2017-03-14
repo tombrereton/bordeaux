@@ -16,6 +16,7 @@ public class Player {
         this.username = user.getUserName();
         this.playerHand = new BlackjackHand();
         this.budget = 100;
+        this.isFinishedRound = false;
     }
 
     public String getUsername() {

@@ -6,14 +6,16 @@ import static CardGame.ProtocolTypes.CREATE_GAME;
  * Created by tom on 11/03/17.
  */
 public class RequestCreateGame extends RequestProtocol {
-    String username;
+    private String username;
 
-    public RequestCreateGame() {
+    public RequestCreateGame(String username) {
         super(CREATE_GAME);
+        this.username = username;
     }
 
-    public RequestCreateGame(int protocolId) {
+    public RequestCreateGame(int protocolId, String username) {
         super(protocolId, CREATE_GAME);
+        this.username = username;
     }
 
     public String getUsername() {
