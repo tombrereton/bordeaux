@@ -5,6 +5,8 @@ import CardGame.ClientModel;
 import javax.swing.*;
 import java.awt.*;
 
+import static CardGame.Gui.Screens.HOMESCREEN;
+
 /**
  * Class that creates and controls the frame and the panels to be displayed
  *
@@ -93,8 +95,8 @@ public class ScreenFactory extends JFrame {
      *
      * @param type
      */
-    public void screenFactory(String type){
-        if (type.equals(HOMESCREEN)){
+    public void screenFactory(int type){
+        if (type == HOMESCREEN){
             this.homeScreen = new HomeScreen(this.clientModel);
         }
     }

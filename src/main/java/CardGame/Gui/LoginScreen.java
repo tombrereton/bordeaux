@@ -8,7 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static CardGame.Gui.ScreenTypes.HOMESCREEN;
+import static CardGame.Gui.Screens.HOMESCREEN;
+
 
 /**
  * Login Screen
