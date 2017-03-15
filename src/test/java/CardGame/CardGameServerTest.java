@@ -771,7 +771,7 @@ public class CardGameServerTest {
         ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestHit));
 
         // we check the hit was successful
-        int successHit = responseProtocol.getRequestSuccess();
+        int successHit = responseProtocol2.getRequestSuccess();
         assertEquals("Should return successful hit response matching success ", SUCCESS, successHit);
     }
 

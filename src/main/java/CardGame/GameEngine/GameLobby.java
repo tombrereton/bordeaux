@@ -255,6 +255,7 @@ public class GameLobby {
 
         for (Player player : players) {
             playersStand.put(player.getUsername(), false);
+            player.setFinishedRound(false);
         }
 
     }
@@ -401,5 +402,13 @@ public class GameLobby {
         }
 
         allPlayersStand = true;
+    }
+
+    public Map<String, Boolean> getPlayersWon() {
+        return playersWon;
+    }
+
+    public Map<String, Boolean> getPlayersStand() {
+        return playersStand;
     }
 }

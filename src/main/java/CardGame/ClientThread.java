@@ -192,6 +192,7 @@ public class ClientThread implements Runnable {
 
             pushPlayerHands();
             pushPlayersBust();
+            pushPlayerWon();
 
             // return success if bet within budget
             return new ResponseHit(protocolId, SUCCESS);
@@ -535,6 +536,21 @@ public class ClientThread implements Runnable {
         ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
 
         PushPlayerNames push = new PushPlayerNames(playerNames);
+
+        return pushToPlayers(push);
+    }
+
+
+    /**
+     * This method pushes a map player who have won to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerWon() {
+        Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
+
+        PushPlayersWon push = new PushPlayersWon(playersWon);
 
         return pushToPlayers(push);
     }
