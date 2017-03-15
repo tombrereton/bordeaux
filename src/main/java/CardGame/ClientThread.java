@@ -164,9 +164,46 @@ public class ClientThread implements Runnable {
                 return handleHit(JSONInput, protocolId);
             case STAND:
                 return handleStand(JSONInput, protocolId);
+            case FOLD:
+                return handleFold(JSONInput, protocolId);
+            case DOUBLE:
+                return handleDouble(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    private ResponseProtocol handleDouble(String jsonInput, int protocolId) {
+        RequestDoubleBet requestDoubleBet = gson.fromJson(jsonInput, RequestDoubleBet.class);
+        String userFromRequest = requestDoubleBet.getUsername();
+        int betAmountToAdd = getGame(gameJoined).getPlayer(getLoggedInUser()).getBet();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseDoubleBet(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseDoubleBet(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseDoubleBet(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (!isBetWithinBudget(betAmountToAdd)) {
+            // return fail if bet amount is not within budget
+            return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetWithinBudget(betAmountToAdd)) {
+            // make a double bet and deal a card to player
+            doubleBet(betAmountToAdd);
+
+            // return success if bet within budget
+            return new ResponseBet(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    private ResponseProtocol handleFold(String jsonInput, int protocolId) {
+        return null;
     }
 
     private ResponseProtocol handleStand(String jsonInput, int protocolId) {
@@ -280,6 +317,28 @@ public class ClientThread implements Runnable {
         return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
     }
 
+    /**
+     * This method doubles the current bet for the logged in user and sets
+     * the player to isFinishedRound to true. The method
+     * then pushes bets, budgets and playersFinished to all clients
+     * in the same game.
+     *
+     * @param increaseAmountOfBet
+     */
+    private void doubleBet(int increaseAmountOfBet) {
+        // set player bet
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(increaseAmountOfBet);
+        getGame(gameJoined).hit(getLoggedInUser().getUserName());
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
+
+        // push update to all users
+        pushPlayerHands();
+        pushPlayerBets();
+        pushPlayerBudgets();
+        pushPlayerWon();
+        pushPlayersBust();
+        pushAreAllPlayersFinished();
+    }
     /**
      * This method sets the bet for the logged in user and sets
      * the player to isFinishedRound to true. The method

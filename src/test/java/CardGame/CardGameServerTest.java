@@ -780,12 +780,24 @@ public class CardGameServerTest {
      */
     @Test
     public void double01_test() {
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest.getUserName());
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestDoubleBet));
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
+
+        // DOUBLE BET
+        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest.getUserName());
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestDoubleBet));
 
         // we check the double bet was successful
-        int successDouble = responseProtocol.getRequestSuccess();
+        int successDouble = responseProtocol2.getRequestSuccess();
         assertEquals("Should return successful double response matching success ", SUCCESS, successDouble);
 
     }
