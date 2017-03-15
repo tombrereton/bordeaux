@@ -885,7 +885,11 @@ public class CardGameServerTest {
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
         ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
 
-        // QUIT GAME
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
+
+        // FOLD
         RequestFold requestFold = new RequestFold(userTest.getUserName());
         ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestFold));
 

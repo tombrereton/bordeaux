@@ -203,7 +203,38 @@ public class ClientThread implements Runnable {
     }
 
     private ResponseProtocol handleFold(String jsonInput, int protocolId) {
-        return null;
+        RequestFold requestFold = gson.fromJson(jsonInput, RequestFold.class);
+        String userFromRequest = requestFold.getUsername();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseFold(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseFold(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseFold(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+            // return fail if player is already standing
+            return new ResponseFold(protocolId, FAIL, ALREADY_STANDING);
+        } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+            // if the player is not standing, make player fold
+            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
+
+            pushPlayersBust();
+            pushDealerHand();
+            pushPlayersStand();
+            pushPlayerWon();
+            pushPlayerBets();
+            pushPlayerBudgets();
+
+            // return success if player is now standing
+            return new ResponseFold(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseFold(protocolId, FAIL, UNKNOWN_ERROR);
+        }
     }
 
     private ResponseProtocol handleStand(String jsonInput, int protocolId) {
@@ -348,6 +379,10 @@ public class ClientThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
+        if (getGame(gameJoined).isAllPlayersStand()){
+            getGame(gameJoined).nextGame();
+        }
+
         // set player bet
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
         getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
