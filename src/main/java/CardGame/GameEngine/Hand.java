@@ -120,4 +120,7 @@ public class Hand {
 
     }
 
+    public ArrayList<Card> getHand() {
+        return hand;
+    }
 }

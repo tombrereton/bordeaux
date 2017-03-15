@@ -16,7 +16,7 @@ public class RequestStand extends RequestProtocol {
         this.username = username;
     }
 
-    public RequestStand() {
+    public RequestStand(String username) {
         super(STAND);
         this.username = username;
     }
