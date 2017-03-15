@@ -26,13 +26,18 @@ import static CardGame.ProtocolTypes.*;
 public class CardGameClient {
 
     private Socket socket;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
     private String host = "localhost";
     private int port = 7654;
+    private Gson gson = new Gson();
 
     public CardGameClient() {
 
         try {
             this.socket = new Socket(this.host, this.port);
+             inputStream = new DataInputStream(socket.getInputStream());
+            outputStream = new DataOutputStream(socket.getOutputStream());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -65,33 +70,23 @@ public class CardGameClient {
         }
     }
 
-    public ResponseProtocol sendRequest(RequestProtocol rp) throws IOException{
-
-    		DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-            Gson gson = new Gson();
+    public void sendRequest(RequestProtocol rp) throws IOException{
             String request =gson.toJson(rp);
             outputStream.writeUTF(request);
             outputStream.flush();
-            String jsonInString = "";
-            //read response
-            System.out.println("before read");
-            	jsonInString = inputStream.readUTF();
-            	System.out.println("after read");
-
-            return handleResponse(jsonInString);
-
-
-
-
-
-
-
-
+            
     }
+    
+    public ResponseProtocol receiveResponse() throws IOException{
+    	//read response
+    	String jsonInString = inputStream.readUTF();
+    return gson.fromJson(jsonInString, ResponseProtocol.class);
+    }
+    
     public ResponseRegisterUser sendRequestRegisterUser(User user) throws IOException{
     	RequestRegisterUser request = new RequestRegisterUser(user);
-    	ResponseProtocol response = sendRequest(request);
+    	sendRequest(request);
+    	ResponseProtocol response = receiveResponse();
 		System.out.println(response);
 
 		Gson gson = new Gson();
@@ -103,7 +98,8 @@ public class CardGameClient {
 
     public ResponseLoginUser sendRequestLoginUser(User user) throws IOException{
     	RequestLoginUser request = new RequestLoginUser(user);
-    	ResponseProtocol response = sendRequest(request);
+    	sendRequest(request);
+    	ResponseProtocol response = receiveResponse();
 		System.out.println(response);
 
 		Gson gson = new Gson();
