@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 public class CardGameServer {
     private final int port = 7654;
     private ServerSocket serverSocket;
-    private final int numberOfThreads = 10;
+    private final int numberOfThreads = 20;
     protected FunctionDB functionDB;
     private Gson gson;
 
@@ -52,13 +52,17 @@ public class CardGameServer {
             this.serverSocket = new ServerSocket(this.port);
 
             while (true) {
+                // Wait for a client to connect
                 System.out.println("Waiting for connection from Client");
                 Socket socket = this.serverSocket.accept();
-                // add socket to socket list
+
+
+                // Add client socket to socketList
                 socketList.add(socket);
                 System.out.println("Accepted connection form client");
 
 
+                // pass the socket to a new thread
                 threadPool.execute(new ClientThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
