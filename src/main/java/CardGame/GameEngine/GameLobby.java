@@ -22,6 +22,7 @@ public class GameLobby {
     private Map<String, Boolean> playersStand;
     private boolean allPlayersStand;
 
+
     /**
      * creates gamelobby with lobbyname set  : user1's lobby
      *
@@ -65,34 +66,80 @@ public class GameLobby {
         return false;
     }
 
+    public synchronized void setPlayerFold(String username) {
+        getPlayersBust().put(username, true);
+        setPlayerStand(username);
+        setPlayersWon();
+    }
+
+
     public synchronized boolean wonAgainstDealer(Player player) {
         int playerValue = player.getPlayerHand().getBlackjackValue();
 
 
         if (playerValue > 21) {
+            // lost - set bet to zero
             playersBust.put(player.getUsername(), true);
+            setBetToZero(player);
             return false;
         }
 
         if (allPlayersStand) {
+
+            // deal cards to dealer while hand value is less than 17
+            setDealerHandFaceUp();
+            while (getDealerHand().getBlackjackValue() < 17) {
+                dealToDealer();
+            }
+
+
             if (dealerHand.getBlackjackValue() == 21) {
+                // lost - set bet to zero
+                setBetToZero(player);
                 return false;
-            } else if (dealerHand.getBlackjackValue() < 21 && playerValue == 21) {
+            } else if (dealerHand.getBlackjackValue() < 21 && playerValue == 21 && !isPlayerBust(player)) {
+                // won - add bet to budget
+                addBetToBudget(player);
                 return true;
-            } else if (isDealerBust() && playerValue <= 21) {
+            } else if (isDealerBust() && playerValue <= 21 && !isPlayerBust(player)) {
+                // won - add bet to budget
+                addBetToBudget(player);
                 return true;
-            } else return playerValue > 0 && playerValue <= 21 &&
-                    !isDealerBust() && dealerHand.getBlackjackValue() >= 17;
+            } else if (playerValue > 0 && playerValue <= 21 &&
+                    !isDealerBust() && dealerHand.getBlackjackValue() >= 17 &&
+                    !isPlayerBust(player)) {
+                // won - add bet to budget
+                addBetToBudget(player);
+                return true;
+            } else {
+                // lost - set bet to zero
+                setBetToZero(player);
+                return false;
+            }
         }
 
         return false;
     }
 
+    private Boolean isPlayerBust(Player player) {
+        return getPlayersBust().get(player.getUsername());
+    }
+
+    private void setBetToZero(Player player) {
+        getPlayer(player.getUsername()).setBet(0);
+    }
+
+    private void addBetToBudget(Player player) {
+        int amountWon = getPlayer(player.getUsername()).getBet();
+        getPlayer(player.getUsername()).setBudget(amountWon);
+        getPlayer(player.getUsername()).setBet(0);
+    }
+
+
     /**
      * add card to dealerHand if value < 17 (check this!)
      * stand if > 17
      */
-
     public synchronized void dealToDealer() {
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = new Deck().dealCard();
@@ -222,6 +269,7 @@ public class GameLobby {
         }
     }
 
+
     /**
      * deals 2 cards to everyone, all cards face up
      * deals 2 card to dealer, 1 card face down, 1 card face up
@@ -229,6 +277,15 @@ public class GameLobby {
     public synchronized void startGame() {
         // start the game and shuffle the deck
         deck.shuffle();
+
+        nextGame();
+    }
+
+    public synchronized void nextGame() {
+        if (deck.cardsLeft() == 0) {
+            deck = new Deck();
+            deck.shuffle();
+        }
 
         // For players:
 
@@ -255,9 +312,16 @@ public class GameLobby {
 
         for (Player player : players) {
             playersStand.put(player.getUsername(), false);
+            playersBust.put(player.getUsername(), false);
             player.setFinishedRound(false);
         }
 
+    }
+
+    public synchronized void setDealerHandFaceUp() {
+        for (Card card : dealerHand.getHand()) {
+            card.setFaceUp(true);
+        }
     }
 
     public synchronized void setPlayersWon() {
@@ -410,5 +474,9 @@ public class GameLobby {
 
     public Map<String, Boolean> getPlayersStand() {
         return playersStand;
+    }
+
+    public boolean isAllPlayersStand() {
+        return allPlayersStand;
     }
 }
