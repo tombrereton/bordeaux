@@ -17,6 +17,10 @@ public class GameLobby {
     private Map<String, Socket> playerSockets;
     private Deck deck;
     private Map<String, Integer> playerBudgets;
+    private Map<String, Boolean> playersBust;
+    private Map<String, Boolean> playersWon;
+    private Map<String, Boolean> playersStand;
+    private boolean allPlayersStand;
 
     /**
      * creates gamelobby with lobbyname set  : user1's lobby
@@ -30,20 +34,24 @@ public class GameLobby {
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
         this.playerBudgets = new HashMap<>();
+        this.playersBust = new HashMap<>();
+        this.playersWon = new HashMap<>();
+        this.playersStand = new HashMap<>();
         // Create a deck
         this.deck = new Deck();
+
     }
 
     /**
      * @return true if bust, false if not
      */
     public synchronized boolean isDealerBust() {
-        return dealerHand.getBlackjackValue() <= 21;
+        return dealerHand.getBlackjackValue() > 21;
 
     }
 
     /**
-     * return true if player has listOfGames greater than dealer but player is not bust
+     * return true if player has hand greater than dealer but player is not bust
      * return false if player has value less than dealer but dealer is not bust
      *
      * @param player
@@ -57,10 +65,34 @@ public class GameLobby {
         return false;
     }
 
+    public synchronized boolean wonAgainstDealer(Player player) {
+        int playerValue = player.getPlayerHand().getBlackjackValue();
+
+
+        if (playerValue > 21) {
+            playersBust.put(player.getUsername(), true);
+            return false;
+        }
+
+        if (allPlayersStand) {
+            if (dealerHand.getBlackjackValue() == 21) {
+                return false;
+            } else if (dealerHand.getBlackjackValue() < 21 && playerValue == 21) {
+                return true;
+            } else if (isDealerBust() && playerValue <= 21) {
+                return true;
+            } else return playerValue > 0 && playerValue <= 21 &&
+                    !isDealerBust() && dealerHand.getBlackjackValue() >= 17;
+        }
+
+        return false;
+    }
+
     /**
      * add card to dealerHand if value < 17 (check this!)
      * stand if > 17
      */
+
     public synchronized void dealToDealer() {
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = new Deck().dealCard();
@@ -116,7 +148,7 @@ public class GameLobby {
         }
     }
 
-    public synchronized boolean removePlayer(String username){
+    public synchronized boolean removePlayer(String username) {
         int removeID = -1;
         int index = 0;
         for (Player player : players) {
@@ -144,12 +176,13 @@ public class GameLobby {
 
     /**
      * This method returns a map of all players and their budgets.
+     *
      * @return
      */
-    public synchronized Map<String, Integer> getPlayerBets(){
+    public synchronized Map<String, Integer> getPlayerBets() {
         Map<String, Integer> playerBets = new HashMap<>();
 
-        for (Player player : players){
+        for (Player player : players) {
             playerBets.put(player.getUsername(), player.getBet());
         }
 
@@ -158,12 +191,13 @@ public class GameLobby {
 
     /**
      * This method returns a map of all players and their isFinishedRound status.
+     *
      * @return
      */
-    public synchronized Map<String, Boolean> getPlayersFinished(){
+    public synchronized Map<String, Boolean> getPlayersFinished() {
         Map<String, Boolean> playersFinished = new HashMap<>();
 
-        for (Player player : players){
+        for (Player player : players) {
             playersFinished.put(player.getUsername(), player.isFinishedRound());
         }
 
@@ -174,7 +208,6 @@ public class GameLobby {
      * tells everyone to bet
      * tells everyone who still has to bet
      * once everyone has bet, calls startgame method
-     *
      */
     public synchronized void takeBets() {
         // fill out
@@ -218,6 +251,21 @@ public class GameLobby {
         dealerSecondCard.setFaceUp(true);
         dealerHand.addCard(dealerSecondCard);
 
+        // set all players stand to false
+
+        for (Player player : players) {
+            playersStand.put(player.getUsername(), false);
+            player.setFinishedRound(false);
+        }
+
+    }
+
+    public synchronized void setPlayersWon() {
+        for (Player player : players) {
+            if (wonAgainstDealer(player)) {
+                playersWon.put(player.getUsername(), true);
+            }
+        }
     }
 
     /**
@@ -233,6 +281,28 @@ public class GameLobby {
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
         player.setFinishedRound(true);
+
+        setPlayersWon();
+
+        return player.getPlayerHand().getBlackjackValue() <= 21;
+    }
+
+    /**
+     * adds card to player hand
+     * returns true if below or equal 21
+     * sets player to finished round
+     *
+     * @param username
+     * @return
+     */
+    public synchronized boolean hit(String username) {
+        Player player = getPlayer(username);
+        Card newCard = deck.dealCard();
+        player.addCardToPlayerHand(newCard);
+        player.setFinishedRound(true);
+
+        setPlayersWon();
+
         return player.getPlayerHand().getBlackjackValue() <= 21;
     }
 
@@ -264,10 +334,10 @@ public class GameLobby {
         return dealerHand;
     }
 
-    public Map<String, Hand> getPlayerHands(){
+    public Map<String, Hand> getPlayerHands() {
         Map<String, Hand> playerHands = new HashMap<>();
 
-        for (Player player : this.getPlayers()){
+        for (Player player : this.getPlayers()) {
             playerHands.put(player.getUsername(), player.getPlayerHand());
         }
         return playerHands;
@@ -276,16 +346,16 @@ public class GameLobby {
     public Map<String, Integer> getPlayerBudgets() {
         Map<String, Integer> playerBudgets = new HashMap<>();
 
-        for (Player player: getPlayers()){
+        for (Player player : getPlayers()) {
             playerBudgets.put(player.getUsername(), player.getBudget());
         }
         return playerBudgets;
     }
 
-    public ArrayList<String> getPlayerNames(){
+    public ArrayList<String> getPlayerNames() {
         ArrayList<String> playerNames = new ArrayList<>();
 
-        for (Player player : getPlayers()){
+        for (Player player : getPlayers()) {
             playerNames.add(player.getUsername());
         }
 
@@ -294,6 +364,10 @@ public class GameLobby {
 
     public Map<String, Socket> getPlayerSockets() {
         return playerSockets;
+    }
+
+    public Map<String, Boolean> getPlayersBust() {
+        return playersBust;
     }
 
     @Override
@@ -307,5 +381,34 @@ public class GameLobby {
     @Override
     public int hashCode() {
         return getLobbyName() != null ? getLobbyName().hashCode() : 0;
+    }
+
+    public synchronized void setPlayerStand(String username) {
+        for (Player player : players) {
+            if (player.getUsername().equals(username)) {
+                playersStand.put(username, true);
+            }
+        }
+
+        setAllPlayersStand();
+        setPlayersWon();
+    }
+
+    public synchronized void setAllPlayersStand() {
+        for (Map.Entry<String, Boolean> playerStand : playersStand.entrySet()) {
+            if (!playerStand.getValue()) {
+                allPlayersStand = false;
+            }
+        }
+
+        allPlayersStand = true;
+    }
+
+    public Map<String, Boolean> getPlayersWon() {
+        return playersWon;
+    }
+
+    public Map<String, Boolean> getPlayersStand() {
+        return playersStand;
     }
 }

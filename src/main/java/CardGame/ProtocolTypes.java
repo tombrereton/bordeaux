@@ -20,6 +20,7 @@ public class ProtocolTypes {
     public static final int HIT = 24;
     public static final int DOUBLE = 25;
     public static final int STAND = 26;
+    public static final int FOLD = 27;
     public static final int PUSH_GAME_NAMES = 50;
     public static final int PUSH_PLAYER_HANDS = 51;
     public static final int PUSH_PLAYER_NAMES = 52;

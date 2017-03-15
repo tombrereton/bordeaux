@@ -3,10 +3,7 @@ package CardGame;
 import CardGame.GameEngine.GameLobby;
 import CardGame.Pushes.PushGameNames;
 import CardGame.Requests.*;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseProtocol;
-import CardGame.Responses.ResponseRegisterUser;
-import CardGame.Responses.ResponseSendMessage;
+import CardGame.Responses.*;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
@@ -738,7 +735,7 @@ public class CardGameServerTest {
     }
 
     /**
-     * We test a hit request for the blackjack game
+     * We test a hit request while not in a game
      */
     @Test
     public void hit01_test() {
@@ -748,6 +745,33 @@ public class CardGameServerTest {
 
         // we check the hit was successful
         int successHit = responseProtocol.getRequestSuccess();
+        assertEquals("Should return successful hit response matching success ", FAIL, successHit);
+    }
+
+
+    /**
+     * We test a hit request while in a game
+     */
+    @Test
+    public void hit02_test() {
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
+
+        // HIT
+        RequestHit requestHit = new RequestHit(userTest.getUserName());
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestHit));
+
+        // we check the hit was successful
+        int successHit = responseProtocol2.getRequestSuccess();
         assertEquals("Should return successful hit response matching success ", SUCCESS, successHit);
     }
 
@@ -821,6 +845,208 @@ public class CardGameServerTest {
         int successLogout = responseProtocol.getRequestSuccess();
 
         assertEquals("Should return successful logOut response matching success ", SUCCESS, successLogout);
+    }
+
+
+    /**
+     * We test a fold game request for a user in a blackjack game.
+     */
+    @Test
+    public void fold01_test() {
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // QUIT GAME
+        RequestFold requestFold = new RequestFold(userTest.getUserName());
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestFold));
+
+        // we check the user quit the game successfully
+        int successFold = responseProtocol2.getRequestSuccess();
+
+        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successFold);
+    }
+
+    /**
+     * We test getting a message while in a game.
+     */
+    @Test
+    public void getMessages01_test() {
+
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // SEND MESSAGE
+        MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
+        RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestSendMessage));
+        ArrayList<MessageObject> expectedMsg = new ArrayList<>();
+        expectedMsg.add(messageObject);
+
+        // GET MESSAGE
+        RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
+        ResponseProtocol responseProtocol3 = this.clientThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
+
+
+        int successGetMsg = responseGetMessages.getRequestSuccess();
+        // We check we got success
+        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successGetMsg);
+
+        // We check we got the correct message back
+        ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+        assertEquals("Should return arraylist containing messages matching those sent ",
+                expectedMsg.toString(), messages.toString());
+    }
+
+
+    /**
+     * We test getting a message when no message has been sent.
+     */
+    @Test
+    public void getMessages02_test() {
+
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // SEND MESSAGE
+        ArrayList<MessageObject> expectedMsg = new ArrayList<>();
+
+        // GET MESSAGE
+        RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
+        ResponseProtocol responseProtocol3 = this.clientThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
+
+
+        int successGetMsg = responseGetMessages.getRequestSuccess();
+        // We check we got success
+        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successGetMsg);
+
+        // We check we got the correct message back
+        ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+        assertEquals("Should return arraylist containing messages matching those sent ",
+                expectedMsg.toString(), messages.toString());
+    }
+
+
+    /**
+     * We test getting a message when the offset is too high.
+     */
+    @Test
+    public void getMessages03_test() {
+
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // SEND MESSAGE
+        MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
+        RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestSendMessage));
+        ArrayList<MessageObject> expectedMsg = new ArrayList<>();
+
+        // GET MESSAGE
+        RequestGetMessages requestGetMessages = new RequestGetMessages(2);
+        ResponseProtocol responseProtocol3 = this.clientThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
+
+
+        // We check we got success
+        int successGetMsg = responseGetMessages.getRequestSuccess();
+        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successGetMsg);
+
+        // We check we got the correct message back
+        ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+        assertEquals("Should return arraylist containing messages matching those sent ",
+                expectedMsg.toString(), messages.toString());
+
+        // We check the arraylist is empty
+        assertTrue(messages.isEmpty());
+    }
+
+
+    /**
+     * We test getting only the last message while in a game
+     */
+    @Test
+    public void getMessages04_test() {
+
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // SEND MESSAGE
+        MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
+        RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestSendMessage));
+        MessageObject messageObject1 = new MessageObject(userTest.getUserName(), "How are you?");
+        RequestSendMessage requestSendMessage1 = new RequestSendMessage(messageObject1);
+        ResponseProtocol responseProtocol3 = this.clientThread.handleInput(encodeRequest(requestSendMessage1));
+        ArrayList<MessageObject> expectedMsg = new ArrayList<>();
+        expectedMsg.add(messageObject1);
+
+        // GET MESSAGE
+        RequestGetMessages requestGetMessages = new RequestGetMessages(0);
+        ResponseProtocol responseProtocol4 = this.clientThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol4;
+
+
+        int successGetMsg = responseGetMessages.getRequestSuccess();
+        // We check we got success
+        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successGetMsg);
+
+        // We check we got the correct message back
+        ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+        assertEquals("Should return arraylist containing messages matching those sent ",
+                expectedMsg.toString(), messages.toString());
+    }
+
+
+    /**
+     * We test getting messages while not in a game, should be fail
+     */
+    @Test
+    public void getMessages05_test() {
+
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // SEND MESSAGE
+        MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
+        RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestSendMessage));
+
+        // GET MESSAGE
+        RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
+        ResponseProtocol responseProtocol3 = this.clientThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
+
+        int successGetMsg = responseGetMessages.getRequestSuccess();
+        // We check we got success
+        assertEquals("Should return fail get message response matching fail ", FAIL, successGetMsg);
     }
 
 }

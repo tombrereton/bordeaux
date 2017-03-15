@@ -22,8 +22,6 @@ import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
 import static CardGame.Pushes.PushProtocol.encodePush;
 import static CardGame.Requests.RequestProtocol.decodeRequest;
-import static CardGame.Pushes.PushProtocol.encodePush;
-import static CardGame.Requests.RequestProtocol.decodeRequest;
 import static CardGame.Responses.ResponseProtocol.encodeResponse;
 
 /**
@@ -36,7 +34,7 @@ public class ClientThread implements Runnable {
     private Socket toClientSocket;
     private boolean clientAlive;
     private long clientID;
-    protected User user;
+    private User user;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
@@ -162,8 +160,45 @@ public class ClientThread implements Runnable {
                 return handleQuitGame(JSONInput, protocolId);
             case BET:
                 return handleBet(JSONInput, protocolId);
+            case HIT:
+                return handleHit(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    private ResponseProtocol handleHit(String jsonInput, int protocolId) {
+        RequestHit requestHit = gson.fromJson(jsonInput, RequestHit.class);
+        String userFromRequest = requestHit.getUsername();
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseHit(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseHit(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseHit(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
+            // return fail if user has finished round
+            return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
+        } else if(getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0){
+            // return fail if user has not places a bet
+            return new ResponseHit(protocolId, FAIL, NO_BET);
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()){
+            // if player has not finished the round, give the player a card
+            getGame(gameJoined).hit(getLoggedInUser());
+
+            pushPlayerHands();
+            pushPlayersBust();
+            pushPlayerWon();
+
+            // return success if bet within budget
+            return new ResponseHit(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseHit(protocolId, FAIL, UNKNOWN_ERROR);
         }
     }
 
@@ -174,13 +209,13 @@ public class ClientThread implements Runnable {
 
         if (isLoggedInUserNull()) {
             // return fail if logged in user is null
-            return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+            return new ResponseBet(protocolId, FAIL, NOT_LOGGED_IN);
         } else if (userFromRequest == null) {
             // return fail if request user is null
-            return new ResponseLogOut(protocolId, FAIL, EMPTY);
+            return new ResponseBet(protocolId, FAIL, EMPTY);
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
-            return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+            return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
         } else if (!isBetWithinBudget(betAmount)){
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
@@ -402,6 +437,22 @@ public class ClientThread implements Runnable {
         }
     }
 
+
+    /**
+     * This method pushes all the player bust state to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayersBust() {
+        Map<String, Boolean> playersBust = this.getGame(gameJoined).getPlayersBust();
+
+        PushPlayersBust push = new PushPlayersBust(playersBust);
+
+        return pushToPlayers(push);
+
+    }
+
     /**
      * This method pushes all the player bets to
      * all the clients joined in the same game for this thread.
@@ -431,6 +482,7 @@ public class ClientThread implements Runnable {
         return pushToPlayers(push);
 
     }
+
     /**
      * This method pushes all the player hands to
      * all the clients joined in the same game for this thread.
@@ -484,6 +536,21 @@ public class ClientThread implements Runnable {
         ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
 
         PushPlayerNames push = new PushPlayerNames(playerNames);
+
+        return pushToPlayers(push);
+    }
+
+
+    /**
+     * This method pushes a map player who have won to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayerWon() {
+        Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
+
+        PushPlayersWon push = new PushPlayersWon(playersWon);
 
         return pushToPlayers(push);
     }
@@ -559,11 +626,29 @@ public class ClientThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetMessages(String JSONInput, int protocolId) {
-
         RequestGetMessages requestGetMessages = this.gson.fromJson(JSONInput, RequestGetMessages.class);
-        ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
+        int offset = requestGetMessages.getOffset();
 
-        return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient);
+        if (getLoggedInUser() == null) {
+            // return fail if user not logged in
+            return new ResponseGetMessages(protocolId, FAIL, null, NOT_LOGGED_IN);
+        } else if (gameJoined == null) {
+            // return fail if user has not joined a game
+            return new ResponseGetMessages(protocolId, FAIL, null, NO_GAME_JOINED);
+        } else if (offset < -1) {
+            // return fail for wrong index
+            return new ResponseGetMessages(protocolId, FAIL, null, WRONG_OFFSET);
+        } else if (offset >= -1) {
+            // get messages from queue as per the offset
+            ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
+            // return success if offset greater than -2
+            return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient);
+        } else {
+            // return fail for unknown error
+            return new ResponseGetMessages(protocolId, FAIL, null, UNKNOWN_ERROR);
+        }
+
+
     }
 
     /**
@@ -603,7 +688,7 @@ public class ClientThread implements Runnable {
         if (getLoggedInUser() == null) {
             // return fail if user not logged in
             return new ResponseSendMessage(protocolId, FAIL, NOT_LOGGED_IN);
-        } else if (gameJoined.isEmpty()) {
+        } else if (gameJoined == null) {
             // return fail if user has not joined a game
             return new ResponseSendMessage(protocolId, FAIL, NO_GAME_JOINED);
         } else if (messageFromRequest.isEmpty()) {
@@ -680,7 +765,7 @@ public class ClientThread implements Runnable {
      */
     private ResponseProtocol handleRegisterUser(String JSONInput, int protocolId) {
         boolean successRegister = false;
-        String sqlState = null;
+        String sqlState = "";
 
         // We deserialize the request again but as a RequestRegisterUser object
         RequestRegisterUser requestRegisterUser = this.gson.fromJson(JSONInput, RequestRegisterUser.class);
@@ -707,7 +792,7 @@ public class ClientThread implements Runnable {
         } else if (sqlState.equalsIgnoreCase("23505")) {
             // return fail if user already in database
             return new ResponseRegisterUser(protocolId, FAIL, DUPE_USERNAME);
-        } else if (isLoggedInUserNull()) {
+        } else if (!isLoggedInUserNull()) {
             // return fail if user already logged in
             return new ResponseRegisterUser(protocolId, FAIL, ALREADY_LOGGED_IN);
         } else if (successRegister) {

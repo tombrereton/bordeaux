@@ -13,15 +13,17 @@ import static CardGame.ProtocolTypes.GET_MESSAGE;
 public class RequestGetMessages extends RequestProtocol {
     private int offset;
 
-    public RequestGetMessages(int protocolId, int offset) {
-        super(protocolId, GET_MESSAGE);
-        this.offset = offset;
-    }
 
     public RequestGetMessages(int offset) {
         super(GET_MESSAGE);
         this.offset = offset;
     }
+
+    public RequestGetMessages(int protocolId, int offset) {
+        super(protocolId, GET_MESSAGE);
+        this.offset = offset;
+    }
+
 
     public int getOffset() {
         return offset;
