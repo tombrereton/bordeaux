@@ -5,6 +5,8 @@ import CardGame.ClientModel;
 import javax.swing.*;
 import java.awt.*;
 
+import static CardGame.Gui.ScreenTypes.HOMESCREEN;
+
 /**
  * Class that creates and controls the frame and the panels to be displayed
  *

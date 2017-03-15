@@ -63,7 +63,7 @@ public class GameScreen extends JPanel {
 		});
 		btnDoubledown.setBackground(Color.WHITE);
 		btnDoubledown.setFont(new Font("Soho Std", Font.PLAIN, 12));
-		btnDoubledown.setBounds(671, 492, 109, 35);
+		btnDoubledown.setBounds(675, 492, 80, 35);
 		add(btnDoubledown);
 		
 		JButton btnStand = new JButton("Stand");
@@ -73,7 +73,7 @@ public class GameScreen extends JPanel {
 		});
 		btnStand.setBackground(Color.WHITE);
 		btnStand.setFont(new Font("Soho Std", Font.PLAIN, 12));
-		btnStand.setBounds(539, 493, 109, 35);
+		btnStand.setBounds(585, 493, 80, 35);
 		add(btnStand);
 		
 		JButton btnHit = new JButton("Hit");
@@ -83,8 +83,18 @@ public class GameScreen extends JPanel {
 		});
 		btnHit.setFont(new Font("Soho Std", Font.PLAIN, 12));
 		btnHit.setBackground(Color.WHITE);
-		btnHit.setBounds(405, 492, 109, 35);
+		btnHit.setBounds(495, 492, 80, 35);
 		add(btnHit);
+
+		JButton btnFold = new JButton("Fold");
+		btnFold.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnFold.setFont(new Font("Soho Std", Font.PLAIN, 12));
+		btnFold.setBackground(Color.WHITE);
+		btnFold.setBounds(405, 492, 80, 35);
+		add(btnFold);
 		
 		JLabel lblNewLabel = new JLabel("Pot:");
 		lblNewLabel.setFont(new Font("Soho Std", Font.PLAIN, 18));
