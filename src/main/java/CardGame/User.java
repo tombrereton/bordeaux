@@ -1,9 +1,12 @@
 package CardGame;
 
 
+import java.util.Random;
+
 /**
  * Created by tom on 25/02/17.
  * updated by lois 11/04/17
+ * updates by Alex 15/03/2017
  */
 public class User {
     private String userName;
@@ -11,6 +14,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String emailAddress;
+    private String avatarID;
 
 
 
@@ -20,6 +24,8 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
+        Random r = new Random();
+        this.avatarID = Integer.toString(r.nextInt(39));
     }
 
     public User(String userName, String password, String firstName, String lastName) {
@@ -27,11 +33,15 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        Random r = new Random();
+        this.avatarID = Integer.toString(r.nextInt(39));
     }
 
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
+        Random r = new Random();
+        this.avatarID = Integer.toString(r.nextInt(39));
     }
 
     public User(String userName) {
@@ -39,6 +49,8 @@ public class User {
     }
 
     public User(){
+        Random r = new Random();
+        this.avatarID = Integer.toString(r.nextInt(39));
     }
 
     public String getUserName() {
@@ -61,6 +73,10 @@ public class User {
         return emailAddress;
     }
 
+    public String getAvatarID() {
+        return avatarID;
+    }
+
 
     public void setUserName(String userName) {
         this.userName = userName;
@@ -80,6 +96,10 @@ public class User {
     
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public void setAvatarID(String avatarID) {
+        this.avatarID = avatarID;
     }
 
     @Override

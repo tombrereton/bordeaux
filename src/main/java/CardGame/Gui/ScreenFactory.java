@@ -119,6 +119,12 @@ public class ScreenFactory extends JFrame {
         frame.revalidate();
     }
 
+    /**
+     *
+     */
+    public void factory(){
+
+    }
 
     /**
      * main method with which to run the gui
