@@ -95,8 +95,8 @@ public class ScreenFactory extends JFrame {
      *
      * @param type
      */
-    public void screenFactory(String type){
-        if (type.equals(HOMESCREEN)){
+    public void screenFactory(int type){
+        if (type == HOMESCREEN){
             this.homeScreen = new HomeScreen(this.clientModel);
         }
     }
