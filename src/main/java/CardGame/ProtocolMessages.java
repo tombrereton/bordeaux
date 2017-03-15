@@ -31,6 +31,7 @@ public class ProtocolMessages {
     public static final String NOT_FINISHED_ROUND = "player has not finished their round.";
     public static final String FINISHED_ROUND = "player has already finished their round.";
     public static final String NO_BET = "player has not placed a bet.";
+    public static final String ALREADY_STANDING = "player already standing.";
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 

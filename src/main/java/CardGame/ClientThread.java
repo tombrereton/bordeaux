@@ -162,8 +162,47 @@ public class ClientThread implements Runnable {
                 return handleBet(JSONInput, protocolId);
             case HIT:
                 return handleHit(JSONInput, protocolId);
+            case STAND:
+                return handleStand(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
+        }
+    }
+
+    private ResponseProtocol handleStand(String jsonInput, int protocolId) {
+        RequestStand requestStand = gson.fromJson(jsonInput, RequestStand.class);
+        String userFromRequest = requestStand.getUsername();
+
+
+        if (isLoggedInUserNull()) {
+            // return fail if logged in user is null
+            return new ResponseStand(protocolId, FAIL, NOT_LOGGED_IN);
+        } else if (userFromRequest == null) {
+            // return fail if request user is null
+            return new ResponseStand(protocolId, FAIL, EMPTY);
+        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
+            // return fail if request user does not match logged in user
+            return new ResponseStand(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
+            // return fail if user has not places a bet
+            return new ResponseStand(protocolId, FAIL, NO_BET);
+        } else if (getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+            // return fail if player is already standing
+            return new ResponseStand(protocolId, FAIL, ALREADY_STANDING);
+        } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+            // if the player is not standing, make player stand
+            getGame(gameJoined).setPlayerStand(getLoggedInUser().getUserName());
+
+            pushPlayerHands();
+            pushPlayersBust();
+            pushPlayersStand();
+            pushPlayerWon();
+
+            // return success if player is now standing
+            return new ResponseStand(protocolId, SUCCESS);
+        } else {
+            // return fail for unknown error
+            return new ResponseStand(protocolId, FAIL, UNKNOWN_ERROR);
         }
     }
 
@@ -183,10 +222,10 @@ public class ClientThread implements Runnable {
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // return fail if user has finished round
             return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
-        } else if(getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0){
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
-        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()){
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
 
@@ -216,10 +255,10 @@ public class ClientThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (!isBetWithinBudget(betAmount)){
+        } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
-        } else if (isBetWithinBudget(betAmount)){
+        } else if (isBetWithinBudget(betAmount)) {
             // make bet and push it to all players
             makeBet(betAmount);
             // return success if bet within budget
@@ -233,6 +272,7 @@ public class ClientThread implements Runnable {
     /**
      * This method checks that the bet sent in the request is
      * within the player budget. Returns true if it is, false if not.
+     *
      * @param betAmount
      * @return
      */
@@ -258,7 +298,7 @@ public class ClientThread implements Runnable {
         pushPlayerBudgets();
         pushAreAllPlayersFinished();
 
-        if(getGame(gameJoined).allPlayersFinished()){
+        if (getGame(gameJoined).allPlayersFinished()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
             // if all finished push hands
@@ -437,6 +477,20 @@ public class ClientThread implements Runnable {
         }
     }
 
+
+    /**
+     * This method pushes all the player stand state to
+     * all the clients joined in the same game for this thread.
+     *
+     * @return true if pushed, false if not.
+     */
+    private boolean pushPlayersStand() {
+        Map<String, Boolean> playersStand = this.getGame(gameJoined).getPlayersStand();
+
+        PushPlayersStand push = new PushPlayersStand(playersStand);
+
+        return pushToPlayers(push);
+    }
 
     /**
      * This method pushes all the player bust state to

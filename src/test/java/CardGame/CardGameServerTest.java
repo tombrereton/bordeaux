@@ -795,12 +795,24 @@ public class CardGameServerTest {
      */
     @Test
     public void stand01_test() {
-        RequestStand requestStand = new RequestStand();
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
 
-        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestStand));
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
+
+        // STAND
+        RequestStand requestStand = new RequestStand(userTest.getUserName());
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestStand));
 
         // we check stand was successful
-        int successStand = responseProtocol.getRequestSuccess();
+        int successStand = responseProtocol2.getRequestSuccess();
 
         assertEquals("Should return successful stand response matching success ", SUCCESS, successStand);
     }
