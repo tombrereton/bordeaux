@@ -735,13 +735,40 @@ public class CardGameServerTest {
     }
 
     /**
-     * We test a hit request for the blackjack game
+     * We test a hit request while not in a game
      */
     @Test
     public void hit01_test() {
         RequestHit requestHit = new RequestHit(userTest.getUserName());
 
         ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestHit));
+
+        // we check the hit was successful
+        int successHit = responseProtocol.getRequestSuccess();
+        assertEquals("Should return successful hit response matching success ", FAIL, successHit);
+    }
+
+
+    /**
+     * We test a hit request while in a game
+     */
+    @Test
+    public void hit02_test() {
+        // LOG IN
+        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
+        ResponseProtocol responseProtocol = this.clientThread.handleInput(encodeRequest(requestLoginUser));
+
+        // CREATE GAME
+        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
+        ResponseProtocol responseProtocol1 = this.clientThread.handleInput(encodeRequest(requestCreateGame));
+
+        // BET
+        RequestBet requestBet = new RequestBet(10, userTest.getUserName());
+        ResponseProtocol responseBet = this.clientThread.handleInput(encodeRequest(requestBet));
+
+        // HIT
+        RequestHit requestHit = new RequestHit(userTest.getUserName());
+        ResponseProtocol responseProtocol2 = this.clientThread.handleInput(encodeRequest(requestHit));
 
         // we check the hit was successful
         int successHit = responseProtocol.getRequestSuccess();

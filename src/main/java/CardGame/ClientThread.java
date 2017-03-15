@@ -181,15 +181,15 @@ public class ClientThread implements Runnable {
             // return fail if request user does not match logged in user
             return new ResponseHit(protocolId, FAIL, USERNAME_MISMATCH);
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
-            // return fail if user not finished round
+            // return fail if user has finished round
             return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
+        } else if(getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0){
+            // return fail if user has not places a bet
+            return new ResponseHit(protocolId, FAIL, NO_BET);
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()){
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
 
-            // TODO think this through
-            // push players won?
-            // check against dealer?
             pushPlayerHands();
             pushPlayersBust();
 
