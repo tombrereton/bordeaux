@@ -17,6 +17,7 @@ public class GameLobby {
     private Map<String, Socket> playerSockets;
     private Deck deck;
     private Map<String, Integer> playerBudgets;
+    private Map<String, Boolean> playersBust;
 
     /**
      * creates gamelobby with lobbyname set  : user1's lobby
@@ -233,6 +234,26 @@ public class GameLobby {
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
         player.setFinishedRound(true);
+
+        if (player.getPlayerHand().getBlackjackValue() > 21){
+            playersBust.put(player.getUsername(),true);
+        }
+        return player.getPlayerHand().getBlackjackValue() <= 21;
+    }
+
+    /**
+     * adds card to player hand
+     * returns true if below or equal 21
+     * sets player to finished round
+     *
+     * @param username
+     * @return
+     */
+    public synchronized boolean hit(String username) {
+        Player player = getPlayer(username);
+        Card newCard = deck.dealCard();
+        player.addCardToPlayerHand(newCard);
+        player.setFinishedRound(true);
         return player.getPlayerHand().getBlackjackValue() <= 21;
     }
 
@@ -294,6 +315,10 @@ public class GameLobby {
 
     public Map<String, Socket> getPlayerSockets() {
         return playerSockets;
+    }
+
+    public Map<String, Boolean> getPlayersBust() {
+        return playersBust;
     }
 
     @Override
