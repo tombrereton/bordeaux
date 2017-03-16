@@ -3,10 +3,7 @@ package CardGame;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
-import CardGame.Requests.RequestCreateGame;
-import CardGame.Requests.RequestLogOut;
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestRegisterUser;
+import CardGame.Requests.*;
 import CardGame.Responses.ResponseCreateGame;
 import CardGame.Responses.ResponseLogOut;
 import CardGame.Responses.ResponseLoginUser;
@@ -194,8 +191,9 @@ public class ClientModel extends Observable {
 	}
 
 	public void requestJoinGame(String gamename){
+		RequestJoinGame request = new RequestJoinGame(gamename,user.getUserName());
+		
 
-		// todo: send request for joining a game
 	}
 	
 
