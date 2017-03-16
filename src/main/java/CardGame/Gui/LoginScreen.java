@@ -44,6 +44,7 @@ public class LoginScreen extends JPanel {
         lblPassword = new JLabel("Password");
         usernameField = new JTextField();
         passwordField = new JPasswordField();
+        setBackground(new Color(46, 139, 87));
         initialize();
     }
 

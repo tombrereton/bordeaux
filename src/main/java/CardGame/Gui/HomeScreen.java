@@ -46,6 +46,7 @@ public class HomeScreen extends JPanel {
         lblGamesWon = new JLabel("Games Won:");
         lblGamesLost = new JLabel("Games Lost:");
         lblGamesPlayed = new JLabel("Games Played:");
+        setBackground(new Color(46, 139, 87));
         initialize();
     }
 
