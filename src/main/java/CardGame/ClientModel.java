@@ -278,7 +278,7 @@ public class ClientModel extends Observable {
         }
     }
 
-    public void requestGetMessages(int offset){
+    public ResponseGetMessages requestGetMessages(int offset){
         try {
             RequestGetMessages request = new RequestGetMessages(offset);
             cardGameClient.sendRequest(request);
@@ -288,9 +288,11 @@ public class ClientModel extends Observable {
                 System.out.println("Got messages from the server");
                 System.out.println(responseGetMessages.getMessages());
             }
+            return responseGetMessages;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public void requestSendMessages(String message){
