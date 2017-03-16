@@ -282,7 +282,7 @@ public class ClientModel extends Observable {
             ResponseGetMessages responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
             if (responseGetMessages.getRequestSuccess() == 1){
                 System.out.println("Got messages from the server");
-                System.out.println(responseString);
+                System.out.println(responseGetMessages.getMessages());
             }
         } catch (IOException e) {
             e.printStackTrace();
