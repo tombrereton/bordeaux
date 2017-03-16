@@ -20,7 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolMessages.*;
 import static CardGame.ProtocolTypes.*;
-import static CardGame.Pushes.PushProtocol.encodePush;
 import static CardGame.Requests.RequestProtocol.decodeRequest;
 import static CardGame.Responses.ResponseProtocol.encodeResponse;
 
@@ -89,8 +88,9 @@ public class ClientThread implements Runnable {
                 System.out.println(response);
             }
         } catch (EOFException e) {
-            System.out.println("Client likely disconnected.: " + e.toString());
+            System.out.println("Client disconnected.: " + e.toString());
             this.setLoggedInUser(null);
+            System.out.println("Logged in user set to: " + getLoggedInUser());
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -723,7 +723,7 @@ public class ClientThread implements Runnable {
         try {
             for (Map.Entry<String, Socket> playerSocketEntry : playerSockets.entrySet()) {
                 outputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
-                outputStream.writeUTF(encodePush(push));
+                outputStream.writeUTF(encodeResponse(push));
             }
             return true;
         } catch (IOException e) {
@@ -894,6 +894,8 @@ public class ClientThread implements Runnable {
         } else if (userFromRequest.checkPassword(userFromDatabase)) {
             // if username and password match, we set this.user to user
             // and add user to users
+            // TODO:
+            // set password to null before sending to client
             this.user = userFromDatabase;
             this.addUsertoUsers(this.user);
             // return success if password and username match
@@ -975,7 +977,7 @@ public class ClientThread implements Runnable {
             for (Socket sock : this.socketList) {
                 try {
                     outputStream = new DataOutputStream(sock.getOutputStream());
-                    outputStream.writeUTF(encodePush(pushGameNames));
+                    outputStream.writeUTF(encodeResponse(pushGameNames));
                 } catch (IOException e) {
                     System.out.println("Failed to send out list of game names");
                 } finally {
