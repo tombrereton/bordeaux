@@ -44,8 +44,8 @@ public class Player {
     }
 
     public void setBet(int bet) {
-        if (isBetWithinBudget(bet)){
-            setBudget(-bet);
+        if (isBetWithinBudget(bet)) {
+            setBudget(this.budget - bet);
             this.bet = bet;
         }
 
@@ -53,23 +53,30 @@ public class Player {
         setFinishedRound(true);
     }
 
+    public void doubleBet() {
+        if (isBetWithinBudget(bet)) {
+            setBudget(this.budget - bet);
+            this.bet = bet * 2;
+        }
+    }
+
     public void setFinishedRound(boolean finishedRound) {
         isFinishedRound = finishedRound;
     }
 
-    public int getPlayerHandValue(){
+    public int getPlayerHandValue() {
         return this.playerHand.getBlackjackValue();
     }
 
-    public void addCardToPlayerHand(Card card){
+    public void addCardToPlayerHand(Card card) {
         this.playerHand.addCard(card);
     }
 
-    public boolean isBetWithinBudget(int bet){
+    public boolean isBetWithinBudget(int bet) {
         return bet >= 0 && bet <= this.budget;
     }
 
-    public boolean isBust(){
+    public boolean isBust() {
         return this.getPlayerHandValue() <= 21 && this.getPlayerHandValue() >= 1;
     }
 }
