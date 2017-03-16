@@ -1,6 +1,7 @@
 package CardGame;
 
 import CardGame.GameEngine.Hand;
+import CardGame.Gui.GameScreen;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
 import CardGame.Requests.*;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static CardGame.Gui.Screens.GAMESCREEN;
 import static CardGame.Gui.Screens.HOMESCREEN;
 import static CardGame.Gui.Screens.LOGINSCREEN;
 import static CardGame.ProtocolMessages.SUCCESS;
@@ -193,8 +195,8 @@ public class ClientModel extends Observable {
             String responseString = threadDataIn.readUTF();
             ResponseJoinGame responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
             if (responseJoinGame.getRequestSuccess() == 1){
+                setCurrentScreen(GAMESCREEN);
                 System.out.println("Joined the Game");
-
             }
         } catch (IOException e) {
             e.printStackTrace();
