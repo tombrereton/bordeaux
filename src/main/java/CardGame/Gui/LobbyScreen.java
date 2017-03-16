@@ -116,6 +116,8 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 		btnCreateGame.setBackground(Color.WHITE);
 		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
         add(btnCreateGame);
+
+
 	}
 
 	public void updateBounds(){
