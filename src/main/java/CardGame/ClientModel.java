@@ -87,7 +87,8 @@ public class ClientModel extends Observable {
 	 * @param password
 	 */
 	public void login(String username, String password) {
-		User user = new User(username, password);
+		String hashedPassword = hashPassword(password);
+		User user = new User(username, hashedPassword);
 		try {
 			RequestLoginUser request = new RequestLoginUser(user);
 			cardGameClient.sendRequest(request);
@@ -140,6 +141,11 @@ public class ClientModel extends Observable {
 			e.printStackTrace();
 		}
 
+	}
+
+	public String hashPassword(String password){
+		String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+		return sha256hex;
 	}
 
 	/**

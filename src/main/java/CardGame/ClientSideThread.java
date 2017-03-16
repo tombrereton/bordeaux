@@ -1,14 +1,8 @@
 package CardGame;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-
 import com.google.gson.Gson;
 
-import CardGame.Responses.ResponseProtocol;
+import java.io.*;
 
 public class ClientSideThread implements Runnable {
 	
@@ -29,6 +23,7 @@ public class ClientSideThread implements Runnable {
 			try {
 				String response = client.receiveResponse();
 				dataOutputStream.writeUTF(response);
+				System.out.println(response);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -50,8 +45,8 @@ public class ClientSideThread implements Runnable {
 			System.out.println(din.readUTF() + "world");
 			System.out.println(din.readUTF());
 			System.out.println(din.readUTF());
-			System.out.println("afterread");;
-			
+			System.out.println("afterread");
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
