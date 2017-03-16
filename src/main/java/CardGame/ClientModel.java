@@ -127,7 +127,8 @@ public class ClientModel extends Observable {
 	 * @param last
 	 */
 	public void registerUser(String username, String password, String first, String last) {
-		User user = new User(username, password, first, last);
+		String hashedPassword = hashPassword(password);
+		User user = new User(username, hashedPassword, first, last);
 		try {
 			RequestRegisterUser request = new RequestRegisterUser(user);
 			cardGameClient.sendRequest(request);
