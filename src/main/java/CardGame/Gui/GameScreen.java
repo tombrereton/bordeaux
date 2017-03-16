@@ -5,9 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
 
 /**
@@ -174,7 +171,7 @@ public class GameScreen extends JPanel {
 			Image imgBet2 = ImageIO.read(getClass().getResource("/chips/chipBlue.png"));
 			btnBet2.setIcon(new ImageIcon(imgBet2));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet2);
 
@@ -191,7 +188,7 @@ public class GameScreen extends JPanel {
 			Image imgBet3 = ImageIO.read(getClass().getResource("/chips/chipPurple.png"));
 			btnBet3.setIcon(new ImageIcon(imgBet3));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet3);
 
@@ -208,7 +205,7 @@ public class GameScreen extends JPanel {
 			Image imgBet4 = ImageIO.read(getClass().getResource("/chips/chipRed.png"));
 			btnBet4.setIcon(new ImageIcon(imgBet4));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet4);
 

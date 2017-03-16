@@ -1,12 +1,13 @@
 package CardGame;
 
-import static CardGame.ProtocolMessages.SUCCESS;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
+import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestRegisterUser;
 import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
+import com.google.gson.Gson;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -17,14 +18,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.google.gson.Gson;
-
-import CardGame.GameEngine.Hand;
-import CardGame.Gui.Screens;
-import CardGame.Pushes.PushProtocol;
-import CardGame.Requests.*;
-import CardGame.Responses.*;
-import CardGame.Responses.ResponseRegisterUser;
+import static CardGame.ProtocolMessages.SUCCESS;
 
 /**
  * The observable class that contains all the information to be displayed on the
