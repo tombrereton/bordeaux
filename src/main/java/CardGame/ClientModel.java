@@ -1,5 +1,6 @@
 package CardGame;
 
+import CardGame.GameEngine.BlackjackHand;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -48,7 +50,6 @@ public class ClientModel extends Observable {
     User user;
     ArrayList<User> users;
     LinkedBlockingQueue<PushProtocol> pushRequestQueue;
-    ArrayList<String> listOfGames;
 
     // Game variables
     private ArrayList<String> playerNames;
@@ -59,6 +60,8 @@ public class ClientModel extends Observable {
     private Map<String, Boolean> playersFinished;
     private Map<String, Boolean> playersWon;
     private Map<String, Boolean> playersBust;
+    private Map<String, Boolean> playersStand;
+    private ArrayList<String> listOfGames;
 
     /**
      * Constructor.
@@ -82,6 +85,16 @@ public class ClientModel extends Observable {
         this.loggedIn = false;
         this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
         this.currentScreen = Screens.LOGINSCREEN;
+
+        // instantiate game variables
+        this.playerNames = new ArrayList<>();
+        this.playerHands = new HashMap<>();
+        this.playerBudgets = new HashMap<>();
+        this.playersBust = new HashMap<>();
+        this.playersWon = new HashMap<>();
+        this.playersStand = new HashMap<>();
+        this.dealerHand = new BlackjackHand();
+        this.listOfGames = new ArrayList<>();
     }
 
     /**
@@ -181,7 +194,8 @@ public class ClientModel extends Observable {
             ResponseCreateGame responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
             if (responseCreateGame.getRequestSuccess() == 1) {
                 System.out.println("Created Game");
-                listOfGames.add(responseCreateGame.getGameName());
+                String gameName = responseCreateGame.getGameName();
+                listOfGames.add(gameName);
             }
 
         } catch (IOException e) {
@@ -190,28 +204,28 @@ public class ClientModel extends Observable {
         }
     }
 
-	public void requestJoinGame(String gamename){
+    public void requestJoinGame(String gamename) {
         try {
-            RequestJoinGame request = new RequestJoinGame(gamename,user.getUserName());
+            RequestJoinGame request = new RequestJoinGame(gamename, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseJoinGame responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
-            if (responseJoinGame.getRequestSuccess() == 1){
+            if (responseJoinGame.getRequestSuccess() == 1) {
                 setCurrentScreen(GAMESCREEN);
                 System.out.println("Joined the Game");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-	}
+    }
 
-    public void requestBet(int betAmount){
+    public void requestBet(int betAmount) {
         try {
-            RequestBet request = new RequestBet(betAmount,user.getUserName());
+            RequestBet request = new RequestBet(betAmount, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseBet responseBet = gson.fromJson(responseString, ResponseBet.class);
-            if (responseBet.getRequestSuccess() == 1){
+            if (responseBet.getRequestSuccess() == 1) {
                 System.out.println("Bet!");
             }
         } catch (IOException e) {
@@ -220,14 +234,13 @@ public class ClientModel extends Observable {
     }
 
 
-
-    public void requestDoubleBet(){
+    public void requestDoubleBet() {
         try {
             RequestDoubleBet request = new RequestDoubleBet(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseDoubleBet responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
-            if (responseDoubleBet.getRequestSuccess() == 1){
+            if (responseDoubleBet.getRequestSuccess() == 1) {
                 System.out.println("Double bet!");
             }
         } catch (IOException e) {
@@ -236,13 +249,13 @@ public class ClientModel extends Observable {
     }
 
 
-    public void requestHit(){
+    public void requestHit() {
         try {
             RequestHit request = new RequestHit(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseHit responseHit = gson.fromJson(responseString, ResponseHit.class);
-            if (responseHit.getRequestSuccess() == 1){
+            if (responseHit.getRequestSuccess() == 1) {
                 System.out.println("Hit!");
             }
         } catch (IOException e) {
@@ -250,13 +263,13 @@ public class ClientModel extends Observable {
         }
     }
 
-    public void requestStand(){
+    public void requestStand() {
         try {
             RequestStand request = new RequestStand(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseStand responseStand = gson.fromJson(responseString, ResponseStand.class);
-            if (responseStand.getRequestSuccess() == 1){
+            if (responseStand.getRequestSuccess() == 1) {
                 System.out.println("Stand!");
             }
         } catch (IOException e) {
@@ -264,13 +277,13 @@ public class ClientModel extends Observable {
         }
     }
 
-    public void requestFold(){
+    public void requestFold() {
         try {
             RequestFold request = new RequestFold(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseFold responseFold = gson.fromJson(responseString, ResponseFold.class);
-            if (responseFold.getRequestSuccess() == 1){
+            if (responseFold.getRequestSuccess() == 1) {
                 System.out.println("Fold!");
             }
         } catch (IOException e) {
@@ -278,13 +291,13 @@ public class ClientModel extends Observable {
         }
     }
 
-    public void requestGetMessages(int offset){
+    public void requestGetMessages(int offset) {
         try {
             RequestGetMessages request = new RequestGetMessages(offset);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseGetMessages responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
-            if (responseGetMessages.getRequestSuccess() == 1){
+            if (responseGetMessages.getRequestSuccess() == 1) {
                 System.out.println("Got messages from the server");
                 System.out.println(responseGetMessages.getMessages());
             }
@@ -293,13 +306,13 @@ public class ClientModel extends Observable {
         }
     }
 
-    public void requestSendMessages(String message){
+    public void requestSendMessages(String message) {
         try {
-            RequestSendMessage request = new RequestSendMessage(user.getUserName(),message);
+            RequestSendMessage request = new RequestSendMessage(user.getUserName(), message);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseSendMessage responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
-            if (responseSendMessage.getRequestSuccess() == 1){
+            if (responseSendMessage.getRequestSuccess() == 1) {
                 System.out.println("sent a messages to the server");
             }
         } catch (IOException e) {
@@ -308,13 +321,13 @@ public class ClientModel extends Observable {
     }
 
 
-    public void requestQuitGame(String gameToQuit){
+    public void requestQuitGame(String gameToQuit) {
         try {
-            RequestQuitGame request = new RequestQuitGame(gameToQuit,user.getUserName());
+            RequestQuitGame request = new RequestQuitGame(gameToQuit, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
             ResponseQuitGame responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
-            if (responseQuitGame.getRequestSuccess() == 1){
+            if (responseQuitGame.getRequestSuccess() == 1) {
                 System.out.println("quit the game");
                 setCurrentScreen(LOBBYSCREEN);
             }
@@ -322,8 +335,6 @@ public class ClientModel extends Observable {
             e.printStackTrace();
         }
     }
-
-
 
 
     /**
@@ -482,6 +493,14 @@ public class ClientModel extends Observable {
     }
 
     /**
+     * getter for players standing
+     * @return
+     */
+    public Map<String, Boolean> getPlayersStand() {
+        return playersStand;
+    }
+
+    /**
      * setter for player names
      *
      * @param playerNames
@@ -551,6 +570,15 @@ public class ClientModel extends Observable {
      */
     public void setPlayersBust(Map<String, Boolean> playersBust) {
         this.playersBust = playersBust;
+    }
+
+
+    /**
+     * setter for players standing
+     * @param playersStand
+     */
+    public void setPlayersStand(Map<String, Boolean> playersStand) {
+        this.playersStand = playersStand;
     }
 
     public PipedOutputStream getPout() {
