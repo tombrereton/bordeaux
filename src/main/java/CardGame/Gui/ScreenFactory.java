@@ -59,7 +59,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
 
 
         // instantiate create account and login screen in constructor
-        this.createAccountScreen = new CreateAccountScreen(clientModel);
+        this.createAccountScreen = new CreateAccountScreen(clientModel, this);
         this.loginScreen = new LoginScreen(clientModel, this);
 
         screenWidthMin = 1024;
@@ -108,16 +108,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         return yOrigin;
     }
 
-    /**
-     * This method instantiates a screen at runtime.
-     *
-     * @param type
-     */
-    public void screenFactory(int type) {
-        if (type == HOMESCREEN) {
-            this.homeScreen = new HomeScreen(this.clientModel);
-        }
-    }
 
 
     /**
@@ -213,23 +203,23 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     setPane(this.createAccountScreen);
                     break;
                 case HOMESCREEN:
-                    this.homeScreen = new HomeScreen(model);
+                    this.homeScreen = new HomeScreen(model, this);
                     setPane(this.homeScreen);
                     break;
                 case LOBBYSCREEN:
-                    this.lobbyScreen = new LobbyScreen(model);
+                    this.lobbyScreen = new LobbyScreen(model, this);
                     setPane(this.lobbyScreen);
                     break;
                 case GAMESCREEN:
-                    this.gameScreen = new GameScreen(model);
+                    this.gameScreen = new GameScreen(model, this);
                     setPane(this.gameScreen);
                     break;
                 case STATISTICSSCREEN:
-                    this.statisticsScreen = new StatisticsScreen(model);
+                    this.statisticsScreen = new StatisticsScreen(model, this);
                     setPane(this.statisticsScreen);
                     break;
                 case SETTINGSSCREEN:
-                    this.settingsScreen = new SettingsScreen(model);
+                    this.settingsScreen = new SettingsScreen(model, this);
                     setPane(this.settingsScreen);
                     break;
             }

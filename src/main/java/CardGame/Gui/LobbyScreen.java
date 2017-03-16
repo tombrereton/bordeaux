@@ -22,7 +22,6 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
     public DefaultListModel model;
-    private ClientModel clientModel;
     private String gameName;
 
 	private ClientModel clientModel;
@@ -37,8 +36,9 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 	/**
 	 * Create the application.
 	 */
-	public LobbyScreen(ClientModel clientModel) {
+	public LobbyScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
+		this.screenFactory = screenFactory;
 		this.listOfGames = new ArrayList<>();
 		initialize();
 	}
@@ -148,5 +148,9 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 
         String gameName = listSelectionEvent.toString();
         setGameName(gameName);
+    }
+
+    public ScreenFactory getScreenFactory() {
+        return screenFactory;
     }
 }

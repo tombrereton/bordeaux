@@ -76,11 +76,11 @@ public class LoginScreen extends JPanel {
                 getClientModel().requestLogin(usernameField.getText(), String.valueOf(passwordField.getPassword()));
 
 
-			    // If response say success, change screen
-			    if (clientModel.getCurrentScreen() == HOMESCREEN){
-			    	screenFactory.screenFactory(HOMESCREEN);
-					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
-				}
+//			    // If response say success, change screen
+//			    if (clientModel.getCurrentScreen() == HOMESCREEN){
+//			    	screenFactory.screenFactory(HOMESCREEN);
+//					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+//				}
 			}
 		});
 		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);

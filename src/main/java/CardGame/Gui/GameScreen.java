@@ -24,7 +24,6 @@ public class GameScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private ClientModel clientModel;
 	private JScrollPane scrollPane = new JScrollPane();
 	private JLabel lblChat = new JLabel("Chat");
 	private JButton btnSendMessage = new JButton();

@@ -20,8 +20,8 @@ public class HomeScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JButton btnLogout = new JButton("Logout");
-	private String username = clientModel.getUser().getUserName();
-	private JLabel lblWelcome = new JLabel("Welcome " + username); //get the username
+	private String username;
+	private JLabel lblWelcome; //get the username
 	private JButton btnGoToLobby = new JButton("Go To Lobby");
 	private JButton btnStatistics = new JButton("Statistics");
 	private JButton btnSettings = new JButton("Settings");
@@ -36,7 +36,12 @@ public class HomeScreen extends JPanel {
 	public HomeScreen(ClientModel clientModel,ScreenFactory screenFactory) {
 		this.screenFactory = screenFactory;
 		this.clientModel = clientModel;
+		username = clientModel.getUser().getUserName();
+		lblWelcome = new JLabel("Welcome " + username);
+
+		// last thing
 		initialize();
+
 	}
 
 	/**
