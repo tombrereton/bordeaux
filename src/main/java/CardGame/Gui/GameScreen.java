@@ -225,7 +225,7 @@ public class GameScreen extends JPanel {
 			Image imgBet2 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet2.png"));
 			btnBet2.setIcon(new ImageIcon(imgBet2));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet2);
 
@@ -242,7 +242,7 @@ public class GameScreen extends JPanel {
 			Image imgBet3 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet3.png"));
 			btnBet3.setIcon(new ImageIcon(imgBet3));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet3);
 
@@ -259,7 +259,7 @@ public class GameScreen extends JPanel {
 			Image imgBet4 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet4.png"));
 			btnBet4.setIcon(new ImageIcon(imgBet4));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		add(btnBet4);
 

@@ -73,9 +73,11 @@ public class LoginScreen extends JPanel {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO change to handle password fields later
-			    ResponseProtocol response = getClientModel().login(usernameField.getText(), String.valueOf(passwordField.getPassword()));
+				clientModel.login(usernameField.getText(), String.valueOf(passwordField.getPassword()));
+
+
 			    // If response say success, change screen
-			    if (response.getRequestSuccess() == 1){
+			    if (clientModel.getCurrentScreen() == HOMESCREEN){
 			    	screenFactory.screenFactory(HOMESCREEN);
 					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 				}

@@ -159,10 +159,10 @@ public class ScreenFactory extends JFrame implements ComponentListener {
      * @param args
      */
     public static void main(String[] args) {
-        ClientModel clientModel = new ClientModel();
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    ClientModel clientModel = new ClientModel();
                     frame = new ScreenFactory(clientModel);
                     frame.setVisible(true);
                 } catch (Exception e) {
