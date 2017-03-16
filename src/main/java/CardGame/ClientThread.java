@@ -31,6 +31,7 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  */
 public class ClientThread implements Runnable {
     private Socket toClientSocket;
+    private DataOutputStream pushOutputStream;
     private boolean clientAlive;
     private long clientID;
     private User user;
@@ -73,7 +74,7 @@ public class ClientThread implements Runnable {
     }
 
     /**
-     * This method runs when the thread starts.
+     * This method runs when the clientSideThread starts.
      */
     @Override
     public void run() {
@@ -124,6 +125,7 @@ public class ClientThread implements Runnable {
         this.inputStream.close();
         this.outputStream.close();
         this.toClientSocket.close();
+        this.pushOutputStream.close();
     }
 
     /**
@@ -575,7 +577,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player stand state to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -589,7 +591,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player bust state to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -604,7 +606,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player bets to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -619,7 +621,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player statuses for if they have finished their move to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -634,7 +636,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player hands to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -649,7 +651,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes the dealer hand to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -663,7 +665,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player budgets to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -677,7 +679,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player names to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -692,7 +694,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes a map player who have won to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -713,7 +715,7 @@ public class ClientThread implements Runnable {
      * @return True if push successful, false if not
      */
     private <T extends PushProtocol> boolean pushToPlayers(T push) {
-        DataOutputStream outputStream = null;
+        pushOutputStream = null;
         Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
 
         if (this.socketList.isEmpty()) {
@@ -722,19 +724,21 @@ public class ClientThread implements Runnable {
 
         try {
             for (Map.Entry<String, Socket> playerSocketEntry : playerSockets.entrySet()) {
-                outputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
-                outputStream.writeUTF(encodeResponse(push));
+                // we get the output stream for player i
+                pushOutputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
+
+                // we push to player i
+                pushOutputStream.writeUTF(encodeResponse(push));
             }
+
+            // we print out the push
+            System.out.println(push);
+
+            // we return true if successful
             return true;
         } catch (IOException e) {
             System.out.println("Failed to send out list of game names");
             return false;
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -893,11 +897,12 @@ public class ClientThread implements Runnable {
             return new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
         } else if (userFromRequest.checkPassword(userFromDatabase)) {
             // if username and password match, we set this.user to user
-            // and add user to users
-            // TODO:
-            // set password to null before sending to client
             this.user = userFromDatabase;
             this.addUsertoUsers(this.user);
+
+            // we push the gameList to the client
+            pushGameListToClient();
+
             // return success if password and username match
             return new ResponseLoginUser(protocolId, SUCCESS, userFromDatabase);
         } else {

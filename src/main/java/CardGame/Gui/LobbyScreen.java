@@ -18,7 +18,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * @author Alex
  *
  */
-public class LobbyScreen extends JPanel implements ListSelectionListener {
+public class LobbyScreen extends JPanel {
 //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
     public DefaultListModel model;
@@ -88,6 +88,24 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 			}
 		});
 		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
+
+		// add listener to list
+        ListSelectionModel listSelectionModel = list.getSelectionModel();
+        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
+
+                // we get the index of the selected text in the list
+                int selectionIndex = listSelectionEvent.getFirstIndex();
+
+                // we get the game name with the index
+                String gameNameSelected = getListOfGames().get(selectionIndex);
+
+                // we set the game name to the game selected
+                setGameName(gameNameSelected);
+            }
+        });
 		add(list);
 
 		/**
@@ -111,9 +129,9 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
             public void actionPerformed(ActionEvent e) {
                 // TODO: make this show in the list
                 // todo: double check this
-                listOfGames.add("Test"); //name of game is uername
-                model.addElement(listOfGames);
                 getClientModel().requestCreateGame();
+                setListOfGames(getClientModel().getListOfGames());
+                model.addElement(getListOfGames());
                 //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
         });
@@ -121,6 +139,8 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 		btnCreateGame.setBackground(Color.WHITE);
 		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
         add(btnCreateGame);
+
+
 	}
 
 	public void updateBounds(){
@@ -147,15 +167,11 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
         return gameName;
     }
 
-    @Override
-    public void valueChanged(ListSelectionEvent listSelectionEvent) {
-        ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
-
-        String gameName = listSelectionEvent.toString();
-        setGameName(gameName);
-    }
-
     public ScreenFactory getScreenFactory() {
         return screenFactory;
+    }
+
+    public void setListOfGames(ArrayList<String> listOfGames) {
+        this.listOfGames = listOfGames;
     }
 }

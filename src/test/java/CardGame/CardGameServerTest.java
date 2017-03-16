@@ -214,11 +214,11 @@ public class CardGameServerTest {
         User fromDB = responseLoginUser.getUser();
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
 
-        // We check user is added to users on thread
+        // We check user is added to users on clientSideThread
         int userSize = this.clientThread.getUsers().size();
         assertEquals("Should return size of 1 ", 1, userSize);
 
-        // We check correct user is added to users on thread
+        // We check correct user is added to users on clientSideThread
         User userOnThread = this.clientThread.getLoggedInUser();
         assertEquals("Should return user matching userTest ", this.userTest, userOnThread);
     }
@@ -541,7 +541,7 @@ public class CardGameServerTest {
     }
 
     /**
-     * We test joining a game again on the same thread.
+     * We test joining a game again on the same clientSideThread.
      */
     @Test
     public void joinGame01_test() {
@@ -625,7 +625,7 @@ public class CardGameServerTest {
     }
 
     /**
-     * We test for 1 thread creating a game, another thread joining that game.
+     * We test for 1 clientSideThread creating a game, another clientSideThread joining that game.
      */
     @Test
     public void joinGame02_test() {
