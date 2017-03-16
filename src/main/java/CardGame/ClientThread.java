@@ -90,9 +90,10 @@ public class ClientThread implements Runnable {
             }
         } catch (EOFException e) {
             System.out.println("Client likely disconnected.: " + e.toString());
+            this.setLoggedInUser(null);
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         } finally {
             try {
                 Thread.sleep(10);
