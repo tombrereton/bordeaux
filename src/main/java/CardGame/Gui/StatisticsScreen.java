@@ -1,9 +1,13 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * Statistics Screen
@@ -12,10 +16,13 @@ import java.awt.event.ActionListener;
  */
 public class StatisticsScreen extends JPanel {
 
+	private ClientModel clientModel;
+
 	/**
 	 * Create the application.
 	 */
-	public StatisticsScreen() {
+	public StatisticsScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 
@@ -41,7 +48,7 @@ public class StatisticsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+				getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
@@ -49,4 +56,7 @@ public class StatisticsScreen extends JPanel {
 		
 	}
 
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }

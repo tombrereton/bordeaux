@@ -4,9 +4,10 @@ import CardGame.ClientModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentListener;
+import java.util.Observable;
+import java.util.Observer;
 
-import static CardGame.Gui.Screens.HOMESCREEN;
+import static CardGame.Gui.Screens.*;
 
 
 /**
@@ -14,7 +15,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  *
  * @author Alex
  */
-public class ScreenFactory extends JFrame {
+public class ScreenFactory extends JFrame implements Observer {
 
 //	private ImageIcon icon;
 //	private JLabel label;
@@ -29,10 +30,10 @@ public class ScreenFactory extends JFrame {
     public LoginScreen loginScreen;
     public HomeScreen homeScreen;
     public CreateAccountScreen createAccountScreen;
-    public SettingsScreen settingsScreen = new SettingsScreen();
-    public StatisticsScreen statisticsScreen = new StatisticsScreen();
-    public LobbyScreen lobbyScreen = new LobbyScreen();
-    public GameScreen gameScreen = new GameScreen();
+    public SettingsScreen settingsScreen;
+    public StatisticsScreen statisticsScreen;
+    public LobbyScreen lobbyScreen;
+    public GameScreen gameScreen;
     private ClientModel clientModel;
 
 
@@ -47,15 +48,17 @@ public class ScreenFactory extends JFrame {
      * Constructor for the frame
      */
     public ScreenFactory(ClientModel clientModel) {
+        // add to observer list for notify all
         this.clientModel = clientModel;
+        clientModel.addObserver(this);
 
+
+        // instantiate create account and login screen in constructor
         this.createAccountScreen = new CreateAccountScreen(clientModel);
         this.loginScreen = new LoginScreen(clientModel, this);
 
-        // this screen should be created at run time so it can access the
-        // logged in user after the user has logged in
-//        this.homeScreen = new homeScreen(clientModel);
 
+        // set up jframe and initialise first screen
         setTitle("CardGame");
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,8 +84,8 @@ public class ScreenFactory extends JFrame {
      *
      * @param type
      */
-    public void screenFactory(int type){
-        if (type == HOMESCREEN){
+    public void screenFactory(int type) {
+        if (type == HOMESCREEN) {
             this.homeScreen = new HomeScreen(this.clientModel);
         }
     }
@@ -93,7 +96,7 @@ public class ScreenFactory extends JFrame {
      *
      * @param panelAdd Panel to add
      */
-    public static void setPane(JPanel panelAdd) {
+    public void setPane(JPanel panelAdd) {
         masterPane.remove(centerPane);
         centerPane = panelAdd;
         centerPane.setPreferredSize(new Dimension(scnW, scnH));
@@ -127,7 +130,7 @@ public class ScreenFactory extends JFrame {
     /**
      *
      */
-    public void factory(){
+    public void factory() {
 
     }
 
@@ -148,5 +151,50 @@ public class ScreenFactory extends JFrame {
                 }
             }
         });
+    }
+
+    /**
+     * This update method will change the current jpanel
+     * and repaint it as per ClientModel.currentScreen.
+     *
+     * @param observable
+     * @param o
+     */
+    @Override
+    public void update(Observable observable, Object o) {
+        if (observable instanceof ClientModel) {
+            ClientModel model = (ClientModel) observable;
+            int currentScreen = model.getCurrentScreen();
+
+            switch (currentScreen) {
+                case LOGINSCREEN:
+                    setPane(this.loginScreen);
+                    break;
+                case CREATE_ACCOUNTSCREEN:
+                    setPane(this.createAccountScreen);
+                    break;
+                case HOMESCREEN:
+                    this.homeScreen = new HomeScreen(model);
+                    setPane(this.homeScreen);
+                    break;
+                case LOBBYSCREEN:
+                    this.lobbyScreen = new LobbyScreen(model);
+                    setPane(this.lobbyScreen);
+                    break;
+                case GAMESCREEN:
+                    this.gameScreen = new GameScreen(model);
+                    setPane(this.gameScreen);
+                    break;
+                case STATISTICSSCREEN:
+                    this.statisticsScreen = new StatisticsScreen(model);
+                    setPane(this.statisticsScreen);
+                    break;
+                case SETTINGSSCREEN:
+                    this.settingsScreen = new SettingsScreen(model);
+                    setPane(this.settingsScreen);
+                    break;
+            }
+        }
+
     }
 }

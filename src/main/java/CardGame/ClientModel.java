@@ -3,8 +3,12 @@ package CardGame;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
+import CardGame.Requests.RequestCreateGame;
+import CardGame.Requests.RequestLogOut;
 import CardGame.Requests.RequestLoginUser;
 import CardGame.Requests.RequestRegisterUser;
+import CardGame.Responses.ResponseCreateGame;
+import CardGame.Responses.ResponseLogOut;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
 import com.google.gson.Gson;
@@ -18,7 +22,10 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static CardGame.Gui.Screens.HOMESCREEN;
+import static CardGame.Gui.Screens.LOGINSCREEN;
 import static CardGame.ProtocolMessages.SUCCESS;
+
 
 /**
  * The observable class that contains all the information to be displayed on the
@@ -86,7 +93,7 @@ public class ClientModel extends Observable {
 	 * @param username
 	 * @param password
 	 */
-	public void login(String username, String password) {
+	public void requestLogin(String username, String password) {
 		String hashedPassword = hashPassword(password);
 		User user = new User(username, hashedPassword);
 		try {
@@ -103,9 +110,27 @@ public class ClientModel extends Observable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void requestLogOut(){
+		try{
+		RequestLogOut request = new RequestLogOut(this.user.getUserName());
+		cardGameClient.sendRequest(request);
+		String responseString = threadDataIn.readUTF();
+		ResponseLogOut responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
+		if(responseLogOut.getRequestSuccess() == SUCCESS){
+			setLoggedIn(false, null);
+		}
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+			
+		
+		
+	}
+	
 
 	/**
-	 * helper method for login.
+	 * helper method for login and logout
 	 *
 	 * @param bool
 	 * @param user
@@ -113,9 +138,11 @@ public class ClientModel extends Observable {
 	public void setLoggedIn(boolean bool, User user) {
 		this.loggedIn = bool;
 		this.user = user;
-		this.currentScreen = Screens.HOMESCREEN;
-		setChanged();
-		notifyObservers(loggedIn);
+		if(loggedIn == true){
+			setCurrentScreen(HOMESCREEN);
+		} else {
+			setCurrentScreen(LOGINSCREEN);
+		}
 	}
 
 	/**
@@ -126,7 +153,7 @@ public class ClientModel extends Observable {
 	 * @param first
 	 * @param last
 	 */
-	public void registerUser(String username, String password, String first, String last) {
+	public void requestRegisterUser(String username, String password, String first, String last) {
 		String hashedPassword = hashPassword(password);
 		User user = new User(username, hashedPassword, first, last);
 		try {
@@ -148,6 +175,28 @@ public class ClientModel extends Observable {
 		String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
 		return sha256hex;
 	}
+	
+	public void requestCreateGame(){
+		try {
+			RequestCreateGame request = new RequestCreateGame(user.getUserName());
+			cardGameClient.sendRequest(request);
+			String responseString = threadDataIn.readUTF();
+			ResponseCreateGame responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
+			if (responseCreateGame.getRequestSuccess() == 1) {
+				System.out.println("Created Game");
+				listOfGames.add(responseCreateGame.getGameName());
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void requestJoinGame(String gamename){
+		// todo: send request for joining a game
+	}
+	
 
 	/**
 	 * getter for cardgameclient object.
@@ -219,6 +268,8 @@ public class ClientModel extends Observable {
 	 */
 	public void setCurrentScreen(int currentScreen) {
 		this.currentScreen = currentScreen;
+		setChanged();
+		notifyObservers();
 	}
 
 	/**
@@ -376,5 +427,9 @@ public class ClientModel extends Observable {
 
 	public PipedOutputStream getPout() {
 		return pout;
+	}
+	
+	public LinkedBlockingQueue<PushProtocol> getPushRequestQueue(){
+		return pushRequestQueue;
 	}
 }

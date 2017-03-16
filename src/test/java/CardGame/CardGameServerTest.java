@@ -633,6 +633,7 @@ public class CardGameServerTest {
 
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest);
         RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
+
         RequestLoginUser requestLoginUser1 = new RequestLoginUser(this.userTestTwo);
 
         // LOGIN

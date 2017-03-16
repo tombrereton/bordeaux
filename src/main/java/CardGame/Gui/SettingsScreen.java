@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,10 +14,13 @@ import java.awt.event.ActionListener;
  */
 public class SettingsScreen extends JPanel {
 
+	private ClientModel clientModel;
+
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen() {
+	public SettingsScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 
@@ -41,11 +46,14 @@ public class SettingsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+				getClientModel().setCurrentScreen(Screens.HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
 		add(btnBack);
 	}
 
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }

@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static CardGame.Gui.Screens.*;
+
 /**
  * Home Screen
  * @author Alex
@@ -40,7 +42,7 @@ public class HomeScreen extends JPanel {
 		btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
+			    getClientModel().requestLogOut();
 			}
 		});
 		btnLogout.setBounds(886, 7, 104, 23);
@@ -63,7 +65,7 @@ public class HomeScreen extends JPanel {
 		JButton btnGoToLobby = new JButton("Go To Lobby");
 		btnGoToLobby.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
+			    getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
 		btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -77,7 +79,7 @@ public class HomeScreen extends JPanel {
 		JButton btnStatistics = new JButton("Statistics");
 		btnStatistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.statisticsScreen);
+			    getClientModel().setCurrentScreen(STATISTICSSCREEN);
 			}
 		});
 		btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -91,7 +93,7 @@ public class HomeScreen extends JPanel {
 		JButton btnSettings = new JButton("Settings");
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.settingsScreen);
+			    getClientModel().setCurrentScreen(SETTINGSSCREEN);
 			}
 		});
 		btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -118,5 +120,9 @@ public class HomeScreen extends JPanel {
 		lblGamesPlayed.setFont(new Font("Soho Std", Font.PLAIN, 18));
 		lblGamesPlayed.setBounds(560, 243, 225, 34);
 		add(lblGamesPlayed);
+	}
+
+	public ClientModel getClientModel() {
+		return clientModel;
 	}
 }
