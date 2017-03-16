@@ -145,6 +145,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         centerPane.setOpaque(false);
         centerPane.setLayout(null);
         //TODO: call update bounds method in frame
+        loginScreen.updateBounds();
         frame.repaint();
         frame.revalidate();
     }
