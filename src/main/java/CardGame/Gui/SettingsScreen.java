@@ -46,11 +46,14 @@ public class SettingsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+				getClientModel().setCurrentScreen(Screens.HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
 		add(btnBack);
 	}
 
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }

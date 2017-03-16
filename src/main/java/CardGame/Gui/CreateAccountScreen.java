@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static CardGame.Gui.Screens.LOGINSCREEN;
+
 public class CreateAccountScreen extends JPanel {
 
 	/**
@@ -112,7 +114,7 @@ public class CreateAccountScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
+			    getClientModel().setCurrentScreen(LOGINSCREEN);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
@@ -129,11 +131,11 @@ public class CreateAccountScreen extends JPanel {
 				//If usernameField.getText() is unique create account and return to login screen
 
 
-                getClientModel().registerUser(usernameField.getText(), passwordField.getText(),
+                getClientModel().requestRegisterUser(usernameField.getText(), passwordField.getText(),
                         firstnameField.getText(), lastnameField.getText());
 
                 // if successfully registered - change page:
-				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
+//				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
 				//else display message that username is not unique
 			}
 		});

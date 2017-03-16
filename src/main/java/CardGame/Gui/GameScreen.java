@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static CardGame.Gui.Screens.LOBBYSCREEN;
+
 
 /**
  * gameScreen
@@ -324,7 +326,8 @@ public class GameScreen extends JPanel {
 		JButton btnLeaveGame = new JButton("Leave Game");
 		btnLeaveGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
+			    // todo make this a request leave game
+			    getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
 		btnLeaveGame.setBackground(Color.WHITE);
@@ -374,4 +377,7 @@ public class GameScreen extends JPanel {
 
 	}
 
+    public ClientModel getClientModel() {
+        return clientModel;
+    }
 }

@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static CardGame.Gui.Screens.HOMESCREEN;
+
 /**
  * Statistics Screen
  * @author Alex
@@ -46,7 +48,7 @@ public class StatisticsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+				getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
@@ -54,4 +56,7 @@ public class StatisticsScreen extends JPanel {
 		
 	}
 
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }

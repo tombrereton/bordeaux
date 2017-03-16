@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static CardGame.Gui.Screens.HOMESCREEN;
+import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 
 
 /**
@@ -75,14 +75,14 @@ public class LoginScreen extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 				// TODO change to handle password fields later
-				clientModel.login(usernameField.getText(), String.valueOf(passwordField.getPassword()));
+                getClientModel().requestLogin(usernameField.getText(), String.valueOf(passwordField.getPassword()));
 
 
-			    // If response say success, change screen
-			    if (clientModel.getCurrentScreen() == HOMESCREEN){
-			    	screenFactory.screenFactory(HOMESCREEN);
-					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
-				}
+//			    // If response say success, change screen
+//			    if (clientModel.getCurrentScreen() == HOMESCREEN){
+//			    	screenFactory.screenFactory(HOMESCREEN);
+//					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+//				}
 
 
 			}
@@ -99,7 +99,7 @@ public class LoginScreen extends JPanel {
 		btnCreateAccount.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnCreateAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.createAccountScreen);
+			    getClientModel().setCurrentScreen(CREATE_ACCOUNTSCREEN);
 			}
 		});
 		btnCreateAccount.setBounds(432, 418, 160, 30);

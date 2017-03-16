@@ -169,23 +169,30 @@ public class ScreenFactory extends JFrame implements Observer {
             switch (currentScreen) {
                 case LOGINSCREEN:
                     setPane(this.loginScreen);
+                    break;
                 case CREATE_ACCOUNTSCREEN:
                     setPane(this.createAccountScreen);
+                    break;
                 case HOMESCREEN:
                     this.homeScreen = new HomeScreen(model);
                     setPane(this.homeScreen);
+                    break;
                 case LOBBYSCREEN:
                     this.lobbyScreen = new LobbyScreen(model);
                     setPane(this.lobbyScreen);
+                    break;
                 case GAMESCREEN:
                     this.gameScreen = new GameScreen(model);
                     setPane(this.gameScreen);
+                    break;
                 case STATISTICSSCREEN:
                     this.statisticsScreen = new StatisticsScreen(model);
                     setPane(this.statisticsScreen);
+                    break;
                 case SETTINGSSCREEN:
                     this.settingsScreen = new SettingsScreen(model);
                     setPane(this.settingsScreen);
+                    break;
             }
         }
 

@@ -1,18 +1,5 @@
 package CardGame;
 
-import static CardGame.ProtocolMessages.SUCCESS;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Observable;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import com.google.gson.Gson;
-
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
@@ -24,6 +11,20 @@ import CardGame.Responses.ResponseCreateGame;
 import CardGame.Responses.ResponseLogOut;
 import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseRegisterUser;
+import com.google.gson.Gson;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Observable;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static CardGame.Gui.Screens.HOMESCREEN;
+import static CardGame.Gui.Screens.LOGINSCREEN;
+import static CardGame.ProtocolMessages.SUCCESS;
 
 
 /**
@@ -137,11 +138,11 @@ public class ClientModel extends Observable {
 	public void setLoggedIn(boolean bool, User user) {
 		this.loggedIn = bool;
 		this.user = user;
-		if(loggedIn == true)
-		this.currentScreen = Screens.HOMESCREEN;
-		else this.currentScreen = Screens.LOGINSCREEN;
-		setChanged();
-		notifyObservers(loggedIn);
+		if(loggedIn == true){
+			setCurrentScreen(HOMESCREEN);
+		} else {
+			setCurrentScreen(LOGINSCREEN);
+		}
 	}
 
 	/**
@@ -186,11 +187,14 @@ public class ClientModel extends Observable {
 				listOfGames.add(responseCreateGame.getGameName());
 			}
 			
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void requestJoinGame(String gamename){
+		// todo: send request for joining a game
 	}
 	
 
@@ -264,6 +268,8 @@ public class ClientModel extends Observable {
 	 */
 	public void setCurrentScreen(int currentScreen) {
 		this.currentScreen = currentScreen;
+		setChanged();
+		notifyObservers();
 	}
 
 	/**
