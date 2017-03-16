@@ -1,18 +1,24 @@
 package CardGame;
 
-import CardGame.GameEngine.Hand;
-import CardGame.Gui.Screens;
-import CardGame.Pushes.PushProtocol;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
+import static CardGame.ProtocolMessages.SUCCESS;
 
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static CardGame.ProtocolMessages.SUCCESS;
+import com.google.gson.Gson;
+
+import CardGame.GameEngine.Hand;
+import CardGame.Gui.Screens;
+import CardGame.Pushes.PushProtocol;
+import CardGame.Requests.*;
+import CardGame.Responses.*;
+import CardGame.Responses.ResponseRegisterUser;
 /**
  * The observable class that contains all the information to be displayed on the client gui and methods for sending to server.
  * @author Lloyd
@@ -21,6 +27,10 @@ import static CardGame.ProtocolMessages.SUCCESS;
 public class ClientModel extends Observable {
 	//connectors
 	CardGameClient cardGameClient = new CardGameClient();
+	ClientSideThread thread;
+	PipedInputStream pin = new PipedInputStream(); //for listener thread
+	PipedOutputStream pout = new PipedOutputStream(); //for listener thread
+	DataInputStream threadDataIn;
 
 	//Booleans for states
 	private boolean connected, loggedIn;
@@ -31,6 +41,7 @@ public class ClientModel extends Observable {
 	private int currentScreen;
 
 	//fields
+	Gson gson = new Gson();
 	User user;
 	ArrayList<User> users;
 	LinkedBlockingQueue<PushProtocol> pushRequestQueue;
@@ -50,8 +61,12 @@ public class ClientModel extends Observable {
 
 	/**
 	 * Constructor.
+	 * @throws IOException 
 	 */
-	public ClientModel(){
+	public ClientModel() throws IOException{
+		pin.connect(pout);
+		threadDataIn = new DataInputStream(pin);
+		thread = new ClientSideThread(this, cardGameClient);
 		this.connected = false;
 		this.loggedIn = false;
 		this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
@@ -65,7 +80,10 @@ public class ClientModel extends Observable {
 	public void login(String username, String password){
 		User user = new User(username,password);
 		try {
-			ResponseLoginUser responseLoginUser = cardGameClient.sendRequestLoginUser(user);
+			RequestLoginUser request = new RequestLoginUser(user);
+			cardGameClient.sendRequest(request);
+			String responseString = threadDataIn.readUTF();
+			ResponseLoginUser responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
 			if(responseLoginUser.getRequestSuccess() == SUCCESS){
 				setLoggedIn(true, responseLoginUser.getUser());
 			}
@@ -96,7 +114,10 @@ public class ClientModel extends Observable {
 	public void registerUser(String username, String password, String first, String last){
 		User user = new User(username,password,first,last);
 		try {
-			ResponseRegisterUser responseRegisterUser = cardGameClient.sendRequestRegisterUser(user);
+RequestRegisterUser request = new RequestRegisterUser(user);
+cardGameClient.sendRequest(request);
+			String responseString = threadDataIn.readUTF();
+			ResponseRegisterUser responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
 			if (responseRegisterUser.getRequestSuccess() == 1){
 				System.out.println("registration succesful");
 			}
@@ -303,5 +324,9 @@ public class ClientModel extends Observable {
 	 */
 	public void setPlayersBust(Map<String, Boolean> playersBust) {
 		this.playersBust = playersBust;
+	}
+	
+	public PipedOutputStream getPout(){
+		return pout;
 	}
 }
