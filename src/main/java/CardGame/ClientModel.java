@@ -88,6 +88,7 @@ public class ClientModel extends Observable {
 	public void setLoggedIn(boolean bool, User user){
 		this.loggedIn = bool;
 		this.user = user;
+		this.currentScreen = Screens.HOMESCREEN;
 		setChanged();
 		notifyObservers(loggedIn);
 	}
