@@ -49,6 +49,8 @@ public class ClientSideThread implements Runnable {
 			dout.writeUTF("moo");
 			System.out.println(din.readUTF() + "world");
 			System.out.println(din.readUTF());
+			System.out.println(din.readUTF());
+			System.out.println("afterread");;
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
