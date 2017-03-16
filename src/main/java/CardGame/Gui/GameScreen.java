@@ -1,12 +1,17 @@
 package CardGame.Gui;
 
 import CardGame.ClientModel;
+import CardGame.MessageObject;
+import CardGame.Responses.ResponseGetMessages;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
+import java.util.Timer;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
 
@@ -21,7 +26,6 @@ public class GameScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private JScrollPane scrollPane = new JScrollPane();
 	private JLabel lblChat = new JLabel("Chat");
 	private JButton btnSendMessage = new JButton();
 	private JButton btnDoubledown = new JButton();
@@ -39,6 +43,9 @@ public class GameScreen extends JPanel {
 	private JLabel lblCreditsBox = new JLabel();
 	private JLabel lblBetBox = new JLabel();
 	private JLabel lblBackHud = new JLabel();
+	private JList<String> listChat 	= new JList<String>();
+	private JScrollPane scrollPane = new JScrollPane(listChat);
+
 
 	/**
 	 * Create the application.
@@ -46,6 +53,7 @@ public class GameScreen extends JPanel {
 	public GameScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
+
 		initialize();
 	}
 
@@ -54,6 +62,12 @@ public class GameScreen extends JPanel {
 	 */
 	private void initialize() {
 
+		/**
+		 * Create a JList into Chat message box
+		 */
+		listChat = new JList<String>();
+		listChat.setValueIsAdjusting(true);
+		listChat.setModel(new DefaultListModel<String>());
 		/**
 		 * Chat message box as a JScroll Pane
 		 */
@@ -410,50 +424,40 @@ public class GameScreen extends JPanel {
 		lblBackHud.setBounds(screenFactory.getxOrigin()-20, screenFactory.getyOrigin()+400, 1034, 204);
 	}
 
-//	public void StartCheckingMessages(){
-//
-//		Thread thread = new Thread(new Runnable() {
+	public void StartCheckingMessages(){
 
-//			@Override
-//			public void run() {
-//				while (true) {
-//					ResponseGetMessages response = clientModel.requestGetMessages();
-//					if (response[0].equals("get-message")) {
-//						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
-//						for (int i = 1; i < response.length; i = i + 4) {
-//							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
-//								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
-//								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
-//								try {
-//									Thread.sleep(10);
-//								} catch (InterruptedException e) {
-//									e.printStackTrace();
-//								}
-//							}
-//						}
-//
-//					}
-//					if (response[0].equals("send-message")) {
-//						if (response[1].equals("true")) {
-//							System.out.println("Message sent.");
-//						} else {
-//							JOptionPane.showMessageDialog(ChatClientApp.frame,
-//									"Cannot send message!",
-//									"Error",
-//									JOptionPane.WARNING_MESSAGE);
-//						}
-//					}
-//				}
-//			}
-//		});
-//		thread.start();
-//		timer = new java.util.Timer();
-//		timer.scheduleAtFixedRate(new TimerTask() {
-//			@Override
-//			public void run() {
-//				ChatClientApp.frame.client.get_message();
-//			}
-//		}, 1000, 2000);
+		Thread thread = new Thread(new Runnable() {
 
-//	}
+			@Override
+			public void run() {
+				while (true) {
+					ResponseGetMessages response = clientModel.requestGetMessages(clientModel.getChatOffset());
+					if (response.getRequestSuccess() == 1) {
+						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
+							if (clientModel.getChatOffset()< response.getMessages().size()) {
+								clientModel.setChatOffset(response.getMessages().size());
+								for(MessageObject mo: response.getMessages()){
+									model.addElement(mo.toString());
+								}
+								try {
+									Thread.sleep(10);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+					}
+				}
+			}
+		});
+		thread.start();
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				// MIGHT BE SOME BUGS HERE
+				StartCheckingMessages();
+			}
+		}, 1000, 2000);
+
+	}
 }
