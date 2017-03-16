@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 
@@ -77,15 +75,18 @@ public class LoginScreen extends JPanel {
 		btnLogin.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO change to handle password fields later
-                getClientModel().requestLogin(usernameField.getText(), String.valueOf(passwordField.getPassword()));
 
+			    // We send a request and get the response
+                ResponseProtocol responseProtocol = getClientModel().requestLogin(usernameField.getText(),
+                        String.valueOf(passwordField.getPassword()));
 
-//			    // If response say success, change screen
-//			    if (clientModel.getCurrentScreen() == HOMESCREEN){
-//			    	screenFactory.screenFactory(HOMESCREEN);
-//					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
-//				}
+                // We display the error if not null
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (!errorMsg.equals("")){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
 			}
 		});
 		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
