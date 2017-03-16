@@ -41,44 +41,64 @@ public class ScreenFactory extends JFrame implements ComponentListener {
      * screen size variables
      * smallest screen resolution
      */
-    public static int scnWMIN = 1024;
-    public static int scnHMIN = 576;
-    public static int scnW = scnWMIN;
-    public static int scnH = scnHMIN;
-    public static int xOrigin = ((ScreenFactory.scnW-ScreenFactory.scnWMIN)/2);
-    public static int yOrigin = ((ScreenFactory.scnH-ScreenFactory.scnHMIN)/2);
-
+    private int screenWidthMin;
+    private int screenHeightMin;
+    private int screenWidthCurrent;
+    private int screenHeightCurrent;
+    private int xOrigin;
+    private int yOrigin;
     /**
      * Constructor for the frame
      */
     public ScreenFactory(ClientModel clientModel) {
         this.clientModel = clientModel;
-
         this.createAccountScreen = new CreateAccountScreen(clientModel);
         this.loginScreen = new LoginScreen(clientModel, this);
+
+        screenWidthMin = 1024;
+        screenHeightMin = 576;
+        screenWidthCurrent = screenWidthMin;
+        screenHeightCurrent = screenHeightMin;
+        xOrigin = ((screenWidthCurrent -screenWidthMin)/2);
+        yOrigin = ((screenHeightCurrent-screenHeightMin)/2);
 
         // this screen should be created at run time so it can access the
         // logged in user after the user has logged in
 //        this.homeScreen = new homeScreen(clientModel);
 
+        frameSetup();
+        initialiseLoginScreen();
+    }
+
+    private void frameSetup() {
         setTitle("CardGame");
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(0, 0, scnW, scnH);
+        setBounds(0, 0, screenWidthCurrent, screenHeightCurrent);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(scnW, scnH));
+        setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         addComponentListener(this);
+    }
 
+    private void initialiseLoginScreen() {
         centerPane = loginScreen;
         centerPane.setOpaque(false);
-        centerPane.setPreferredSize(new Dimension(scnW, scnH));
-        centerPane.setMinimumSize(new Dimension(scnW, scnH));
+        centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+        centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
         masterPane = new JPanel(new GridBagLayout());
         masterPane.setBackground(new Color(46, 139, 87));
         masterPane.add(centerPane);
         add(masterPane);
+    }
+
+    public int getxOrigin() {
+        return xOrigin;
+    }
+
+    public int getyOrigin() {
+        return yOrigin;
     }
 
     /**
@@ -98,11 +118,11 @@ public class ScreenFactory extends JFrame implements ComponentListener {
      *
      * @param panelAdd Panel to add
      */
-    public static void setPane(JPanel panelAdd) {
+    public void setPane(JPanel panelAdd) {
         masterPane.remove(centerPane);
         centerPane = panelAdd;
-        centerPane.setPreferredSize(new Dimension(scnW, scnH));
-        centerPane.setMinimumSize(new Dimension(scnW, scnH));
+        centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+        centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setOpaque(false);
         centerPane.setLayout(null);
         masterPane.add(centerPane);
@@ -117,29 +137,17 @@ public class ScreenFactory extends JFrame implements ComponentListener {
 
     }
 
-//    public void frameSize(){
-//        Toolkit tk = Toolkit.getDefaultToolkit();
-//        Dimension d = tk.getScreenSize();
-//        System.out.println("Screen width = " + d.width);
-//        System.out.println("Screen height = " + d.height);
-//        scnW = d.width;
-//        scnH = d.height;
-//    }
-
     @Override
     public void componentResized(ComponentEvent e) {
-        scnW = frame.getWidth();
-        scnH = frame.getHeight();
-        xOrigin = ((scnW-scnWMIN)/2);
-        yOrigin = ((scnH-scnHMIN)/2);
-        centerPane.setPreferredSize(new Dimension(scnW, scnH));
-        centerPane.setMinimumSize(new Dimension(scnW, scnH));
+        screenWidthCurrent = frame.getWidth();
+        screenHeightCurrent = frame.getHeight();
+        xOrigin = ((screenWidthCurrent - screenWidthMin)/2);
+        yOrigin = ((screenHeightCurrent- screenHeightMin)/2);
+        centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+        centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setOpaque(false);
         centerPane.setLayout(null);
-        GameScreen.updateBounds();
-        LoginScreen.updateBounds();
-        CreateAccountScreen.updateBounds();
-        HomeScreen.updateBounds();
+        //TODO: call update bounds method in frame
         frame.repaint();
         frame.revalidate();
     }

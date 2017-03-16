@@ -23,13 +23,13 @@ public class LoginScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	static JLabel lblLogin = new JLabel("BlackJack Online");
-	static JButton btnCreateAccount = new JButton("Create Account");
-	static JButton btnLogin = new JButton("Login");
-	static JLabel lblUsername = new JLabel("Username");
-	static JLabel lblPassword = new JLabel("Password");
-	static JTextField usernameField = new JTextField();
-	static JPasswordField passwordField = new JPasswordField();
+	private JLabel lblLogin = new JLabel("BlackJack Online");
+	private JButton btnCreateAccount = new JButton("Create Account");
+	private JButton btnLogin = new JButton("Login");
+	private JLabel lblUsername = new JLabel("Username");
+	private JLabel lblPassword = new JLabel("Password");
+	private JTextField usernameField = new JTextField();
+	private JPasswordField passwordField = new JPasswordField();
 
 	private int xOrigin = 0;
 	private int yOrigin = 0;
@@ -50,18 +50,18 @@ public class LoginScreen extends JPanel {
 
 		lblUsername.setForeground(new Color(255, 255, 255));
 		lblUsername.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblUsername.setBounds(ScreenFactory.xOrigin+345, ScreenFactory.yOrigin+226, 127, 31);
+		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+226, 127, 31);
 		add(lblUsername);
 
 		lblPassword.setForeground(new Color(255, 255, 255));
 		lblPassword.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblPassword.setBounds(ScreenFactory.xOrigin+345, ScreenFactory.yOrigin+283, 101, 17);
+		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+283, 101, 17);
 		add(lblPassword);
 
-		usernameField.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+233, 140, 20);
+		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+233, 140, 20);
 		add(usernameField);
 
-		passwordField.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+283, 140, 20);
+		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+283, 140, 20);
 		add(passwordField);
 		
 		
@@ -83,7 +83,7 @@ public class LoginScreen extends JPanel {
 				}
 			}
 		});
-		btnLogin.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+332, 140, 30);
+		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
 		add(btnLogin);
 		
 		/**
@@ -96,7 +96,7 @@ public class LoginScreen extends JPanel {
 				ScreenFactory.setPane(ScreenFactory.frame.createAccountScreen);
 			}
 		});
-		btnCreateAccount.setBounds(ScreenFactory.xOrigin+432, ScreenFactory.yOrigin+418, 160, 30);
+		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+418, 160, 30);
 		add(btnCreateAccount);
 		
 		
@@ -106,18 +106,18 @@ public class LoginScreen extends JPanel {
 		lblLogin.setForeground(new Color(255, 255, 255));
 		lblLogin.setFont(new Font("Script MT Bold", Font.BOLD, 36));
 		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogin.setBounds(ScreenFactory.xOrigin+314, ScreenFactory.yOrigin+115, 396, 57);
+		lblLogin.setBounds(screenFactory.getxOrigin()+314, screenFactory.getyOrigin()+115, 396, 57);
 		add(lblLogin);
 	}
 
-	public static void updateBounds(){
-		lblLogin.setBounds(ScreenFactory.xOrigin+314, ScreenFactory.yOrigin+115, 396, 57);
-		btnCreateAccount.setBounds(ScreenFactory.xOrigin+432, ScreenFactory.yOrigin+418, 160, 30);
-		btnLogin.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+332, 140, 30);
-		passwordField.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+283, 140, 20);
-		usernameField.setBounds(ScreenFactory.xOrigin+526, ScreenFactory.yOrigin+233, 140, 20);
-		lblPassword.setBounds(ScreenFactory.xOrigin+345, ScreenFactory.yOrigin+283, 101, 17);
-		lblUsername.setBounds(ScreenFactory.xOrigin+345, ScreenFactory.yOrigin+226, 127, 31);
+	public void updateBounds(){
+		lblLogin.setBounds(screenFactory.getxOrigin()+314, screenFactory.getyOrigin()+115, 396, 57);
+		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+418, 160, 30);
+		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
+		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+283, 140, 20);
+		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+233, 140, 20);
+		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+283, 101, 17);
+		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+226, 127, 31);
 	}
 
 	public ClientModel getClientModel() {

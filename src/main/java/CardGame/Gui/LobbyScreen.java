@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -17,6 +19,15 @@ public class LobbyScreen extends JPanel{
     public ArrayList<String> listOfGames;
     public DefaultListModel model;
 
+	private ClientModel clientModel;
+	private ScreenFactory screenFactory;
+
+	private JLabel lblLobby = new JLabel("Lobby");
+	private JButton btnBack = new JButton("Back");
+	private JList list = new JList();
+	private JButton btnJoinGame = new JButton("Join game");
+	private JButton btnCreateGame = new JButton("Create game");
+
 	/**
 	 * Create the application.
 	 */
@@ -29,21 +40,16 @@ public class LobbyScreen extends JPanel{
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		setSize(1024,576);
-		setLayout(null);
-		
-		
-		JLabel lblWelcome = new JLabel("Lobby");
-		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
-		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
-		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(391, 11, 242, 34);
-		add(lblWelcome);
+
+		lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
+		lblLobby.setForeground(new Color(255, 255, 255));
+		lblLobby.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		add(lblLobby);
 		
 		/**
 		 * back button events
 		 */
-		JButton btnBack = new JButton("Back");
 		btnBack.setBackground(new Color(255, 255, 255));
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
@@ -51,13 +57,12 @@ public class LobbyScreen extends JPanel{
 				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 			}
 		});
-		btnBack.setBounds(40, 515, 150, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
 		add(btnBack);
 
         /**
          * List of games
          */
-		JList list = new JList();
 		list.setVisibleRowCount(20);
 		list.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		list.setFont(new Font("Soho Std", Font.PLAIN, 18));
@@ -70,28 +75,26 @@ public class LobbyScreen extends JPanel{
 				return listOfGames.get(index);
 			}
 		});
-		list.setBounds(40, 56, 946, 444);
+		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
 		add(list);
 
 		/**
 		 * Join button
 		 */
-		JButton button = new JButton("Join game");
-		button.addActionListener(new ActionListener() {
+		btnJoinGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScreenFactory.setPane(ScreenFactory.frame.gameScreen);
 			}
 		});
-		button.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		button.setBackground(Color.WHITE);
-		button.setBounds(836, 515, 150, 23);
-		add(button);
+		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+		btnJoinGame.setBackground(Color.WHITE);
+		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
+		add(btnJoinGame);
 
         /**
          * Create game button
          */
-        JButton createGameButton = new JButton("Create game");
-        createGameButton.addActionListener(new ActionListener() {
+		btnCreateGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: make this show in the list
                 listOfGames.add("Test"); //name of game is uername
@@ -101,9 +104,17 @@ public class LobbyScreen extends JPanel{
                 //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
         });
-        createGameButton.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        createGameButton.setBackground(Color.WHITE);
-        createGameButton.setBounds(428, 515, 150, 23);
-        add(createGameButton);
+		btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+		btnCreateGame.setBackground(Color.WHITE);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
+        add(btnCreateGame);
+	}
+
+	public void updateBounds(){
+		lblLobby.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
+		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
+		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
 	}
 }

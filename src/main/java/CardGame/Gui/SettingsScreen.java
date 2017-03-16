@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,10 +14,18 @@ import java.awt.event.ActionListener;
  */
 public class SettingsScreen extends JPanel {
 
+	private ClientModel clientModel;
+	private ScreenFactory screenFactory;
+
+	private JLabel lblWelcome = new JLabel("Settings");
+	private JButton btnBack = new JButton("Back");
+
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen() {
+	public SettingsScreen(ClientModel clientModel, ScreenFactory screenFactory) {
+		this.clientModel = clientModel;
+		this.screenFactory = screenFactory;
 		initialize();
 	}
 
@@ -25,18 +35,16 @@ public class SettingsScreen extends JPanel {
 	private void initialize() {
 		setSize(1024,576);
 		setLayout(null);
-		
-		JLabel lblWelcome = new JLabel("Settings");
+
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(391, 11, 242, 34);
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
 		add(lblWelcome);
 		
 		/**
 		 * back button events
 		 */
-		JButton btnBack = new JButton("Back");
 		btnBack.setBackground(new Color(255, 255, 255));
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
@@ -44,8 +52,13 @@ public class SettingsScreen extends JPanel {
 				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 			}
 		});
-		btnBack.setBounds(40, 526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 		add(btnBack);
+	}
+
+	public void update(){
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 	}
 
 }

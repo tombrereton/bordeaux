@@ -15,22 +15,24 @@ import java.awt.event.ActionListener;
 public class HomeScreen extends JPanel {
 
 	private ClientModel clientModel;
+	private ScreenFactory screenFactory;
 
-	static JButton btnLogout = new JButton("Logout");
-	String username = clientModel.getUser().getUserName();
-	static JLabel lblWelcome = new JLabel("Welcome "); //get the username
-	static JButton btnGoToLobby = new JButton("Go To Lobby");
-	static JButton btnStatistics = new JButton("Statistics");
-	static JButton btnSettings = new JButton("Settings");
-	static JLabel lblCredits = new JLabel("Credits:");
-	static JLabel lblGamesWon = new JLabel("Games Won:");
-	static JLabel lblGamesLost = new JLabel("Games Lost:");
-	static JLabel lblGamesPlayed = new JLabel("Games Played:");
+	private JButton btnLogout = new JButton("Logout");
+	private String username = clientModel.getUser().getUserName();
+	private JLabel lblWelcome = new JLabel("Welcome " + username); //get the username
+	private JButton btnGoToLobby = new JButton("Go To Lobby");
+	private JButton btnStatistics = new JButton("Statistics");
+	private JButton btnSettings = new JButton("Settings");
+	private JLabel lblCredits = new JLabel("Credits:");
+	private JLabel lblGamesWon = new JLabel("Games Won:");
+	private JLabel lblGamesLost = new JLabel("Games Lost:");
+	private JLabel lblGamesPlayed = new JLabel("Games Played:");
 
 	/**
 	 * Create the application.
 	 */
-	public HomeScreen(ClientModel clientModel) {
+	public HomeScreen(ClientModel clientModel,ScreenFactory screenFactory) {
+		this.screenFactory = screenFactory;
 		this.clientModel = clientModel;
 		initialize();
 	}
@@ -50,7 +52,7 @@ public class HomeScreen extends JPanel {
 				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
 			}
 		});
-		btnLogout.setBounds(ScreenFactory.xOrigin+886, ScreenFactory.yOrigin+7, 104, 23);
+		btnLogout.setBounds(screenFactory.getxOrigin()+886, screenFactory.getyOrigin()+7, 104, 23);
 		add(btnLogout);
 		
 		/**
@@ -59,7 +61,7 @@ public class HomeScreen extends JPanel {
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(ScreenFactory.xOrigin+391, ScreenFactory.yOrigin+11, 242, 34);
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
 		add(lblWelcome);
 		
 		/**
@@ -72,7 +74,7 @@ public class HomeScreen extends JPanel {
 		});
 		btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnGoToLobby.setBackground(Color.WHITE);
-		btnGoToLobby.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+174, 165, 34);
+		btnGoToLobby.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+174, 165, 34);
 		add(btnGoToLobby);
 		
 		/**
@@ -85,7 +87,7 @@ public class HomeScreen extends JPanel {
 		});
 		btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnStatistics.setBackground(Color.WHITE);
-		btnStatistics.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+271, 165, 34);
+		btnStatistics.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+271, 165, 34);
 		add(btnStatistics);
 		
 		/**
@@ -98,35 +100,35 @@ public class HomeScreen extends JPanel {
 		});
 		btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnSettings.setBackground(Color.WHITE);
-		btnSettings.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+368, 165, 34);
+		btnSettings.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+368, 165, 34);
 		add(btnSettings);
 
 		lblCredits.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblCredits.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+191, 225, 34);
+		lblCredits.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+191, 225, 34);
 		add(lblCredits);
 
 		lblGamesWon.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesWon.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+300, 225, 34);
+		lblGamesWon.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+300, 225, 34);
 		add(lblGamesWon);
 
 		lblGamesLost.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesLost.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+352, 225, 34);
+		lblGamesLost.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+352, 225, 34);
 		add(lblGamesLost);
 
 		lblGamesPlayed.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesPlayed.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+243, 225, 34);
+		lblGamesPlayed.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+243, 225, 34);
 		add(lblGamesPlayed);
 	}
 
-	public static void updateBounds(){
-		btnLogout.setBounds(ScreenFactory.xOrigin+886, ScreenFactory.yOrigin+7, 104, 23);
-		lblWelcome.setBounds(ScreenFactory.xOrigin+391, ScreenFactory.yOrigin+11, 242, 34);
-		btnGoToLobby.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+174, 165, 34);
-		btnStatistics.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+271, 165, 34);
-		btnSettings.setBounds(ScreenFactory.xOrigin+148, ScreenFactory.yOrigin+368, 165, 34);
-		lblCredits.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+191, 225, 34);
-		lblGamesWon.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+300, 225, 34);
-		lblGamesLost.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+352, 225, 34);
-		lblGamesPlayed.setBounds(ScreenFactory.xOrigin+560, ScreenFactory.yOrigin+243, 225, 34);
+	public void updateBounds(){
+		btnLogout.setBounds(screenFactory.getxOrigin()+886, screenFactory.getyOrigin()+7, 104, 23);
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		btnGoToLobby.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+174, 165, 34);
+		btnStatistics.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+271, 165, 34);
+		btnSettings.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+368, 165, 34);
+		lblCredits.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+191, 225, 34);
+		lblGamesWon.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+300, 225, 34);
+		lblGamesLost.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+352, 225, 34);
+		lblGamesPlayed.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+243, 225, 34);
 	}
 }
