@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,10 +14,13 @@ import java.awt.event.ActionListener;
  */
 public class StatisticsScreen extends JPanel {
 
+	private ClientModel clientModel;
+
 	/**
 	 * Create the application.
 	 */
-	public StatisticsScreen() {
+	public StatisticsScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 

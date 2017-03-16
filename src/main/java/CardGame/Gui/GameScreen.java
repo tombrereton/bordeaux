@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -15,11 +17,13 @@ import java.awt.event.ActionListener;
 public class GameScreen extends JPanel {
 
 	private JTextArea textArea;
+	private ClientModel clientModel;
 
 	/**
 	 * Create the application.
 	 */
-	public GameScreen() {
+	public GameScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 

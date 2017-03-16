@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -16,13 +18,15 @@ public class LobbyScreen extends JPanel{
 //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
     public DefaultListModel model;
+    private ClientModel clientModel;
 
 	/**
 	 * Create the application.
 	 */
-	public LobbyScreen() {
-		initialize();
+	public LobbyScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		this.listOfGames = new ArrayList<>();
+		initialize();
 	}
 
 	/**
@@ -31,7 +35,6 @@ public class LobbyScreen extends JPanel{
 	private void initialize() {
 		setSize(1024,576);
 		setLayout(null);
-		
 		
 		JLabel lblWelcome = new JLabel("Lobby");
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
