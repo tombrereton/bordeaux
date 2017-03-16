@@ -27,11 +27,11 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblLobby = new JLabel("Lobby");
-	private JButton btnBack = new JButton("Back");
-	private JList list = new JList();
-	private JButton btnJoinGame = new JButton("Join game");
-	private JButton btnCreateGame = new JButton("Create game");
+	private JLabel lblLobby;
+	private JButton btnBack;
+	private JList list;
+	private JButton btnJoinGame;
+	private JButton btnCreateGame;
 
 	/**
 	 * Create the application.
@@ -40,8 +40,13 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
 		this.listOfGames = new ArrayList<>();
-		initialize();
-	}
+        lblLobby = new JLabel("Lobby");
+        btnBack = new JButton("Back");
+        list = new JList();
+        btnJoinGame = new JButton("Join game");
+        btnCreateGame = new JButton("Create game");
+        initialize();
+    }
 
 	/**
 	 * Initialize the contents of the frame.

@@ -17,8 +17,8 @@ public class SettingsScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblWelcome = new JLabel("Settings");
-	private JButton btnBack = new JButton("Back");
+	private JLabel lblWelcome;
+	private JButton btnBack;
 
 	/**
 	 * Create the application.
@@ -26,6 +26,8 @@ public class SettingsScreen extends JPanel {
 	public SettingsScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
+		lblWelcome = new JLabel("Settings");
+		btnBack = new JButton("Back");
 		initialize();
 	}
 
@@ -56,7 +58,7 @@ public class SettingsScreen extends JPanel {
 		add(btnBack);
 	}
 
-	public void update(){
+	public void updateBounds(){
 		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
 		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 	}

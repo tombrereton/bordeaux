@@ -23,16 +23,13 @@ public class LoginScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblLogin = new JLabel("BlackJack Online");
-	private JButton btnCreateAccount = new JButton("Create Account");
-	private JButton btnLogin = new JButton("Login");
-	private JLabel lblUsername = new JLabel("Username");
-	private JLabel lblPassword = new JLabel("Password");
-	private JTextField usernameField = new JTextField();
-	private JPasswordField passwordField = new JPasswordField();
-
-	private int xOrigin = 0;
-	private int yOrigin = 0;
+	private JLabel lblLogin;
+	private JButton btnCreateAccount;
+	private JButton btnLogin;
+	private JLabel lblUsername;
+	private JLabel lblPassword;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
 
 	/**
 	 * Create the application.
@@ -40,8 +37,15 @@ public class LoginScreen extends JPanel {
 	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
-		initialize();
-	}
+		lblLogin = new JLabel("BlackJack Online");
+		btnCreateAccount = new JButton("Create Account");
+		btnLogin = new JButton("Login");
+        lblUsername = new JLabel("Username");
+        lblPassword = new JLabel("Password");
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        initialize();
+    }
 
 	/**
 	 * Initialize the contents of the panel.

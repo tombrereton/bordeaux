@@ -19,16 +19,16 @@ public class HomeScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JButton btnLogout = new JButton("Logout");
+	private JButton btnLogout;
 	private String username;
-	private JLabel lblWelcome; //get the username
-	private JButton btnGoToLobby = new JButton("Go To Lobby");
-	private JButton btnStatistics = new JButton("Statistics");
-	private JButton btnSettings = new JButton("Settings");
-	private JLabel lblCredits = new JLabel("Credits:");
-	private JLabel lblGamesWon = new JLabel("Games Won:");
-	private JLabel lblGamesLost = new JLabel("Games Lost:");
-	private JLabel lblGamesPlayed = new JLabel("Games Played:");
+	private JLabel lblWelcome;
+	private JButton btnGoToLobby;
+	private JButton btnStatistics;
+	private JButton btnSettings;
+	private JLabel lblCredits;
+	private JLabel lblGamesWon;
+	private JLabel lblGamesLost;
+	private JLabel lblGamesPlayed;
 
 	/**
 	 * Create the application.
@@ -38,11 +38,16 @@ public class HomeScreen extends JPanel {
 		this.clientModel = clientModel;
 		username = clientModel.getUser().getUserName();
 		lblWelcome = new JLabel("Welcome " + username);
-
-		// last thing
-		initialize();
-
-	}
+        btnLogout = new JButton("Logout");
+        btnGoToLobby = new JButton("Go To Lobby");
+        btnStatistics = new JButton("Statistics");
+        btnSettings = new JButton("Settings");
+        lblCredits = new JLabel("Credits:");
+        lblGamesWon = new JLabel("Games Won:");
+        lblGamesLost = new JLabel("Games Lost:");
+        lblGamesPlayed = new JLabel("Games Played:");
+        initialize();
+    }
 
 	/**
 	 * Initialize the contents of the frame.

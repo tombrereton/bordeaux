@@ -10,9 +10,6 @@ import java.awt.event.ActionListener;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
 /**
  * gameScreen
  * @author Alex
@@ -24,24 +21,24 @@ public class GameScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private JScrollPane scrollPane = new JScrollPane();
-	private JLabel lblChat = new JLabel("Chat");
-	private JButton btnSendMessage = new JButton();
-	private JButton btnDoubledown = new JButton();
-	private JButton btnStand = new JButton();
-	private JButton btnHit = new JButton();
-	private JButton btnFold = new JButton();
-	private JLabel lblCredits = new JLabel("Credits: \u00A31000");
-	private JLabel lblSubmitBet = new JLabel("Bet to be placed");
-	private JButton btnSubmitBet = new JButton();
-	private JButton btnBet1 = new JButton();
-	private JButton btnBet2 = new JButton();
-	private JButton btnBet3 = new JButton();
-	private JButton btnBet4 = new JButton();
-	private JButton btnLeaveGame = new JButton("Leave Game");
-	private JLabel lblCreditsBox = new JLabel();
-	private JLabel lblBetBox = new JLabel();
-	private JLabel lblBackHud = new JLabel();
+	private JScrollPane scrollPane;
+	private JLabel lblChat;
+	private JButton btnSendMessage;
+	private JButton btnDoubleDown;
+	private JButton btnStand;
+	private JButton btnHit;
+	private JButton btnFold;
+	private JLabel lblCredits;
+	private JLabel lblSubmitBet;
+	private JButton btnSubmitBet;
+	private JButton btnBet1;
+	private JButton btnBet2;
+	private JButton btnBet3;
+	private JButton btnBet4;
+	private JButton btnLeaveGame;
+	private JLabel lblCreditsBox;
+	private JLabel lblBetBox;
+	private JLabel lblBackHud;
 
 	/**
 	 * Create the application.
@@ -49,8 +46,26 @@ public class GameScreen extends JPanel {
 	public GameScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
-		initialize();
-	}
+        scrollPane = new JScrollPane();
+        lblChat = new JLabel("Chat");
+        btnSendMessage = new JButton();
+        btnDoubleDown = new JButton();
+        btnStand = new JButton();
+        btnHit = new JButton();
+        btnFold = new JButton();
+        lblCredits = new JLabel("Credits: \u00A31000");
+        lblSubmitBet = new JLabel("Bet to be placed");
+        btnSubmitBet = new JButton();
+        btnBet1 = new JButton();
+        btnBet2 = new JButton();
+        btnBet3 = new JButton();
+        btnBet4 = new JButton();
+        btnLeaveGame = new JButton("Leave Game");
+        lblCreditsBox = new JLabel();
+        lblBetBox = new JLabel();
+        lblBackHud = new JLabel();
+        initialize();
+    }
 
 	/**
 	 * Initialize the contents of the frame.
@@ -102,20 +117,20 @@ public class GameScreen extends JPanel {
 		 */
 
 		//DoubleDown Button
-		btnDoubledown.addActionListener(new ActionListener() {
+		btnDoubleDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnDoubledown.setBounds(screenFactory.getxOrigin()+740, screenFactory.getyOrigin()+470, 98, 55);
-		btnDoubledown.setContentAreaFilled(false);
-		btnDoubledown.setBorderPainted(false);
+		btnDoubleDown.setBounds(screenFactory.getxOrigin()+740, screenFactory.getyOrigin()+470, 98, 55);
+		btnDoubleDown.setContentAreaFilled(false);
+		btnDoubleDown.setBorderPainted(false);
 		try {
 			Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
-			btnDoubledown.setIcon(new ImageIcon(imgDoubleDown));
+			btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}
-		add(btnDoubledown);
+		add(btnDoubleDown);
 
 		//Stand Button
 		btnStand.addActionListener(new ActionListener() {
@@ -386,7 +401,7 @@ public class GameScreen extends JPanel {
 		lblChat.setBounds(screenFactory.getxOrigin()+845, screenFactory.getyOrigin()+10, 205, 35);
 		btnSendMessage.setBounds(screenFactory.getxOrigin()+845, screenFactory.getyOrigin()+470, 159, 60);
 		textArea.setBounds(screenFactory.getxOrigin()+845, screenFactory.getyOrigin()+400, 160, 60);
-		btnDoubledown.setBounds(screenFactory.getxOrigin()+740, screenFactory.getyOrigin()+470, 98, 55);
+		btnDoubleDown.setBounds(screenFactory.getxOrigin()+740, screenFactory.getyOrigin()+470, 98, 55);
 		btnStand.setBounds(screenFactory.getxOrigin()+640, screenFactory.getyOrigin()+470, 98, 55);
 		btnHit.setBounds(screenFactory.getxOrigin()+540, screenFactory.getyOrigin()+470, 98, 55);
 		btnFold.setBounds(screenFactory.getxOrigin()+440, screenFactory.getyOrigin()+470, 98, 55);
