@@ -4,20 +4,26 @@ import CardGame.ClientModel;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
+import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * Lobby Screen
  * @author Alex
  *
  */
-public class LobbyScreen extends JPanel{
+public class LobbyScreen extends JPanel implements ListSelectionListener {
 //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
     public DefaultListModel model;
+    private ClientModel clientModel;
+    private String gameName;
 
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
@@ -31,9 +37,10 @@ public class LobbyScreen extends JPanel{
 	/**
 	 * Create the application.
 	 */
-	public LobbyScreen() {
-		initialize();
+	public LobbyScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		this.listOfGames = new ArrayList<>();
+		initialize();
 	}
 
 	/**
@@ -54,7 +61,7 @@ public class LobbyScreen extends JPanel{
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+			    getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
@@ -83,7 +90,8 @@ public class LobbyScreen extends JPanel{
 		 */
 		btnJoinGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.gameScreen);
+			    // todo: create this method and somehow get gameName from list
+			    getClientModel().requestJoinGame(getGameName());
 			}
 		});
 		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -97,10 +105,10 @@ public class LobbyScreen extends JPanel{
 		btnCreateGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: make this show in the list
+                // todo: double check this
                 listOfGames.add("Test"); //name of game is uername
                 model.addElement(listOfGames);
-                repaint();
-                revalidate();
+                getClientModel().requestCreateGame();
                 //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
         });
@@ -117,4 +125,28 @@ public class LobbyScreen extends JPanel{
 		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
 		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
 	}
+
+	public ArrayList<String> getListOfGames() {
+		return listOfGames;
+	}
+
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+        ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
+
+        String gameName = listSelectionEvent.toString();
+        setGameName(gameName);
+    }
 }

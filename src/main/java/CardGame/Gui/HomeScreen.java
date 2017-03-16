@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static CardGame.Gui.Screens.*;
+
 /**
  * Home Screen
  * @author Alex
@@ -49,7 +51,7 @@ public class HomeScreen extends JPanel {
 		btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
+			    getClientModel().requestLogOut();
 			}
 		});
 		btnLogout.setBounds(screenFactory.getxOrigin()+886, screenFactory.getyOrigin()+7, 104, 23);
@@ -69,7 +71,7 @@ public class HomeScreen extends JPanel {
 		 */
 		btnGoToLobby.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
+			    getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
 		btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -82,7 +84,7 @@ public class HomeScreen extends JPanel {
 		 */
 		btnStatistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.statisticsScreen);
+			    getClientModel().setCurrentScreen(STATISTICSSCREEN);
 			}
 		});
 		btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -95,7 +97,7 @@ public class HomeScreen extends JPanel {
 		 */
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.settingsScreen);
+			    getClientModel().setCurrentScreen(SETTINGSSCREEN);
 			}
 		});
 		btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -130,5 +132,9 @@ public class HomeScreen extends JPanel {
 		lblGamesWon.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+300, 225, 34);
 		lblGamesLost.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+352, 225, 34);
 		lblGamesPlayed.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+243, 225, 34);
+	}
+
+	public ClientModel getClientModel() {
+		return clientModel;
 	}
 }

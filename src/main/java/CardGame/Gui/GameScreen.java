@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static CardGame.Gui.Screens.LOBBYSCREEN;
+
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -21,6 +24,7 @@ public class GameScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
+	private ClientModel clientModel;
 	private JScrollPane scrollPane = new JScrollPane();
 	private JLabel lblChat = new JLabel("Chat");
 	private JButton btnSendMessage = new JButton();
@@ -327,7 +331,8 @@ public class GameScreen extends JPanel {
 
 		btnLeaveGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
+			    // todo make this a request leave game
+			    getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
 		btnLeaveGame.setBackground(Color.WHITE);
@@ -374,6 +379,9 @@ public class GameScreen extends JPanel {
 
 	}
 
+    public ClientModel getClientModel() {
+        return clientModel;
+    }
 	public void updateBounds(){
 		scrollPane.setBounds(screenFactory.getxOrigin()+845, screenFactory.getyOrigin()+40, 160, 340);
 		lblChat.setBounds(screenFactory.getxOrigin()+845, screenFactory.getyOrigin()+10, 205, 35);

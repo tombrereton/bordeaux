@@ -49,7 +49,7 @@ public class SettingsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
+				getClientModel().setCurrentScreen(Screens.HOMESCREEN);
 			}
 		});
 		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
@@ -61,4 +61,7 @@ public class SettingsScreen extends JPanel {
 		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 	}
 
+	public ClientModel getClientModel() {
+		return clientModel;
+	}
 }
