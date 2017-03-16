@@ -4,6 +4,7 @@ import CardGame.ClientModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentListener;
 
 import static CardGame.Gui.Screens.HOMESCREEN;
 
@@ -24,7 +25,6 @@ public class ScreenFactory extends JFrame {
      */
     public static JPanel masterPane;
     public static JPanel centerPane;
-    public static JPanel backgroundPane;
     public static ScreenFactory frame = null;
     public LoginScreen loginScreen;
     public HomeScreen homeScreen;
@@ -64,7 +64,6 @@ public class ScreenFactory extends JFrame {
         setMinimumSize(new Dimension(scnW, scnH));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-
         centerPane = loginScreen;
         centerPane.setOpaque(false);
         centerPane.setPreferredSize(new Dimension(scnW, scnH));
@@ -72,20 +71,6 @@ public class ScreenFactory extends JFrame {
         centerPane.setLayout(null);
         masterPane = new JPanel(new GridBagLayout());
         masterPane.setBackground(new Color(46, 139, 87));
-
-//		backgroundPane = new JPanel();
-//		BufferedImage img = null;
-//		try {
-//		    img = ImageIO.read(new File("resources/bgimage.jpg"));
-//		} catch (IOException e) {
-//		    e.printStackTrace();
-//		}
-//		Image dimg = img.getScaledInstance(1920, 1080,Image.SCALE_SMOOTH);
-//		icon = new ImageIcon(dimg);
-//	    label = new JLabel(icon);
-//	    backgroundPane.add(label);
-//	    backgroundPane.setBounds(0, 0, getWidth(), getHeight());
-//	    add(backgroundPane);
 
         masterPane.add(centerPane);
         add(masterPane);
@@ -119,6 +104,25 @@ public class ScreenFactory extends JFrame {
         frame.repaint();
         frame.revalidate();
     }
+
+//    frame.addComponentListener(new FrameListen());
+////    addComponentListener(new ComponentListener() {
+////        public void componentResized(ComponentEvent e) {
+////            // do stuff
+////        }
+////    });
+
+//    public void setPanelToFrame(){
+//        System.out.println(frame.getWidth());
+//        //masterPane.remove(centerPane);
+//        //centerPane.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
+//        //centerPane.setMinimumSize(new Dimension(frame.getWidth(), frame.getHeight()));
+////        centerPane.setOpaque(false);
+////        centerPane.setLayout(null);
+////        masterPane.add(centerPane);
+////        frame.repaint();
+////        frame.revalidate();
+//    }
 
     /**
      *
