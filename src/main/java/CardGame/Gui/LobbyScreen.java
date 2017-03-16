@@ -85,6 +85,7 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
 		add(list);
 
+
 		/**
 		 * Join button
 		 */
