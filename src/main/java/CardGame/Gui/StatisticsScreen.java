@@ -17,12 +17,18 @@ import static CardGame.Gui.Screens.HOMESCREEN;
 public class StatisticsScreen extends JPanel {
 
 	private ClientModel clientModel;
+	private ScreenFactory screenFactory;
+
+	private JLabel lblWelcome = new JLabel("Statistics");
+	private JButton btnBack = new JButton("Back");
+
 
 	/**
 	 * Create the application.
 	 */
-	public StatisticsScreen(ClientModel clientModel) {
+	public StatisticsScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
+		this.screenFactory = screenFactory;
 		initialize();
 	}
 
@@ -30,20 +36,16 @@ public class StatisticsScreen extends JPanel {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		setSize(1024,576);
-		setLayout(null);
-		
-		JLabel lblWelcome = new JLabel("Statistics");
+
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(391, 11, 242, 34);
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
 		add(lblWelcome);
 		
 		/**
 		 * back button events
 		 */
-		JButton btnBack = new JButton("Back");
 		btnBack.setBackground(new Color(255, 255, 255));
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
@@ -51,9 +53,13 @@ public class StatisticsScreen extends JPanel {
 				getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
-		btnBack.setBounds(40, 526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 		add(btnBack);
-		
+	}
+
+	public void update(){
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 	}
 
 	public ClientModel getClientModel() {
