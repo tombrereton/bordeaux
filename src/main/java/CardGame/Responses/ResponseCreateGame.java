@@ -18,4 +18,9 @@ public class ResponseCreateGame extends ResponseProtocol {
         super(protocolId, CREATE_GAME, requestSuccess, errorMsg);
         this.gameName = gameName;
     }
+    
+    public String getGameName(){
+    	return gameName;
+    }
+    
 }

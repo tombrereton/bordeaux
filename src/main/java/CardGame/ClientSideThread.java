@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 
 import java.io.*;
 
+import CardGame.Responses.*;
+import CardGame.Pushes.*;
+
 public class ClientSideThread implements Runnable {
 	
 	private ClientModel model;
@@ -22,10 +25,20 @@ public class ClientSideThread implements Runnable {
 		while(true){
 			try {
 				String response = client.receiveResponse();
+				ResponseProtocol responseProtocol = gson.fromJson(response, ResponseProtocol.class);
+				if(responseProtocol.getType() >= 50){
+					PushProtocol pushProtocol = gson.fromJson(response, PushProtocol.class);
+					model.getPushRequestQueue().put(pushProtocol);
+				} else{
+					//pipe to response
 				dataOutputStream.writeUTF(response);
 				System.out.println(response);
+				}
 				
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
