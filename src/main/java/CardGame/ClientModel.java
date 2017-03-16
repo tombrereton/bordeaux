@@ -104,38 +104,42 @@ public class ClientModel extends Observable {
      * @param username
      * @param password
      */
-    public void requestLogin(String username, String password) {
+    public ResponseProtocol requestLogin(String username, String password) {
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword);
+        ResponseLoginUser responseLoginUser = null;
         try {
             RequestLoginUser request = new RequestLoginUser(user);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseLoginUser responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
+            responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
+
+            // set logged in user on successful response
             if (responseLoginUser.getRequestSuccess() == SUCCESS) {
                 setLoggedIn(true, responseLoginUser.getUser());
             }
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseLoginUser;
     }
 
-    public void requestLogOut() {
+    public ResponseProtocol requestLogOut() {
+        ResponseLogOut responseLogOut = null;
         try {
             RequestLogOut request = new RequestLogOut(this.user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseLogOut responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
+            responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
             if (responseLogOut.getRequestSuccess() == SUCCESS) {
                 setLoggedIn(false, null);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        return responseLogOut;
     }
 
 
@@ -163,21 +167,22 @@ public class ClientModel extends Observable {
      * @param first
      * @param last
      */
-    public void requestRegisterUser(String username, String password, String first, String last) {
+    public ResponseProtocol requestRegisterUser(String username, String password, String first, String last) {
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword, first, last);
+        ResponseRegisterUser responseRegisterUser = null;
         try {
             RequestRegisterUser request = new RequestRegisterUser(user);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseRegisterUser responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
+            responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
             if (responseRegisterUser.getRequestSuccess() == 1) {
                 System.out.println("registration succesful");
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseRegisterUser;
 
     }
 
@@ -186,149 +191,170 @@ public class ClientModel extends Observable {
         return sha256hex;
     }
 
-    public void requestCreateGame() {
+    public ResponseProtocol requestCreateGame() {
+        ResponseCreateGame responseCreateGame = null;
         try {
             RequestCreateGame request = new RequestCreateGame(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseCreateGame responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
+            responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
             if (responseCreateGame.getRequestSuccess() == 1) {
                 System.out.println("Created Game");
                 String gameName = responseCreateGame.getGameName();
                 listOfGames.add(gameName);
             }
-
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseCreateGame;
     }
 
-    public void requestJoinGame(String gamename) {
+    public ResponseProtocol requestJoinGame(String gamename) {
+        ResponseJoinGame responseJoinGame = null;
         try {
             RequestJoinGame request = new RequestJoinGame(gamename, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseJoinGame responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
+            responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
             if (responseJoinGame.getRequestSuccess() == 1) {
                 setCurrentScreen(GAMESCREEN);
                 System.out.println("Joined the Game");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseJoinGame;
     }
 
-    public void requestBet(int betAmount) {
+    public ResponseProtocol requestBet(int betAmount) {
+        ResponseBet responseBet = null;
         try {
             RequestBet request = new RequestBet(betAmount, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseBet responseBet = gson.fromJson(responseString, ResponseBet.class);
+            responseBet = gson.fromJson(responseString, ResponseBet.class);
             if (responseBet.getRequestSuccess() == 1) {
                 System.out.println("Bet!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseBet;
     }
 
 
-    public void requestDoubleBet() {
+    public ResponseProtocol requestDoubleBet() {
+        ResponseDoubleBet responseDoubleBet = null;
         try {
             RequestDoubleBet request = new RequestDoubleBet(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseDoubleBet responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
+            responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
             if (responseDoubleBet.getRequestSuccess() == 1) {
                 System.out.println("Double bet!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseDoubleBet;
     }
 
 
-    public void requestHit() {
+    public ResponseProtocol requestHit() {
+        ResponseHit responseHit = null;
         try {
             RequestHit request = new RequestHit(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseHit responseHit = gson.fromJson(responseString, ResponseHit.class);
+            responseHit = gson.fromJson(responseString, ResponseHit.class);
             if (responseHit.getRequestSuccess() == 1) {
                 System.out.println("Hit!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseHit;
     }
 
-    public void requestStand() {
+    public ResponseProtocol requestStand() {
+        ResponseStand responseStand = null;
         try {
             RequestStand request = new RequestStand(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseStand responseStand = gson.fromJson(responseString, ResponseStand.class);
+            responseStand = gson.fromJson(responseString, ResponseStand.class);
             if (responseStand.getRequestSuccess() == 1) {
                 System.out.println("Stand!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseStand;
     }
 
-    public void requestFold() {
+    public ResponseProtocol requestFold() {
+        ResponseFold responseFold = null;
         try {
             RequestFold request = new RequestFold(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseFold responseFold = gson.fromJson(responseString, ResponseFold.class);
+            responseFold = gson.fromJson(responseString, ResponseFold.class);
             if (responseFold.getRequestSuccess() == 1) {
                 System.out.println("Fold!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseFold;
     }
 
-    public ResponseGetMessages requestGetMessages(int offset){
+    public ResponseProtocol requestGetMessages(int offset) {
+        ResponseGetMessages responseGetMessages = null;
         try {
             RequestGetMessages request = new RequestGetMessages(offset);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseGetMessages responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
+            responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
             if (responseGetMessages.getRequestSuccess() == 1) {
                 System.out.println("Got messages from the server");
                 System.out.println(responseGetMessages.getMessages());
             }
-            return responseGetMessages;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return responseGetMessages;
     }
 
-    public void requestSendMessages(String message) {
+    public ResponseProtocol requestSendMessages(String message) {
+        ResponseSendMessage responseSendMessage = null;
         try {
             RequestSendMessage request = new RequestSendMessage(user.getUserName(), message);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseSendMessage responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
+            responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
             if (responseSendMessage.getRequestSuccess() == 1) {
                 System.out.println("sent a messages to the server");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseSendMessage;
     }
 
 
-    public void requestQuitGame(String gameToQuit) {
+    public ResponseProtocol requestQuitGame(String gameToQuit) {
+        ResponseQuitGame responseQuitGame = null;
         try {
             RequestQuitGame request = new RequestQuitGame(gameToQuit, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseQuitGame responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
+            responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
             if (responseQuitGame.getRequestSuccess() == 1) {
                 System.out.println("quit the game");
                 setCurrentScreen(LOBBYSCREEN);
@@ -336,6 +362,7 @@ public class ClientModel extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseQuitGame;
     }
 
 
@@ -496,6 +523,7 @@ public class ClientModel extends Observable {
 
     /**
      * getter for players standing
+     *
      * @return
      */
     public Map<String, Boolean> getPlayersStand() {
@@ -577,6 +605,7 @@ public class ClientModel extends Observable {
 
     /**
      * setter for players standing
+     *
      * @param playersStand
      */
     public void setPlayersStand(Map<String, Boolean> playersStand) {
