@@ -4,6 +4,7 @@ import CardGame.ClientModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import static CardGame.Gui.Screens.HOMESCREEN;
@@ -14,7 +15,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  *
  * @author Alex
  */
-public class ScreenFactory extends JFrame {
+public class ScreenFactory extends JFrame implements ComponentListener {
 
 //	private ImageIcon icon;
 //	private JLabel label;
@@ -40,8 +41,12 @@ public class ScreenFactory extends JFrame {
      * screen size variables
      * smallest screen resolution
      */
-    public static int scnW = 1024;
-    public static int scnH = 576;
+    public static int scnWMIN = 1024;
+    public static int scnHMIN = 576;
+    public static int scnW = scnWMIN;
+    public static int scnH = scnHMIN;
+    public static int xOrigin = ((ScreenFactory.scnW-ScreenFactory.scnWMIN)/2);
+    public static int yOrigin = ((ScreenFactory.scnH-ScreenFactory.scnHMIN)/2);
 
     /**
      * Constructor for the frame
@@ -63,6 +68,7 @@ public class ScreenFactory extends JFrame {
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(scnW, scnH));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        addComponentListener(this);
 
         centerPane = loginScreen;
         centerPane.setOpaque(false);
@@ -71,7 +77,6 @@ public class ScreenFactory extends JFrame {
         centerPane.setLayout(null);
         masterPane = new JPanel(new GridBagLayout());
         masterPane.setBackground(new Color(46, 139, 87));
-
         masterPane.add(centerPane);
         add(masterPane);
     }
@@ -95,7 +100,6 @@ public class ScreenFactory extends JFrame {
      */
     public static void setPane(JPanel panelAdd) {
         masterPane.remove(centerPane);
-        centerPane = panelAdd;
         centerPane.setPreferredSize(new Dimension(scnW, scnH));
         centerPane.setMinimumSize(new Dimension(scnW, scnH));
         centerPane.setOpaque(false);
@@ -105,30 +109,48 @@ public class ScreenFactory extends JFrame {
         frame.revalidate();
     }
 
-//    frame.addComponentListener(new FrameListen());
-////    addComponentListener(new ComponentListener() {
-////        public void componentResized(ComponentEvent e) {
-////            // do stuff
-////        }
-////    });
-
-//    public void setPanelToFrame(){
-//        System.out.println(frame.getWidth());
-//        //masterPane.remove(centerPane);
-//        //centerPane.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
-//        //centerPane.setMinimumSize(new Dimension(frame.getWidth(), frame.getHeight()));
-////        centerPane.setOpaque(false);
-////        centerPane.setLayout(null);
-////        masterPane.add(centerPane);
-////        frame.repaint();
-////        frame.revalidate();
-//    }
-
     /**
      *
      */
     public void factory(){
 
+    }
+
+//    public void frameSize(){
+//        Toolkit tk = Toolkit.getDefaultToolkit();
+//        Dimension d = tk.getScreenSize();
+//        System.out.println("Screen width = " + d.width);
+//        System.out.println("Screen height = " + d.height);
+//        scnW = d.width;
+//        scnH = d.height;
+//    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        scnW = frame.getWidth();
+        scnH = frame.getHeight();
+        xOrigin = ((scnW-scnWMIN)/2);
+        yOrigin = ((scnH-scnHMIN)/2);
+        centerPane.setPreferredSize(new Dimension(scnW, scnH));
+        centerPane.setMinimumSize(new Dimension(scnW, scnH));
+        centerPane.setOpaque(false);
+        centerPane.setLayout(null);
+        GameScreen.updateBounds();
+        LoginScreen.updateBounds();
+        frame.repaint();
+        frame.revalidate();
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
     }
 
     /**
@@ -149,4 +171,6 @@ public class ScreenFactory extends JFrame {
             }
         });
     }
+
+
 }

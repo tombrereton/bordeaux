@@ -5,7 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 /**
  * gameScreen
@@ -367,6 +368,10 @@ public class GameScreen extends JPanel {
 			System.out.println(ex);
 		}
 		add(lblBackHud);
+
+	}
+
+	public static void updateBounds(){
 
 	}
 
