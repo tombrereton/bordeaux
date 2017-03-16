@@ -10,10 +10,6 @@ import java.awt.event.ActionListener;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.util.*;
-
 /**
  * gameScreen
  * @author Alex
@@ -416,18 +412,18 @@ public class GameScreen extends JPanel {
 
 //	public void StartCheckingMessages(){
 //
-//		thread = new Thread(new Runnable() {
-//
+//		Thread thread = new Thread(new Runnable() {
+
 //			@Override
 //			public void run() {
-//				while(true){
-//					String[] response = ChatClientApp.frame.client.getResponse();
-//					if(response[0].equals("get-message")){
+//				while (true) {
+//					ResponseGetMessages response = clientModel.requestGetMessages();
+//					if (response[0].equals("get-message")) {
 //						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
-//						for(int i=1; i<response.length; i=i+4){
-//							if(ChatClientApp.frame.client.offset < Integer.parseInt(response[i])){
+//						for (int i = 1; i < response.length; i = i + 4) {
+//							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
 //								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
-//								model.addElement(String.format("%s @ (%s): %s", response[i+1], response[i+2], response[i+3]));
+//								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
 //								try {
 //									Thread.sleep(10);
 //								} catch (InterruptedException e) {
@@ -437,10 +433,10 @@ public class GameScreen extends JPanel {
 //						}
 //
 //					}
-//					if(response[0].equals("send-message")){
-//						if(response[1].equals("true")){
+//					if (response[0].equals("send-message")) {
+//						if (response[1].equals("true")) {
 //							System.out.println("Message sent.");
-//						}else{
+//						} else {
 //							JOptionPane.showMessageDialog(ChatClientApp.frame,
 //									"Cannot send message!",
 //									"Error",
@@ -458,6 +454,6 @@ public class GameScreen extends JPanel {
 //				ChatClientApp.frame.client.get_message();
 //			}
 //		}, 1000, 2000);
-//
+
 //	}
 }
