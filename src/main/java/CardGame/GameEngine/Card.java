@@ -106,7 +106,6 @@ public class Card {
         }
     }
 
-
     public String toString() {
         // Return a String representation of this card, such as
         // "10 of Hearts" or "Queen of Spades".

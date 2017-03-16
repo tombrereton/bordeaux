@@ -5,6 +5,9 @@ import CardGame.ClientModel;
 import javax.swing.*;
 import java.awt.*;
 
+import static CardGame.Gui.Screens.HOMESCREEN;
+
+
 /**
  * Class that creates and controls the frame and the panels to be displayed
  *
@@ -23,13 +26,13 @@ public class ScreenFactory extends JFrame {
     public static JPanel centerPane;
     public static JPanel backgroundPane;
     public static ScreenFactory frame = null;
-    public LoginScreen LoginScreen;
-    public HomeScreen HomeScreen = new HomeScreen();
-    public CreateAccountScreen CreateAccountScreen;
-    public SettingsScreen SettingsScreen = new SettingsScreen();
-    public StatisticsScreen StatisticsScreen = new StatisticsScreen();
-    public LobbyScreen LobbyScreen = new LobbyScreen();
-    public GameScreen GameScreen = new GameScreen();
+    public LoginScreen loginScreen;
+    public HomeScreen homeScreen;
+    public CreateAccountScreen createAccountScreen;
+    public SettingsScreen settingsScreen = new SettingsScreen();
+    public StatisticsScreen statisticsScreen = new StatisticsScreen();
+    public LobbyScreen lobbyScreen = new LobbyScreen();
+    public GameScreen gameScreen = new GameScreen();
     private ClientModel clientModel;
 
 
@@ -45,8 +48,13 @@ public class ScreenFactory extends JFrame {
      */
     public ScreenFactory(ClientModel clientModel) {
         this.clientModel = clientModel;
-        this.CreateAccountScreen = new CreateAccountScreen(clientModel);
-        this.LoginScreen = new LoginScreen(clientModel);
+
+        this.createAccountScreen = new CreateAccountScreen(clientModel);
+        this.loginScreen = new LoginScreen(clientModel, this);
+
+        // this screen should be created at run time so it can access the
+        // logged in user after the user has logged in
+//        this.homeScreen = new homeScreen(clientModel);
 
         setTitle("CardGame");
         setResizable(true);
@@ -57,7 +65,7 @@ public class ScreenFactory extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 
-        centerPane = LoginScreen;
+        centerPane = loginScreen;
         centerPane.setOpaque(false);
         centerPane.setPreferredSize(new Dimension(scnW, scnH));
         centerPane.setMinimumSize(new Dimension(scnW, scnH));
@@ -83,6 +91,17 @@ public class ScreenFactory extends JFrame {
         add(masterPane);
     }
 
+    /**
+     * This method instantiates a screen at runtime.
+     *
+     * @param type
+     */
+    public void screenFactory(int type){
+        if (type == HOMESCREEN){
+            this.homeScreen = new HomeScreen(this.clientModel);
+        }
+    }
+
 
     /**
      * method for changing between panels
@@ -101,6 +120,12 @@ public class ScreenFactory extends JFrame {
         frame.revalidate();
     }
 
+    /**
+     *
+     */
+    public void factory(){
+
+    }
 
     /**
      * main method with which to run the gui
@@ -114,8 +139,6 @@ public class ScreenFactory extends JFrame {
                 try {
                     frame = new ScreenFactory(clientModel);
                     frame.setVisible(true);
-//					frame.client.setHost(args[0]);
-//					frame.client.setPort(Integer.parseInt(args[1]));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
