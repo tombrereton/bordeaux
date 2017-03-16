@@ -31,6 +31,7 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  */
 public class ClientThread implements Runnable {
     private Socket toClientSocket;
+    private DataOutputStream pushOutputStream;
     private boolean clientAlive;
     private long clientID;
     private User user;
@@ -124,6 +125,7 @@ public class ClientThread implements Runnable {
         this.inputStream.close();
         this.outputStream.close();
         this.toClientSocket.close();
+        this.pushOutputStream.close();
     }
 
     /**
@@ -713,7 +715,7 @@ public class ClientThread implements Runnable {
      * @return True if push successful, false if not
      */
     private <T extends PushProtocol> boolean pushToPlayers(T push) {
-        DataOutputStream outputStream = null;
+        pushOutputStream = null;
         Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
 
         if (this.socketList.isEmpty()) {
@@ -722,19 +724,21 @@ public class ClientThread implements Runnable {
 
         try {
             for (Map.Entry<String, Socket> playerSocketEntry : playerSockets.entrySet()) {
-                outputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
-                outputStream.writeUTF(encodeResponse(push));
+                // we get the output stream for player i
+                pushOutputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
+
+                // we push to player i
+                pushOutputStream.writeUTF(encodeResponse(push));
             }
+
+            // we print out the push
+            System.out.println(push);
+
+            // we return true if successful
             return true;
         } catch (IOException e) {
             System.out.println("Failed to send out list of game names");
             return false;
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -893,11 +897,12 @@ public class ClientThread implements Runnable {
             return new ResponseLoginUser(protocolId, FAIL, null, PASSWORD_MISMATCH);
         } else if (userFromRequest.checkPassword(userFromDatabase)) {
             // if username and password match, we set this.user to user
-            // and add user to users
-            // TODO:
-            // set password to null before sending to client
             this.user = userFromDatabase;
             this.addUsertoUsers(this.user);
+
+            // we push the gameList to the client
+            pushGameListToClient();
+
             // return success if password and username match
             return new ResponseLoginUser(protocolId, SUCCESS, userFromDatabase);
         } else {

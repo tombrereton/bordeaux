@@ -106,9 +106,9 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
             public void actionPerformed(ActionEvent e) {
                 // TODO: make this show in the list
                 // todo: double check this
-                listOfGames.add("Test"); //name of game is uername
-                model.addElement(listOfGames);
                 getClientModel().requestCreateGame();
+                setListOfGames(getClientModel().getListOfGames());
+                model.addElement(getListOfGames());
                 //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
         });
@@ -152,5 +152,9 @@ public class LobbyScreen extends JPanel implements ListSelectionListener {
 
     public ScreenFactory getScreenFactory() {
         return screenFactory;
+    }
+
+    public void setListOfGames(ArrayList<String> listOfGames) {
+        this.listOfGames = listOfGames;
     }
 }
