@@ -100,6 +100,7 @@ public class ScreenFactory extends JFrame implements ComponentListener {
      */
     public static void setPane(JPanel panelAdd) {
         masterPane.remove(centerPane);
+        centerPane = panelAdd;
         centerPane.setPreferredSize(new Dimension(scnW, scnH));
         centerPane.setMinimumSize(new Dimension(scnW, scnH));
         centerPane.setOpaque(false);
@@ -137,6 +138,8 @@ public class ScreenFactory extends JFrame implements ComponentListener {
         centerPane.setLayout(null);
         GameScreen.updateBounds();
         LoginScreen.updateBounds();
+        CreateAccountScreen.updateBounds();
+        HomeScreen.updateBounds();
         frame.repaint();
         frame.revalidate();
     }
