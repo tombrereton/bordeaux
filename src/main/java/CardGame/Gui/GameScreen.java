@@ -1,7 +1,6 @@
 package CardGame.Gui;
 
 import CardGame.ClientModel;
-import CardGame.Responses.ResponseGetMessages;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -10,10 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
-
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.util.*;
 
 /**
  * gameScreen
@@ -415,50 +410,50 @@ public class GameScreen extends JPanel {
 		lblBackHud.setBounds(screenFactory.getxOrigin()-20, screenFactory.getyOrigin()+400, 1034, 204);
 	}
 
-	public void StartCheckingMessages(){
+//	public void StartCheckingMessages(){
+//
+//		Thread thread = new Thread(new Runnable() {
 
-		Thread thread = new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				while (true) {
+//					ResponseGetMessages response = clientModel.requestGetMessages();
+//					if (response[0].equals("get-message")) {
+//						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
+//						for (int i = 1; i < response.length; i = i + 4) {
+//							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
+//								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
+//								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
+//								try {
+//									Thread.sleep(10);
+//								} catch (InterruptedException e) {
+//									e.printStackTrace();
+//								}
+//							}
+//						}
+//
+//					}
+//					if (response[0].equals("send-message")) {
+//						if (response[1].equals("true")) {
+//							System.out.println("Message sent.");
+//						} else {
+//							JOptionPane.showMessageDialog(ChatClientApp.frame,
+//									"Cannot send message!",
+//									"Error",
+//									JOptionPane.WARNING_MESSAGE);
+//						}
+//					}
+//				}
+//			}
+//		});
+//		thread.start();
+//		timer = new java.util.Timer();
+//		timer.scheduleAtFixedRate(new TimerTask() {
+//			@Override
+//			public void run() {
+//				ChatClientApp.frame.client.get_message();
+//			}
+//		}, 1000, 2000);
 
-			@Override
-			public void run() {
-				while (true) {
-					ResponseGetMessages response = clientModel.requestGetMessages();
-					if (response[0].equals("get-message")) {
-						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
-						for (int i = 1; i < response.length; i = i + 4) {
-							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
-								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
-								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
-								try {
-									Thread.sleep(10);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-
-					}
-					if (response[0].equals("send-message")) {
-						if (response[1].equals("true")) {
-							System.out.println("Message sent.");
-						} else {
-							JOptionPane.showMessageDialog(ChatClientApp.frame,
-									"Cannot send message!",
-									"Error",
-									JOptionPane.WARNING_MESSAGE);
-						}
-					}
-				}
-			}
-		});
-		thread.start();
-		timer = new java.util.Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				ChatClientApp.frame.client.get_message();
-			}
-		}, 1000, 2000);
-
-	}
+//	}
 }
