@@ -1,13 +1,6 @@
 package CardGame;
 
-import CardGame.GameEngine.Hand;
-import CardGame.Gui.Screens;
-import CardGame.Pushes.PushProtocol;
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
-import com.google.gson.Gson;
+import static CardGame.ProtocolMessages.SUCCESS;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -18,7 +11,17 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static CardGame.ProtocolMessages.SUCCESS;
+import com.google.gson.Gson;
+
+import CardGame.GameEngine.Hand;
+import CardGame.Gui.Screens;
+import CardGame.Pushes.PushProtocol;
+import CardGame.Requests.RequestLogOut;
+import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestRegisterUser;
+import CardGame.Responses.ResponseLogOut;
+import CardGame.Responses.ResponseLoginUser;
+import CardGame.Responses.ResponseRegisterUser;
 
 /**
  * The observable class that contains all the information to be displayed on the
@@ -103,9 +106,27 @@ public class ClientModel extends Observable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void logOut(){
+		try{
+		RequestLogOut request = new RequestLogOut(this.user.getUserName());
+		cardGameClient.sendRequest(request);
+		String responseString = threadDataIn.readUTF();
+		ResponseLogOut responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
+		if(responseLogOut.getRequestSuccess() == SUCCESS){
+			setLoggedIn(false, null);
+		}
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+			
+		
+		
+	}
+	
 
 	/**
-	 * helper method for login.
+	 * helper method for login and logout
 	 *
 	 * @param bool
 	 * @param user
@@ -113,7 +134,9 @@ public class ClientModel extends Observable {
 	public void setLoggedIn(boolean bool, User user) {
 		this.loggedIn = bool;
 		this.user = user;
+		if(loggedIn == true)
 		this.currentScreen = Screens.HOMESCREEN;
+		else this.currentScreen = Screens.LOGINSCREEN;
 		setChanged();
 		notifyObservers(loggedIn);
 	}
