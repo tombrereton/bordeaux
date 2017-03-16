@@ -194,6 +194,7 @@ public class ClientModel extends Observable {
 	}
 
 	public void requestJoinGame(String gamename){
+
 		// todo: send request for joining a game
 	}
 	
