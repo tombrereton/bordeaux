@@ -91,7 +91,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
-        centerPane.setBackground(new Color(46, 139, 87));
         add(centerPane);
     }
 

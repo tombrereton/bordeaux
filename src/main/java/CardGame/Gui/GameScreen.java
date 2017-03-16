@@ -64,6 +64,7 @@ public class GameScreen extends JPanel {
         lblCreditsBox = new JLabel();
         lblBetBox = new JLabel();
         lblBackHud = new JLabel();
+        setBackground(new Color(46, 139, 87));
         initialize();
     }
 

@@ -28,6 +28,7 @@ public class SettingsScreen extends JPanel {
 		this.screenFactory = screenFactory;
 		lblWelcome = new JLabel("Settings");
 		btnBack = new JButton("Back");
+		setBackground(new Color(46, 139, 87));
 		initialize();
 	}
 
@@ -54,13 +55,13 @@ public class SettingsScreen extends JPanel {
 				getClientModel().setCurrentScreen(Screens.HOMESCREEN);
 			}
 		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 		add(btnBack);
 	}
 
 	public void updateBounds(){
 		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 	}
 
 	public ClientModel getClientModel() {

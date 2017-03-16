@@ -45,6 +45,7 @@ public class LobbyScreen extends JPanel {
         list = new JList();
         btnJoinGame = new JButton("Join game");
         btnCreateGame = new JButton("Create game");
+        setBackground(new Color(46, 139, 87));
         initialize();
     }
 
@@ -69,7 +70,7 @@ public class LobbyScreen extends JPanel {
 			    getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 150, 23);
 		add(btnBack);
 
         /**
@@ -119,7 +120,7 @@ public class LobbyScreen extends JPanel {
 		});
 		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnJoinGame.setBackground(Color.WHITE);
-		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
+		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+500, 150, 23);
 		add(btnJoinGame);
 
         /**
@@ -137,7 +138,7 @@ public class LobbyScreen extends JPanel {
         });
 		btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnCreateGame.setBackground(Color.WHITE);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+500, 150, 23);
         add(btnCreateGame);
 
 
@@ -145,10 +146,10 @@ public class LobbyScreen extends JPanel {
 
 	public void updateBounds(){
 		lblLobby.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
-		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
-		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 150, 23);
+		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 400);
+		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+500, 150, 23);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+500, 150, 23);
 	}
 
 	public ArrayList<String> getListOfGames() {
