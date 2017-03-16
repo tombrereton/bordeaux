@@ -1,5 +1,7 @@
 package CardGame.Gui;
 
+import CardGame.ClientModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,10 +14,13 @@ import java.awt.event.ActionListener;
  */
 public class HomeScreen extends JPanel {
 
+	private ClientModel clientModel;
+
 	/**
 	 * Create the application.
 	 */
-	public HomeScreen() {
+	public HomeScreen(ClientModel clientModel) {
+		this.clientModel = clientModel;
 		initialize();
 	}
 
@@ -35,7 +40,7 @@ public class HomeScreen extends JPanel {
 		btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
 			}
 		});
 		btnLogout.setBounds(886, 7, 104, 23);
@@ -44,7 +49,8 @@ public class HomeScreen extends JPanel {
 		/**
 		 * Title label
 		 */
-		JLabel lblWelcome = new JLabel("Welcome Username"); //get the username
+		String username = clientModel.getUser().getUserName();
+		JLabel lblWelcome = new JLabel("Welcome " + username); //get the username
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
@@ -57,7 +63,7 @@ public class HomeScreen extends JPanel {
 		JButton btnGoToLobby = new JButton("Go To Lobby");
 		btnGoToLobby.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LobbyScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
 			}
 		});
 		btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -71,7 +77,7 @@ public class HomeScreen extends JPanel {
 		JButton btnStatistics = new JButton("Statistics");
 		btnStatistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.StatisticsScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.statisticsScreen);
 			}
 		});
 		btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -85,7 +91,7 @@ public class HomeScreen extends JPanel {
 		JButton btnSettings = new JButton("Settings");
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.SettingsScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.settingsScreen);
 			}
 		});
 		btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));

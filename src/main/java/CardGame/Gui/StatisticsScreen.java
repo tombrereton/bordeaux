@@ -41,7 +41,7 @@ public class StatisticsScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
