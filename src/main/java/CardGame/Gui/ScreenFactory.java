@@ -84,7 +84,9 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         addComponentListener(this);
+
     }
+
 
     private void initialiseLoginScreen() {
         centerPane = loginScreen;
@@ -102,7 +104,13 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         return yOrigin;
     }
 
+    public int getScreenWidthCurrent() {
+        return screenWidthCurrent;
+    }
 
+    public int getScreenHeightCurrent() {
+        return screenHeightCurrent;
+    }
 
     /**
      * method for changing between panels
