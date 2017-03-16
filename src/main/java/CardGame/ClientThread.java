@@ -73,7 +73,7 @@ public class ClientThread implements Runnable {
     }
 
     /**
-     * This method runs when the thread starts.
+     * This method runs when the clientSideThread starts.
      */
     @Override
     public void run() {
@@ -575,7 +575,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player stand state to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -589,7 +589,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player bust state to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -604,7 +604,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player bets to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -619,7 +619,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player statuses for if they have finished their move to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -634,7 +634,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player hands to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -649,7 +649,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes the dealer hand to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -663,7 +663,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player budgets to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -677,7 +677,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes all the player names to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */
@@ -692,7 +692,7 @@ public class ClientThread implements Runnable {
 
     /**
      * This method pushes a map player who have won to
-     * all the clients joined in the same game for this thread.
+     * all the clients joined in the same game for this clientSideThread.
      *
      * @return true if pushed, false if not.
      */

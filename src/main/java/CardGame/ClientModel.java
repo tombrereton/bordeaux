@@ -3,7 +3,10 @@ package CardGame;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
-import CardGame.Requests.*;
+import CardGame.Requests.RequestCreateGame;
+import CardGame.Requests.RequestLogOut;
+import CardGame.Requests.RequestLoginUser;
+import CardGame.Requests.RequestRegisterUser;
 import CardGame.Responses.ResponseCreateGame;
 import CardGame.Responses.ResponseLogOut;
 import CardGame.Responses.ResponseLoginUser;
@@ -32,11 +35,11 @@ import static CardGame.ProtocolMessages.SUCCESS;
  */
 public class ClientModel extends Observable {
     // connectors
-    CardGameClient cardGameClient = new CardGameClient();
-    ClientSideThread thread;
+    CardGameClient cardGameClient;
+    ClientSideThread clientSideThread;
     Thread runningThread;
-    PipedInputStream pin = new PipedInputStream(); // for listener thread
-    PipedOutputStream pout = new PipedOutputStream(); // for listener thread
+    PipedInputStream pin; // for listener clientSideThread
+    PipedOutputStream pout; // for listener clientSideThread
     DataInputStream threadDataIn;
 
     // Booleans for states
@@ -70,10 +73,16 @@ public class ClientModel extends Observable {
      * @throws IOException
      */
     public ClientModel() throws IOException {
+        // set up pipes
+        pout = new PipedOutputStream();
+        pin = new PipedInputStream();
         pin.connect(pout);
+
+        // get input stream from client side thread
         threadDataIn = new DataInputStream(pin);
-        thread = new ClientSideThread(this, cardGameClient);
-        runningThread = new Thread(thread);
+        cardGameClient = new CardGameClient();
+        clientSideThread = new ClientSideThread(this, cardGameClient);
+        runningThread = new Thread(clientSideThread);
         runningThread.start();
 
         this.connected = false;
