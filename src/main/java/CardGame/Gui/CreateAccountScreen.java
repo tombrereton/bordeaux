@@ -112,7 +112,7 @@ public class CreateAccountScreen extends JPanel {
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
 			}
 		});
 		btnBack.setBounds(40, 526, 89, 23);
@@ -133,7 +133,7 @@ public class CreateAccountScreen extends JPanel {
                         firstnameField.getText(), lastnameField.getText());
 
                 // if successfully registered - change page:
-				ScreenFactory.setPane(ScreenFactory.frame.LoginScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.loginScreen);
 				//else display message that username is not unique
 			}
 		});

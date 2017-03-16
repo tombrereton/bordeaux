@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class LobbyScreen extends JPanel{
 //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
+    public DefaultListModel model;
 
 	/**
 	 * Create the application.
@@ -22,7 +23,6 @@ public class LobbyScreen extends JPanel{
 	public LobbyScreen() {
 		initialize();
 		this.listOfGames = new ArrayList<>();
-		listOfGames.add("test game");
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class LobbyScreen extends JPanel{
 		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.HomeScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
 			}
 		});
 		btnBack.setBounds(40, 515, 150, 23);
@@ -62,8 +62,7 @@ public class LobbyScreen extends JPanel{
 		list.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		list.setFont(new Font("Soho Std", Font.PLAIN, 18));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setModel(new AbstractListModel() {
-
+        list.setModel(model = new DefaultListModel() {
             public int getSize() {
 				return listOfGames.size();
 			}
@@ -80,7 +79,7 @@ public class LobbyScreen extends JPanel{
 		JButton button = new JButton("Join game");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScreenFactory.setPane(ScreenFactory.frame.GameScreen);
+				ScreenFactory.setPane(ScreenFactory.frame.gameScreen);
 			}
 		});
 		button.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -95,8 +94,11 @@ public class LobbyScreen extends JPanel{
         createGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: make this show in the list
-                listOfGames.add("Test");
-                ScreenFactory.setPane(ScreenFactory.frame.LobbyScreen);
+                listOfGames.add("Test"); //name of game is uername
+                model.addElement(listOfGames);
+                repaint();
+                revalidate();
+                //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
         });
         createGameButton.setFont(new Font("Soho Std", Font.PLAIN, 16));

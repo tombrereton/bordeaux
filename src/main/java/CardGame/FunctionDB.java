@@ -6,7 +6,7 @@ import java.sql.*;
  * CREATE TABLE users (
  * userID SERIAL,
  * username varchar(50) UNIQUE NOT NULL,
- * password varchar(50) NOT NULL,
+ * password varchar(64) NOT NULL,
  * firstname varchar(50) NOT NULL,
  * lastname varchar(50) NOT NULL,
  * CONSTRAINT users_key PRIMARY KEY (userID)
