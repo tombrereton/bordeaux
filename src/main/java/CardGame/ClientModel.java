@@ -4,11 +4,9 @@ import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
 import CardGame.Requests.*;
-import CardGame.Responses.ResponseCreateGame;
-import CardGame.Responses.ResponseLogOut;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.*;
 import com.google.gson.Gson;
+import com.sun.tools.internal.ws.processor.model.Response;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -189,8 +187,138 @@ public class ClientModel extends Observable {
     }
 
 	public void requestJoinGame(String gamename){
-		// todo: send request for joining a game
+        try {
+            RequestJoinGame request = new RequestJoinGame(gamename,user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseJoinGame responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
+            if (responseJoinGame.getRequestSuccess() == 1){
+                System.out.println("Joined the Game");
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
+
+    public void requestBet(int betAmount){
+        try {
+            RequestBet request = new RequestBet(betAmount,user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseBet responseBet = gson.fromJson(responseString, ResponseBet.class);
+            if (responseBet.getRequestSuccess() == 1){
+                System.out.println("Bet!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void requestDoubleBet(){
+        try {
+            RequestDoubleBet request = new RequestDoubleBet(user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseDoubleBet responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
+            if (responseDoubleBet.getRequestSuccess() == 1){
+                System.out.println("Double bet!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void requestHit(){
+        try {
+            RequestHit request = new RequestHit(user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseHit responseHit = gson.fromJson(responseString, ResponseHit.class);
+            if (responseHit.getRequestSuccess() == 1){
+                System.out.println("Hit!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void requestStand(){
+        try {
+            RequestStand request = new RequestStand(user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseStand responseStand = gson.fromJson(responseString, ResponseStand.class);
+            if (responseStand.getRequestSuccess() == 1){
+                System.out.println("Stand!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void requestFold(){
+        try {
+            RequestFold request = new RequestFold(user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseFold responseFold = gson.fromJson(responseString, ResponseFold.class);
+            if (responseFold.getRequestSuccess() == 1){
+                System.out.println("Fold!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void requestGetMessages(int offset){
+        try {
+            RequestGetMessages request = new RequestGetMessages(offset);
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseGetMessages responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
+            if (responseGetMessages.getRequestSuccess() == 1){
+                System.out.println("Got messages from the server");
+                System.out.println(responseString);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void requestSendMessages(String message){
+        try {
+            RequestSendMessage request = new RequestSendMessage(user.getUserName(),message);
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseSendMessage responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
+            if (responseSendMessage.getRequestSuccess() == 1){
+                System.out.println("sent a messages to the server");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void requestQuitGame(String gameToQuit){
+        try {
+            RequestQuitGame request = new RequestQuitGame(gameToQuit,user.getUserName());
+            cardGameClient.sendRequest(request);
+            String responseString = threadDataIn.readUTF();
+            ResponseQuitGame responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
+            if (responseQuitGame.getRequestSuccess() == 1){
+                System.out.println("quit the game");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 
     /**
