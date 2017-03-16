@@ -18,9 +18,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static CardGame.Gui.Screens.GAMESCREEN;
-import static CardGame.Gui.Screens.HOMESCREEN;
-import static CardGame.Gui.Screens.LOGINSCREEN;
+import static CardGame.Gui.Screens.*;
 import static CardGame.ProtocolMessages.SUCCESS;
 
 
@@ -314,6 +312,7 @@ public class ClientModel extends Observable {
             ResponseQuitGame responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
             if (responseQuitGame.getRequestSuccess() == 1){
                 System.out.println("quit the game");
+                setCurrentScreen(LOBBYSCREEN);
             }
         } catch (IOException e) {
             e.printStackTrace();
