@@ -1,5 +1,6 @@
 package CardGame;
 
+import static CardGame.ProtocolMessages.SUCCESS;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
@@ -7,23 +8,41 @@ import CardGame.Responses.ResponseLoginUser;
 import CardGame.Responses.ResponseProtocol;
 import CardGame.Responses.ResponseRegisterUser;
 
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static CardGame.ProtocolMessages.SUCCESS;
+import com.google.gson.Gson;
+
+import CardGame.GameEngine.Hand;
+import CardGame.Gui.Screens;
+import CardGame.Pushes.PushProtocol;
+import CardGame.Requests.*;
+import CardGame.Responses.*;
+import CardGame.Responses.ResponseRegisterUser;
+
 /**
- * The observable class that contains all the information to be displayed on the client gui and methods for sending to server.
+ * The observable class that contains all the information to be displayed on the
+ * client gui and methods for sending to server.
+ *
  * @author Lloyd
  *
  */
 public class ClientModel extends Observable {
-	//connectors
+	// connectors
 	CardGameClient cardGameClient = new CardGameClient();
+	ClientSideThread thread;
+	Thread runningThread;
+	PipedInputStream pin = new PipedInputStream(); // for listener thread
+	PipedOutputStream pout = new PipedOutputStream(); // for listener thread
+	DataInputStream threadDataIn;
 
-	//Booleans for states
+	// Booleans for states
 	private boolean connected, loggedIn;
 
 	// Screen state variable
@@ -31,14 +50,15 @@ public class ClientModel extends Observable {
 	// in CardGame.Gui.Screens
 	private int currentScreen;
 
-	//fields
+	// fields
+	Gson gson = new Gson();
 	User user;
 	ArrayList<User> users;
 	LinkedBlockingQueue<PushProtocol> pushRequestQueue;
 	ArrayList<String> listOfGames;
 
 	// Game variables
-    private ArrayList<String> playerNames;
+	private ArrayList<String> playerNames;
 	private Hand dealerHand;
 	private Map<String, Hand> playerHands;
 	private Map<String, Integer> playerBets;
@@ -47,63 +67,78 @@ public class ClientModel extends Observable {
 	private Map<String, Boolean> playersWon;
 	private Map<String, Boolean> playersBust;
 
-
-
 	/**
 	 * Constructor.
+	 *
+	 * @throws IOException
 	 */
-	public ClientModel(){
+	public ClientModel() throws IOException {
+		pin.connect(pout);
+		threadDataIn = new DataInputStream(pin);
+		thread = new ClientSideThread(this, cardGameClient);
+		runningThread = new Thread(thread);
+		runningThread.start();
+
 		this.connected = false;
 		this.loggedIn = false;
 		this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
 		this.currentScreen = Screens.LOGINSCREEN;
 	}
+
 	/**
-	 * method that sends login request to server and updates loggedin and user fields.
+	 * method that sends login request to server and updates loggedin and user
+	 * fields.
+	 *
 	 * @param username
 	 * @param password
 	 */
-	public ResponseProtocol login(String username, String password) {
+	public void login(String username, String password) {
 		User user = new User(username, password);
-		ResponseLoginUser responseLoginUser = null;
 		try {
-			responseLoginUser = cardGameClient.sendRequestLoginUser(user);
+			RequestLoginUser request = new RequestLoginUser(user);
+			cardGameClient.sendRequest(request);
+			String responseString = threadDataIn.readUTF();
+			ResponseLoginUser responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
 			if (responseLoginUser.getRequestSuccess() == SUCCESS) {
 				setLoggedIn(true, responseLoginUser.getUser());
-
 			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			return responseLoginUser;
 		}
 	}
+
 	/**
 	 * helper method for login.
+	 *
 	 * @param bool
 	 * @param user
 	 */
-	public void setLoggedIn(boolean bool, User user){
+	public void setLoggedIn(boolean bool, User user) {
 		this.loggedIn = bool;
 		this.user = user;
 		this.currentScreen = Screens.HOMESCREEN;
 		setChanged();
 		notifyObservers(loggedIn);
 	}
+
 	/**
 	 * Method for sending a request to register a user.
+	 *
 	 * @param username
 	 * @param password
 	 * @param first
 	 * @param last
 	 */
-	public void registerUser(String username, String password, String first, String last){
-		User user = new User(username,password,first,last);
+	public void registerUser(String username, String password, String first, String last) {
+		User user = new User(username, password, first, last);
 		try {
-			ResponseRegisterUser responseRegisterUser = cardGameClient.sendRequestRegisterUser(user);
-			if (responseRegisterUser.getRequestSuccess() == 1){
+			RequestRegisterUser request = new RequestRegisterUser(user);
+			cardGameClient.sendRequest(request);
+			String responseString = threadDataIn.readUTF();
+			ResponseRegisterUser responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
+			if (responseRegisterUser.getRequestSuccess() == 1) {
 				System.out.println("registration succesful");
 			}
 		} catch (IOException e) {
@@ -111,40 +146,47 @@ public class ClientModel extends Observable {
 			e.printStackTrace();
 		}
 
-
-
 	}
-/**
- * getter for cardgameclient object.
- * @return
- */
+
+	/**
+	 * getter for cardgameclient object.
+	 *
+	 * @return
+	 */
 	public CardGameClient getCardGameClient() {
 		return cardGameClient;
 	}
-/**
- * getter for connected
- * @return
- */
+
+	/**
+	 * getter for connected
+	 *
+	 * @return
+	 */
 	public boolean isConnected() {
 		return connected;
 	}
-/**
- * getter for boolean logged in
- * @return
- */
+
+	/**
+	 * getter for boolean logged in
+	 *
+	 * @return
+	 */
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
-/**
- * getter for user
- * @return
- */
+
+	/**
+	 * getter for user
+	 *
+	 * @return
+	 */
 	public User getUser() {
 		return user;
 	}
 
 	/**
 	 * getter for current screen
+	 *
 	 * @return
 	 */
 	public int getCurrentScreen() {
@@ -153,6 +195,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for user list
+	 *
 	 * @return
 	 */
 	public ArrayList<User> getUsers() {
@@ -161,6 +204,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for list of games
+	 *
 	 * @return
 	 */
 	public ArrayList<String> getListOfGames() {
@@ -169,6 +213,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * Setter for current screen.
+	 *
 	 * @param currentScreen
 	 */
 	public void setCurrentScreen(int currentScreen) {
@@ -177,6 +222,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * Setter for list of games.
+	 *
 	 * @param listOfGames
 	 */
 	public void setListOfGames(ArrayList<String> listOfGames) {
@@ -185,6 +231,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for player names
+	 *
 	 * @return
 	 */
 	public ArrayList<String> getPlayerNames() {
@@ -193,6 +240,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for dealer hand
+	 *
 	 * @return
 	 */
 	public Hand getDealerHand() {
@@ -201,6 +249,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for player hands
+	 *
 	 * @return
 	 */
 	public Map<String, Hand> getPlayerHands() {
@@ -209,6 +258,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for player bets
+	 *
 	 * @return
 	 */
 	public Map<String, Integer> getPlayerBets() {
@@ -217,6 +267,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for player budgets
+	 *
 	 * @return
 	 */
 	public Map<String, Integer> getPlayerBudgets() {
@@ -225,6 +276,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for players finished
+	 *
 	 * @return
 	 */
 	public Map<String, Boolean> getPlayersFinished() {
@@ -233,6 +285,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for players won
+	 *
 	 * @return
 	 */
 	public Map<String, Boolean> getPlayersWon() {
@@ -241,6 +294,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * getter for players bust
+	 *
 	 * @return
 	 */
 	public Map<String, Boolean> getPlayersBust() {
@@ -249,6 +303,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for player names
+	 *
 	 * @param playerNames
 	 */
 	public void setPlayerNames(ArrayList<String> playerNames) {
@@ -257,6 +312,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for dealerHand
+	 *
 	 * @param dealerHand
 	 */
 	public void setDealerHand(Hand dealerHand) {
@@ -265,6 +321,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for playerhands
+	 *
 	 * @param playerHands
 	 */
 	public void setPlayerHands(Map<String, Hand> playerHands) {
@@ -273,6 +330,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for player bets
+	 *
 	 * @param playerBets
 	 */
 	public void setPlayerBets(Map<String, Integer> playerBets) {
@@ -281,6 +339,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for player budgets
+	 *
 	 * @param playerBudgets
 	 */
 	public void setPlayerBudgets(Map<String, Integer> playerBudgets) {
@@ -289,6 +348,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for players finished
+	 *
 	 * @param playersFinished
 	 */
 	public void setPlayersFinished(Map<String, Boolean> playersFinished) {
@@ -297,6 +357,7 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for players won
+	 *
 	 * @param playersWon
 	 */
 	public void setPlayersWon(Map<String, Boolean> playersWon) {
@@ -305,9 +366,14 @@ public class ClientModel extends Observable {
 
 	/**
 	 * setter for players bust
+	 *
 	 * @param playersBust
 	 */
 	public void setPlayersBust(Map<String, Boolean> playersBust) {
 		this.playersBust = playersBust;
+	}
+
+	public PipedOutputStream getPout() {
+		return pout;
 	}
 }
