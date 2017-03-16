@@ -62,7 +62,7 @@ public class CardGameServer {
                 System.out.println("Accepted connection form client");
 
 
-                // pass the socket to a new thread
+                // pass the socket to a new clientSideThread
                 threadPool.execute(new ClientThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }

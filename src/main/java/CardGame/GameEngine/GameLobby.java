@@ -13,14 +13,16 @@ import java.util.Map;
 public class GameLobby {
     private String lobbyName;
     private ArrayList<Player> players;
-    private BlackjackHand dealerHand;
     private Map<String, Socket> playerSockets;
     private Deck deck;
+    private boolean allPlayersStand;
+
+    // variables that will be sent to client
     private Map<String, Integer> playerBudgets;
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersWon;
     private Map<String, Boolean> playersStand;
-    private boolean allPlayersStand;
+    private BlackjackHand dealerHand;
 
 
     /**
@@ -31,15 +33,17 @@ public class GameLobby {
     public GameLobby(User user, Socket socket) {
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
-        this.dealerHand = new BlackjackHand();
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
+        // Create a deck
+        this.deck = new Deck();
+
+        // variables that will be sent to client
         this.playerBudgets = new HashMap<>();
         this.playersBust = new HashMap<>();
         this.playersWon = new HashMap<>();
         this.playersStand = new HashMap<>();
-        // Create a deck
-        this.deck = new Deck();
+        this.dealerHand = new BlackjackHand();
 
     }
 
