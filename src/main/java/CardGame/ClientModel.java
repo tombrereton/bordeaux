@@ -1,19 +1,11 @@
 package CardGame;
 
 import CardGame.GameEngine.Hand;
-import CardGame.Gui.GameScreen;
 import CardGame.Gui.Screens;
 import CardGame.Pushes.PushProtocol;
-import CardGame.Requests.RequestCreateGame;
-import CardGame.Requests.RequestLogOut;
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.ResponseCreateGame;
-import CardGame.Responses.ResponseLogOut;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Requests.*;
+import CardGame.Responses.*;
 import com.google.gson.Gson;
-import com.sun.tools.internal.ws.processor.model.Response;
 
 import java.io.DataInputStream;
 import java.io.IOException;
