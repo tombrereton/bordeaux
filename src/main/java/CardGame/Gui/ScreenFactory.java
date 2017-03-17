@@ -43,8 +43,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * screen size variables
      * smallest screen resolution
      */
-    private int screenWidthMin;
-    private int screenHeightMin;
+    public static final int screenWidthMin = 1024;
+    public static final int screenHeightMin = 576;
     private int screenWidthCurrent;
     private int screenHeightCurrent;
     private int xOrigin;
@@ -62,8 +62,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         this.createAccountScreen = new CreateAccountScreen(clientModel, this);
         this.loginScreen = new LoginScreen(clientModel, this);
 
-        screenWidthMin = 1024;
-        screenHeightMin = 576;
         screenWidthCurrent = screenWidthMin;
         screenHeightCurrent = screenHeightMin;
         xOrigin = ((screenWidthCurrent -screenWidthMin)/2);
@@ -90,14 +88,10 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
 
     private void initialiseLoginScreen() {
         centerPane = loginScreen;
-        centerPane.setOpaque(false);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
-        masterPane = new JPanel(new GridBagLayout());
-        masterPane.setBackground(new Color(46, 139, 87));
-        masterPane.add(centerPane);
-        add(masterPane);
+        add(centerPane);
     }
 
     public int getxOrigin() {
@@ -116,22 +110,15 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * @param panelAdd Panel to add
      */
     public void setPane(JPanel panelAdd) {
-        masterPane.remove(centerPane);
+        frame.remove(centerPane);
         centerPane = panelAdd;
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setOpaque(false);
         centerPane.setLayout(null);
-        masterPane.add(centerPane);
+        updatePanelBounds();
+        frame.add(centerPane);
         frame.repaint();
         frame.revalidate();
-    }
-
-    /**
-     *
-     */
-    public void factory() {
-
     }
 
     @Override
@@ -142,9 +129,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         yOrigin = ((screenHeightCurrent- screenHeightMin)/2);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setOpaque(false);
         centerPane.setLayout(null);
-        //TODO: call update bounds method in frame
+        updatePanelBounds();
         frame.repaint();
         frame.revalidate();
     }
@@ -159,6 +145,33 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
 
     @Override
     public void componentHidden(ComponentEvent e) {
+    }
+
+    public void updatePanelBounds(){
+        int currentScreen = clientModel.getCurrentScreen();
+        switch (currentScreen){
+            case 0:
+                loginScreen.updateBounds();
+                break;
+            case 1:
+                createAccountScreen.updateBounds();
+                break;
+            case 2:
+                homeScreen.updateBounds();
+                break;
+            case 3:
+                lobbyScreen.updateBounds();
+                break;
+            case 4:
+                gameScreen.updateBounds();
+                break;
+            case 5:
+                statisticsScreen.updateBounds();
+                break;
+            case 6:
+                settingsScreen.updateBounds();
+                break;
+        }
     }
 
     /**

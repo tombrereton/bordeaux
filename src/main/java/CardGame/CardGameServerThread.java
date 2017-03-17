@@ -29,7 +29,7 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  *
  * @Author Tom Brereton
  */
-public class ClientThread implements Runnable {
+public class CardGameServerThread implements Runnable {
     private Socket toClientSocket;
     private DataOutputStream pushOutputStream;
     private boolean clientAlive;
@@ -50,14 +50,14 @@ public class ClientThread implements Runnable {
     private volatile CopyOnWriteArrayList<String> gameNames;
 
 
-    public ClientThread(CardGameServer server,
-                        Socket toClientSocket,
-                        ConcurrentLinkedDeque<MessageObject> messageQueue,
-                        ConcurrentLinkedDeque<Socket> socketList,
-                        CopyOnWriteArrayList<User> users,
-                        FunctionDB functionsDB,
-                        CopyOnWriteArrayList<GameLobby> games,
-                        CopyOnWriteArrayList<String> gameNames) {
+    public CardGameServerThread(CardGameServer server,
+                                Socket toClientSocket,
+                                ConcurrentLinkedDeque<MessageObject> messageQueue,
+                                ConcurrentLinkedDeque<Socket> socketList,
+                                CopyOnWriteArrayList<User> users,
+                                FunctionDB functionsDB,
+                                CopyOnWriteArrayList<GameLobby> games,
+                                CopyOnWriteArrayList<String> gameNames) {
         this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
@@ -100,7 +100,7 @@ public class ClientThread implements Runnable {
                 Thread.sleep(10);
                 closeConnections();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("connection couldn't be closed");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -373,6 +373,7 @@ public class ClientThread implements Runnable {
         pushPlayersBust();
         pushAreAllPlayersFinished();
     }
+
     /**
      * This method sets the bet for the logged in user and sets
      * the player to isFinishedRound to true. The method
@@ -382,7 +383,7 @@ public class ClientThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersStand()){
+        if (getGame(gameJoined).isAllPlayersStand()) {
             getGame(gameJoined).nextGame();
         }
 
@@ -979,15 +980,16 @@ public class ClientThread implements Runnable {
         PushGameNames pushGameNames = new PushGameNames(getGameNames());
 
         if (!this.socketList.isEmpty()) {
-            for (Socket sock : this.socketList) {
-                try {
+            try {
+                for (Socket sock : this.socketList) {
                     outputStream = new DataOutputStream(sock.getOutputStream());
                     outputStream.writeUTF(encodeResponse(pushGameNames));
-                } catch (IOException e) {
-                    System.out.println("Failed to send out list of game names");
-                } finally {
-                    return pushGameNames;
                 }
+                System.out.println(pushGameNames);
+            } catch (IOException e) {
+                System.out.println("Failed to send out list of game names");
+            } finally {
+                return pushGameNames;
             }
         }
         return pushGameNames;

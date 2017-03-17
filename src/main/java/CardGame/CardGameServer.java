@@ -63,7 +63,7 @@ public class CardGameServer {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new ClientThread(this,socket, this.messageQueue,
+                threadPool.execute(new CardGameServerThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {

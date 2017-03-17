@@ -19,8 +19,8 @@ public class StatisticsScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblWelcome = new JLabel("Statistics");
-	private JButton btnBack = new JButton("Back");
+	private JLabel lblWelcome;
+	private JButton btnBack;
 
 
 	/**
@@ -29,6 +29,9 @@ public class StatisticsScreen extends JPanel {
 	public StatisticsScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
+		lblWelcome = new JLabel("Statistics");
+		btnBack = new JButton("Back");
+        setBackground(new Color(46, 139, 87));
 		initialize();
 	}
 
@@ -53,13 +56,13 @@ public class StatisticsScreen extends JPanel {
 				getClientModel().setCurrentScreen(HOMESCREEN);
 			}
 		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 		add(btnBack);
 	}
 
-	public void update(){
+	public void updateBounds(){
 		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
+		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 	}
 
 	public ClientModel getClientModel() {

@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 
@@ -23,16 +21,13 @@ public class LoginScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblLogin = new JLabel("BlackJack Online");
-	private JButton btnCreateAccount = new JButton("Create Account");
-	private JButton btnLogin = new JButton("Login");
-	private JLabel lblUsername = new JLabel("Username");
-	private JLabel lblPassword = new JLabel("Password");
-	private JTextField usernameField = new JTextField();
-	private JPasswordField passwordField = new JPasswordField();
-
-	private int xOrigin = 0;
-	private int yOrigin = 0;
+	private JLabel lblLogin;
+	private JButton btnCreateAccount;
+	private JButton btnLogin;
+	private JLabel lblUsername;
+	private JLabel lblPassword;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
 
 	/**
 	 * Create the application.
@@ -40,8 +35,16 @@ public class LoginScreen extends JPanel {
 	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
 		this.clientModel = clientModel;
 		this.screenFactory = screenFactory;
-		initialize();
-	}
+		lblLogin = new JLabel("BlackJack Online");
+		btnCreateAccount = new JButton("Create Account");
+		btnLogin = new JButton("Login");
+        lblUsername = new JLabel("Username");
+        lblPassword = new JLabel("Password");
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        setBackground(new Color(46, 139, 87));
+        initialize();
+    }
 
 	/**
 	 * Initialize the contents of the panel.
@@ -72,15 +75,18 @@ public class LoginScreen extends JPanel {
 		btnLogin.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO change to handle password fields later
-                getClientModel().requestLogin(usernameField.getText(), String.valueOf(passwordField.getPassword()));
 
+			    // We send a request and get the response
+                ResponseProtocol responseProtocol = getClientModel().requestLogin(usernameField.getText(),
+                        String.valueOf(passwordField.getPassword()));
 
-//			    // If response say success, change screen
-//			    if (clientModel.getCurrentScreen() == HOMESCREEN){
-//			    	screenFactory.screenFactory(HOMESCREEN);
-//					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
-//				}
+                // We display the error if not null
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (!errorMsg.equals("")){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
 			}
 		});
 		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
