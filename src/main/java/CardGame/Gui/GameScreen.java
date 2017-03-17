@@ -125,6 +125,8 @@ public class GameScreen extends JPanel {
          */
         btnSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
+            	// show error in pop up box
                 if (textArea.getText().equals("")) {
                     JOptionPane.showMessageDialog(null,
                             "You can not send empty messages!",
@@ -132,6 +134,8 @@ public class GameScreen extends JPanel {
                             JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+
+                // send message from text area to server
                 client.requestSendMessage(textArea.getText());
                 textArea.setText("");
                 textArea.grabFocus();

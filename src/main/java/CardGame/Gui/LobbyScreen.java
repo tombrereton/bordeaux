@@ -22,7 +22,6 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
-    //    public String[] listOfGames;
     public ArrayList<String> listOfGames;
     public DefaultListModel defaultListModel;
     private String gameName;
@@ -44,9 +43,8 @@ public class LobbyScreen extends JPanel implements Observer {
         this.client = client;
         client.addObserver(this);
 
-
         this.screenFactory = screenFactory;
-        this.listOfGames = new ArrayList<>();
+        this.listOfGames = new ArrayList<>(getClientModel().getListOfGames());
         lblLobby = new JLabel("Lobby");
         btnBack = new JButton("Back");
         list = new JList();

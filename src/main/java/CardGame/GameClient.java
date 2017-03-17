@@ -1,6 +1,5 @@
 package CardGame;
 
-import CardGame.Gui.Screens;
 import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
@@ -9,12 +8,14 @@ import com.google.gson.Gson;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static CardGame.Gui.Screens.HOMESCREEN;
+import static CardGame.Gui.Screens.LOGINSCREEN;
 
 /**
  * This client connects to the servers.
@@ -47,16 +48,20 @@ public class GameClient extends Observable {
 
 
     public GameClient(String HOST, int PORT) {
+        // connection variables
         this.HOST = HOST;
         this.PORT = PORT;
         this.gson = new Gson();
 
-        this.currentScreen = Screens.LOGINSCREEN;
-        // instantiate game variables
-
-        this.chatOffset = -1;
-
         connectToServer();
+
+        // set current screen to login
+        setCurrentScreen(LOGINSCREEN);
+
+        // instantiate game variables
+        this.chatOffset = -1;
+        this.listOfGames = new ConcurrentSkipListSet<>();
+
     }
 
     /**
@@ -68,6 +73,8 @@ public class GameClient extends Observable {
             this.socket = new Socket(this.HOST, this.PORT);
             System.out.println("Connected to server.");
             connectDataStreams();
+        } catch (ConnectException e) {
+            System.out.println("Cannot connect to server. Ensure server is up.");
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -214,6 +221,7 @@ public class GameClient extends Observable {
         if (success == 1){
             setLoggedInUser(responseLoginUser.getUser());
             setCurrentScreen(HOMESCREEN);
+            startGettingGameNames();
         }
 
         // return response
@@ -252,8 +260,17 @@ public class GameClient extends Observable {
         RequestLogOut requestLogOut = new RequestLogOut(getLoggedInUser().getUserName());
         sendRequest(requestLogOut);
 
-        // get response from server and returnit
-        return getResponse(ResponseLogOut.class);
+        // get response from server
+        ResponseLogOut responseLogOut = getResponse(ResponseLogOut.class);
+        int success =  responseLogOut.getRequestSuccess();
+
+        // log user out if successful
+        if (success == 1){
+            setLoggedInUser(null);
+            setCurrentScreen(LOGINSCREEN);
+        }
+
+        return responseLogOut;
     }
 
     /**
@@ -267,7 +284,7 @@ public class GameClient extends Observable {
         RequestSendMessage requestSendMessage = new RequestSendMessage(getLoggedInUser().getUserName(), message);
         sendRequest(requestSendMessage);
 
-        // get response from server and returnit
+        // get response from server and return it
         return getResponse(ResponseSendMessage.class);
     }
 
@@ -515,6 +532,32 @@ public class GameClient extends Observable {
 
     public void setChatOffset(int chatOffset) {
         this.chatOffset = chatOffset;
+    }
+
+    // THREAD FOR GETTING GAME NAMES
+
+    /**
+     * This method starts a thread which polls for game names
+     */
+    public void startGettingGameNames(){
+
+        // create the job
+        Runnable gameNamesJob = () -> {
+            PushGameNames pushGameNames = requestGetGameNames();
+            getListOfGames().addAll(pushGameNames.getGameNames());
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
+
+        // create the thread
+        Thread gameNamesThread = new Thread(gameNamesJob);
+
+        // start the thread
+        gameNamesThread.start();
     }
 
     public static void main(String[] args) {
