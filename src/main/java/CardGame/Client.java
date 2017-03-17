@@ -1,6 +1,6 @@
 package CardGame;
 
-import CardGame.Pushes.PushDealerHand;
+import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -385,7 +385,7 @@ public class Client extends Observable {
         return getResponse(ResponseStand.class);
     }
 
-    public PushDealerHand requestPushDealerHand() {
+    public PushDealerHand requestGetDealerHand() {
         // create request and send request
         RequestGetDealerHand requestGetDealerHand = new RequestGetDealerHand();
         sendRequest(requestGetDealerHand);
@@ -394,7 +394,77 @@ public class Client extends Observable {
         return getResponse(PushDealerHand.class);
     }
 
+    public PushGameNames requestGetGameNames() {
+        // create request and send request
+        RequestGetGameNames requestGetGameNames = new RequestGetGameNames();
+        sendRequest(requestGetGameNames);
 
+        // get response from server and returnit
+        return getResponse(PushGameNames.class);
+    }
+
+    public PushPlayerBets requestGetPlayerBets() {
+        // create request and send request
+        RequestGetPlayerBets requestGetPlayerBets = new RequestGetPlayerBets();
+        sendRequest(requestGetPlayerBets);
+
+        // get response from server and returnit
+        return getResponse(PushPlayerBets.class);
+    }
+
+    public PushPlayerBudgets requestGetPlayerBudgets() {
+        // create request and send request
+        RequestGetPlayerBudgets requestGetPlayerBudgets = new RequestGetPlayerBudgets();
+        sendRequest(requestGetPlayerBudgets);
+
+        // get response from server and returnit
+        return getResponse(PushPlayerBudgets.class);
+    }
+
+    public PushPlayersBust requestGetPlayersBust() {
+        // create request and send request
+        RequestGetPlayersBust requestGetPlayersBust = new RequestGetPlayersBust();
+        sendRequest(requestGetPlayersBust);
+
+        // get response from server and returnit
+        return getResponse(PushPlayersBust.class);
+    }
+
+    public PushPlayerHands requestGetPlayerHands() {
+        // create request and send request
+        RequestGetPlayerHands requestGetPlayerHands = new RequestGetPlayerHands();
+        sendRequest(requestGetPlayerHands);
+
+        // get response from server and returnit
+        return getResponse(PushPlayerHands.class);
+    }
+
+    public PushPlayerNames requestGetPlayerNames() {
+        // create request and send request
+        RequestGetPlayerNames requestGetPlayerNames = new RequestGetPlayerNames();
+        sendRequest(requestGetPlayerNames);
+
+        // get response from server and returnit
+        return getResponse(PushPlayerNames.class);
+    }
+
+    public PushPlayersStand requestGetPlayersStand() {
+        // create request and send request
+        RequestGetPlayersStand requestGetPlayersStand = new RequestGetPlayersStand();
+        sendRequest(requestGetPlayersStand);
+
+        // get response from server and returnit
+        return getResponse(PushPlayersStand.class);
+    }
+
+    public PushPlayersWon requestGetPlayersWon() {
+        // create request and send request
+        RequestGetPlayersWon requestGetPlayersWon = new RequestGetPlayersWon();
+        sendRequest(requestGetPlayersWon);
+
+        // get response from server and returnit
+        return getResponse(PushPlayersWon.class);
+    }
 
 
     public static void main(String[] args) {
