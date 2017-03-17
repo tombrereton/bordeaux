@@ -26,7 +26,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * sets up the screen guis
      * screen ratio 16:9
      */
-    public static JPanel masterPane;
     public static JPanel centerPane;
     public static ScreenFactory frame = null;
     public LoginScreen loginScreen;
@@ -56,7 +55,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         // add to observer list for notify all
         this.clientModel = clientModel;
         clientModel.addObserver(this);
-
 
         // instantiate create account and login screen in constructor
         this.createAccountScreen = new CreateAccountScreen(clientModel, this);
