@@ -129,6 +129,7 @@ public class LobbyScreen extends JPanel {
                 // todo: double check this
                 getClientModel().requestCreateGame();
                 setListOfGames(getClientModel().getListOfGames());
+                model.removeAllElements();
                 model.addElement(getListOfGames());
                 //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
             }
