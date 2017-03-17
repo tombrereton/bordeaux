@@ -171,6 +171,7 @@ public class GameScreen extends JPanel implements Observer {
         //DoubleDown Button
         btnDoubleDown.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                client.requestDoubleBet();
             }
         });
         btnDoubleDown.setContentAreaFilled(false);
@@ -186,6 +187,7 @@ public class GameScreen extends JPanel implements Observer {
         //Stand Button
         btnStand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                client.requestStand();
             }
         });
         btnStand.setContentAreaFilled(false);
@@ -201,6 +203,7 @@ public class GameScreen extends JPanel implements Observer {
         //Hit Button
         btnHit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                client.requestHit();
             }
         });
 
@@ -217,6 +220,7 @@ public class GameScreen extends JPanel implements Observer {
         //Hold Button
         btnFold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                client.requestFold();
             }
         });
 
