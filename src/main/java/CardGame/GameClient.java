@@ -43,6 +43,7 @@ public class GameClient extends Observable {
 
     // game variables
     private volatile ConcurrentSkipListSet<String> listOfGames;
+    private String gameJoined;
 
     // chat variables
     private int chatOffset;
@@ -352,6 +353,7 @@ public class GameClient extends Observable {
             setCurrentScreen(GAMESCREEN);
             stopGettingGameNames();
             startGettingMessages();
+            setGameJoined(gameToJoin);
         }
 
         return responseJoinGame;
@@ -584,8 +586,9 @@ public class GameClient extends Observable {
             while (isGettingGames) {
                 PushGameNames pushGameNames = requestGetGameNames();
                 getListOfGames().addAll(pushGameNames.getGameNames());
+
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -659,6 +662,14 @@ public class GameClient extends Observable {
         for (MessageObject mo : messages){
             this.messages.add(mo);
         }
+    }
+
+    public String getGameJoined() {
+        return gameJoined;
+    }
+
+    public void setGameJoined(String gameJoined) {
+        this.gameJoined = gameJoined;
     }
 
     public static void main(String[] args) {
