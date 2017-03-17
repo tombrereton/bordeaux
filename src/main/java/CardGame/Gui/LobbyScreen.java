@@ -18,7 +18,6 @@ import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * Lobby Screen
- *
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
