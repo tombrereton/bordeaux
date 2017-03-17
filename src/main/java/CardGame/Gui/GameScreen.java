@@ -364,8 +364,7 @@ public class GameScreen extends JPanel implements Observer {
 
         btnLeaveGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameName());
-                getClientModel().setCurrentScreen(LOBBYSCREEN);
+                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
