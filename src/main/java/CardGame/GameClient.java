@@ -50,7 +50,9 @@ public class GameClient extends Observable {
 
     // Threads
     Thread gameNamesThread;
+    Thread getMessagesThread;
     private volatile boolean isGettingGames;
+    private volatile boolean isGettingMessages;
 
 
     public GameClient(String HOST, int PORT) {
@@ -366,8 +368,17 @@ public class GameClient extends Observable {
         RequestQuitGame requestQuitGame = new RequestQuitGame(gameToQuit, getLoggedInUser().getUserName());
         sendRequest(requestQuitGame);
 
-        // get response from server and returnit
-        return getResponse(ResponseQuitGame.class);
+        // get response from server
+        ResponseQuitGame responseQuitGame = getResponse(ResponseQuitGame.class);
+        int success = responseQuitGame.getRequestSuccess();
+
+        if (success == 1){
+            setCurrentScreen(LOBBYSCREEN);
+            stopGettingMessages();
+            startGettingGameNames();
+        }
+
+        return responseQuitGame;
     }
 
     /**
@@ -594,11 +605,12 @@ public class GameClient extends Observable {
 
     public void startGettingMessages() {
 
+        this.isGettingMessages = true;
 
         // create the job
         Runnable getMessagesJob = () -> {
 
-            while (true) {
+            while (isGettingMessages) {
 
                 // get the client offset and send a request for the messages
                 int clientOffset = getChatOffset();
@@ -628,10 +640,14 @@ public class GameClient extends Observable {
         };
 
         // create the thread
-        Thread getMessagesThread = new Thread(getMessagesJob);
+        getMessagesThread = new Thread(getMessagesJob);
 
         // start the thread
         getMessagesThread.start();
+    }
+
+    public void stopGettingMessages(){
+        this.isGettingMessages = false;
     }
 
     public ConcurrentLinkedDeque<MessageObject> getMessages() {
