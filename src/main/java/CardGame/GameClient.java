@@ -166,6 +166,9 @@ public class GameClient extends Observable {
             e.printStackTrace();
         }
 
+        setChanged();
+        notifyObservers();
+
         // return the correct response
         return handleResponse(responseClass, jsonInput);
     }
@@ -218,7 +221,7 @@ public class GameClient extends Observable {
         int success = responseLoginUser.getRequestSuccess();
 
         // log user in if successful
-        if (success == 1){
+        if (success == 1) {
             setLoggedInUser(responseLoginUser.getUser());
             setCurrentScreen(HOMESCREEN);
             startGettingGameNames();
@@ -262,10 +265,10 @@ public class GameClient extends Observable {
 
         // get response from server
         ResponseLogOut responseLogOut = getResponse(ResponseLogOut.class);
-        int success =  responseLogOut.getRequestSuccess();
+        int success = responseLogOut.getRequestSuccess();
 
         // log user out if successful
-        if (success == 1){
+        if (success == 1) {
             setLoggedInUser(null);
             setCurrentScreen(LOGINSCREEN);
         }
@@ -539,17 +542,19 @@ public class GameClient extends Observable {
     /**
      * This method starts a thread which polls for game names
      */
-    public void startGettingGameNames(){
+    public void startGettingGameNames() {
 
         // create the job
         Runnable gameNamesJob = () -> {
-            PushGameNames pushGameNames = requestGetGameNames();
-            getListOfGames().addAll(pushGameNames.getGameNames());
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            while (true) {
+                PushGameNames pushGameNames = requestGetGameNames();
+                getListOfGames().addAll(pushGameNames.getGameNames());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
 

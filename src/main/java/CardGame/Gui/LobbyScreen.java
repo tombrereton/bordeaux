@@ -2,7 +2,6 @@ package CardGame.Gui;
 
 import CardGame.ClientModel;
 import CardGame.GameClient;
-import CardGame.Responses.ResponseCreateGame;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -14,12 +13,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * Lobby Screen
+ *
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
@@ -32,9 +31,12 @@ public class LobbyScreen extends JPanel implements Observer {
 
     private JLabel lblLobby;
     private JButton btnBack;
-    private JList list;
     private JButton btnJoinGame;
     private JButton btnCreateGame;
+
+    // gameList variables
+    private DefaultListModel listModel;
+    private JList gameList;
 
     /**
      * Create the application.
@@ -42,18 +44,29 @@ public class LobbyScreen extends JPanel implements Observer {
     public LobbyScreen(GameClient client, ScreenFactory screenFactory) {
         // we become an observer
         this.client = client;
+        this.screenFactory = screenFactory;
         client.addObserver(this);
 
-        this.screenFactory = screenFactory;
-        this.listOfGames = new ArrayList<>(getClientModel().getListOfGames());
+
+        // gameList variables
+//        this.listOfGames = new ArrayList<>(getClientModel().getListOfGames());
+        this.listModel = new DefaultListModel();
+        addToList(new ArrayList<>(getClientModel().getListOfGames()));
+        this.gameList = new JList(this.listModel);
+
         lblLobby = new JLabel("Lobby");
         btnBack = new JButton("Back");
-        list = new JList();
         btnJoinGame = new JButton("Join game");
         btnCreateGame = new JButton("Create game");
         setBackground(new Color(46, 139, 87));
         initialize();
-		updateBounds();
+        updateBounds();
+    }
+
+    private void addToList(ArrayList<String> gamesNames) {
+        for (String game : gamesNames) {
+            this.listModel.addElement(game);
+        }
     }
 
     /**
@@ -61,72 +74,73 @@ public class LobbyScreen extends JPanel implements Observer {
      */
     private void initialize() {
 
-		lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
-		lblLobby.setForeground(new Color(255, 255, 255));
-		add(lblLobby);
+        lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
+        lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
+        lblLobby.setForeground(new Color(255, 255, 255));
+        add(lblLobby);
 
-		/**
-		 * back button events
-		 */
-		btnBack.setBackground(new Color(255, 255, 255));
-		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    getClientModel().setCurrentScreen(HOMESCREEN);
-			}
-		});
+        /**
+         * back button events
+         */
+        btnBack.setBackground(new Color(255, 255, 255));
+        btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getClientModel().setCurrentScreen(HOMESCREEN);
+            }
+        });
 
-		add(btnBack);
+        add(btnBack);
 
         /**
          * List of games
          */
-        list.setVisibleRowCount(20);
-        list.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-        list.setFont(new Font("Soho Std", Font.PLAIN, 18));
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setModel(defaultListModel = new DefaultListModel() {
-            public int getSize() {
-				return listOfGames.size();
-			}
-			public Object getElementAt(int index) {
-				return listOfGames.get(index);
-			}
-		});
+        gameList.setVisibleRowCount(20);
+        gameList.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        gameList.setFont(new Font("Soho Std", Font.PLAIN, 18));
+        gameList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        gameList.setModel(defaultListModel = new DefaultListModel() {
+//            public int getSize() {
+//				return listOfGames.size();
+//			}
+//			public Object getElementAt(int index) {
+//				return listOfGames.get(index);
+//			}
+//		});
 
 
-        // add listener to list
-        ListSelectionModel listSelectionModel = list.getSelectionModel();
+        // add listener to gameList
+        ListSelectionModel listSelectionModel = gameList.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
 
-                // we get the index of the selected text in the list
+                // we get the index of the selected text in the gameList
                 int selectionIndex = listSelectionEvent.getFirstIndex();
 
                 // we get the game name with the index
-                String gameNameSelected = getListOfGames().get(selectionIndex);
+                ArrayList<String> games = new ArrayList<>(getClientModel().getListOfGames());
+                String gameNameSelected = games.get(selectionIndex);
 
                 // we set the game name to the game selected
                 setGameName(gameNameSelected);
             }
         });
-        add(list);
+        add(gameList);
 
-		/**
-		 * Join button
-		 */
-		btnJoinGame.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        /**
+         * Join button
+         */
+        btnJoinGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
 
-			    getClientModel().requestJoinGame(getGameName());
-			}
-		});
-		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnJoinGame.setBackground(Color.WHITE);
-		add(btnJoinGame);
+                getClientModel().requestJoinGame(getGameName());
+            }
+        });
+        btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnJoinGame.setBackground(Color.WHITE);
+        add(btnJoinGame);
 
         /**
          * Create game button
@@ -135,30 +149,30 @@ public class LobbyScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
 
                 // send request to create a game
-                ResponseCreateGame responseCreateGame = getClientModel().requestCreateGame();
-                String gameNameFromServer = responseCreateGame.getGameName();
-
-                ArrayList<String> games = new ArrayList<>();
-                games.add(gameNameFromServer);
-
-                setListOfGames(games);
-
-                defaultListModel.removeAllElements();
-                defaultListModel.addElement(getListOfGames());
+                getClientModel().requestCreateGame();
+//                String gameNameFromServer = responseCreateGame.getGameName();
+//
+//                ArrayList<String> games = new ArrayList<>();
+//                games.add(gameNameFromServer);
+//
+//                setListOfGames(games);
+//
+//                defaultListModel.removeAllElements();
+//                defaultListModel.addElement(getListOfGames());
             }
         });
-		btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnCreateGame.setBackground(Color.WHITE);
+        btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnCreateGame.setBackground(Color.WHITE);
         add(btnCreateGame);
     }
 
-	public void updateBounds(){
-		lblLobby.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
-		btnBack.setBounds(10,screenFactory.getScreenHeightCurrent()-70, 150, 23);
-		list.setBounds(50, 50,screenFactory.getScreenWidthCurrent()-120, screenFactory.getScreenHeightCurrent()-160);
-		btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent()-180, screenFactory.getScreenHeightCurrent()-70, 150, 23);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getScreenHeightCurrent()-70, 150, 23);
-	}
+    public void updateBounds() {
+        lblLobby.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
+        btnBack.setBounds(10, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
+        gameList.setBounds(50, 50, screenFactory.getScreenWidthCurrent() - 120, screenFactory.getScreenHeightCurrent() - 160);
+        btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent() - 180, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
+        btnCreateGame.setBounds(screenFactory.getxOrigin() + 428, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
+    }
 
     public ArrayList<String> getListOfGames() {
         return listOfGames;
@@ -189,12 +203,19 @@ public class LobbyScreen extends JPanel implements Observer {
         if (observable instanceof ClientModel) {
             ClientModel model = (ClientModel) observable;
 
-            CopyOnWriteArrayList<String> gameNameList = model.getListOfGames();
+            // add to list
+            addToList(new ArrayList<>(model.getListOfGames()));
 
-            getListOfGames().remove(gameNameList);
-            getListOfGames().addAll(gameNameList);
-            defaultListModel.removeAllElements();
-            defaultListModel.addElement(getListOfGames());
+//            CopyOnWriteArrayList<String> gameNameList = model.getListOfGames();
+//
+//            // add games to list model
+//            listModel.addElement(gameNameList);
+
+
+//            getListOfGames().remove(gameNameList);
+//            getListOfGames().addAll(gameNameList);
+//            defaultListModel.removeAllElements();
+//            defaultListModel.addElement(getListOfGames());
         }
     }
 }
