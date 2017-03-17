@@ -49,62 +49,51 @@ public class CreateAccountScreen extends JPanel {
 		lblCreateNewAccount.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCreateNewAccount.setFont(new Font("Soho Std", Font.PLAIN, 20));
 		lblCreateNewAccount.setForeground(new Color(255, 255, 255));
-		lblCreateNewAccount.setBounds(screenFactory.getxOrigin()+408, screenFactory.getyOrigin()+121, 207, 23);
 		add(lblCreateNewAccount);
 
 		lblFirstName.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblFirstName.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		lblFirstName.setForeground(new Color(255, 255, 255));
-		lblFirstName.setBounds(screenFactory.getxOrigin()+374, screenFactory.getyOrigin()+218, 100, 14);
 		add(lblFirstName);
 
 		lblLastName.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblLastName.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		lblLastName.setForeground(new Color(255, 255, 255));
-		lblLastName.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+248, 83, 14);
 		add(lblLastName);
 
 		lblUsername.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblUsername.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		lblUsername.setForeground(new Color(255, 255, 255));
-		lblUsername.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+278, 83, 14);
 		add(lblUsername);
 
 		lblPassword.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblPassword.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		lblPassword.setForeground(new Color(255, 255, 255));
-		lblPassword.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+308, 83, 14);
 		add(lblPassword);
 
 		lblEmail.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblEmail.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		lblEmail.setForeground(new Color(255, 255, 255));
-		lblEmail.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+338, 83, 14);
 		add(lblEmail);
 		
 		firstnameField = new JTextField();
-		firstnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+218, 146, 20);
 		add(firstnameField);
 		firstnameField.setColumns(10);
 		
 		lastnameField = new JTextField();
 		lastnameField.setColumns(10);
-		lastnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+248, 146, 20);
 		add(lastnameField);
 		
 		usernameField = new JTextField();
 		usernameField.setColumns(10);
-		usernameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+278, 146, 20);
 		add(usernameField);
 		
 		passwordField = new JPasswordField();
 		passwordField.setColumns(10);
-		passwordField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+308, 146, 20);
 		add(passwordField);
 		
 		emailField = new JTextField();
 		emailField.setColumns(10);
-		emailField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+338, 146, 20);
 		add(emailField);
 		
 		/**
@@ -117,7 +106,6 @@ public class CreateAccountScreen extends JPanel {
 			    getClientModel().setCurrentScreen(LOGINSCREEN);
 			}
 		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 		add(btnBack);
 		
 		/**
@@ -138,13 +126,12 @@ public class CreateAccountScreen extends JPanel {
 				//else display message that username is not unique
 			}
 		});
-		btnSignUp.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+392, 146, 23);
 		add(btnSignUp);
 	}
 
 	public void updateBounds(){
 		btnSignUp.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+392, 146, 23);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
+		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-70, 89, 23);
 		emailField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+338, 146, 20);
 		passwordField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+308, 146, 20);
 		usernameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+278, 146, 20);

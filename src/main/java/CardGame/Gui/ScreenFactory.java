@@ -26,7 +26,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * sets up the screen guis
      * screen ratio 16:9
      */
-    public static JPanel masterPane;
     public static JPanel centerPane;
     public static ScreenFactory frame = null;
     public LoginScreen loginScreen;
@@ -57,7 +56,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         this.client = client;
         client.addObserver(this);
 
-
         // instantiate create account and login screen in constructor
         this.createAccountScreen = new CreateAccountScreen(client, this);
         this.loginScreen = new LoginScreen(client, this);
@@ -84,7 +82,9 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         addComponentListener(this);
+
     }
+
 
     private void initialiseLoginScreen() {
         centerPane = loginScreen;
@@ -102,7 +102,13 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         return yOrigin;
     }
 
+    public int getScreenWidthCurrent() {
+        return screenWidthCurrent;
+    }
 
+    public int getScreenHeightCurrent() {
+        return screenHeightCurrent;
+    }
 
     /**
      * method for changing between panels

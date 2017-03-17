@@ -48,6 +48,7 @@ public class HomeScreen extends JPanel {
         lblGamesPlayed = new JLabel("Games Played:");
         setBackground(new Color(46, 139, 87));
         initialize();
+		updateBounds();
     }
 
 	/**
@@ -65,7 +66,6 @@ public class HomeScreen extends JPanel {
 			    getClientModel().requestLogOut();
 			}
 		});
-		btnLogout.setBounds(screenFactory.getxOrigin()+886, screenFactory.getyOrigin()+7, 104, 23);
 		add(btnLogout);
 		
 		/**
@@ -74,7 +74,6 @@ public class HomeScreen extends JPanel {
 		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
 		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
 		add(lblWelcome);
 		
 		/**
@@ -87,7 +86,7 @@ public class HomeScreen extends JPanel {
 		});
 		btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnGoToLobby.setBackground(Color.WHITE);
-		btnGoToLobby.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+174, 165, 34);
+
 		add(btnGoToLobby);
 		
 		/**
@@ -100,7 +99,6 @@ public class HomeScreen extends JPanel {
 		});
 		btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnStatistics.setBackground(Color.WHITE);
-		btnStatistics.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+271, 165, 34);
 		add(btnStatistics);
 		
 		/**
@@ -113,29 +111,24 @@ public class HomeScreen extends JPanel {
 		});
 		btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnSettings.setBackground(Color.WHITE);
-		btnSettings.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+368, 165, 34);
 		add(btnSettings);
 
 		lblCredits.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblCredits.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+191, 225, 34);
 		add(lblCredits);
 
 		lblGamesWon.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesWon.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+300, 225, 34);
 		add(lblGamesWon);
 
 		lblGamesLost.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesLost.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+352, 225, 34);
 		add(lblGamesLost);
 
 		lblGamesPlayed.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblGamesPlayed.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+243, 225, 34);
 		add(lblGamesPlayed);
 	}
 
 	public void updateBounds(){
-		btnLogout.setBounds(screenFactory.getxOrigin()+886, screenFactory.getyOrigin()+7, 104, 23);
-		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
+		btnLogout.setBounds(screenFactory.getScreenWidthCurrent()-130, 10, 104, 23);
+		lblWelcome.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
 		btnGoToLobby.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+174, 165, 34);
 		btnStatistics.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+271, 165, 34);
 		btnSettings.setBounds(screenFactory.getxOrigin()+148, screenFactory.getyOrigin()+368, 165, 34);

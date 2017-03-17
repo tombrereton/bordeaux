@@ -54,6 +54,7 @@ public class LobbyScreen extends JPanel implements Observer {
         btnCreateGame = new JButton("Create game");
         setBackground(new Color(46, 139, 87));
         initialize();
+		updateBounds();
     }
 
     /**
@@ -61,24 +62,23 @@ public class LobbyScreen extends JPanel implements Observer {
      */
     private void initialize() {
 
-        lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
-        lblLobby.setForeground(new Color(255, 255, 255));
-        lblLobby.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 11, 242, 34);
-        add(lblLobby);
+		lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
+		lblLobby.setForeground(new Color(255, 255, 255));
+		add(lblLobby);
 
-        /**
-         * back button events
-         */
-        btnBack.setBackground(new Color(255, 255, 255));
-        btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        btnBack.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getClientModel().setCurrentScreen(HOMESCREEN);
-            }
-        });
-        btnBack.setBounds(screenFactory.getxOrigin() + 40, screenFactory.getyOrigin() + 500, 150, 23);
-        add(btnBack);
+		/**
+		 * back button events
+		 */
+		btnBack.setBackground(new Color(255, 255, 255));
+		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			    getClientModel().setCurrentScreen(HOMESCREEN);
+			}
+		});
+
+		add(btnBack);
 
         /**
          * List of games
@@ -89,14 +89,13 @@ public class LobbyScreen extends JPanel implements Observer {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setModel(defaultListModel = new DefaultListModel() {
             public int getSize() {
-                return listOfGames.size();
-            }
+				return listOfGames.size();
+			}
+			public Object getElementAt(int index) {
+				return listOfGames.get(index);
+			}
+		});
 
-            public Object getElementAt(int index) {
-                return listOfGames.get(index);
-            }
-        });
-        list.setBounds(screenFactory.getxOrigin() + 40, screenFactory.getyOrigin() + 56, 946, 444);
 
         // add listener to list
         ListSelectionModel listSelectionModel = list.getSelectionModel();
@@ -117,18 +116,18 @@ public class LobbyScreen extends JPanel implements Observer {
         });
         add(list);
 
-        /**
-         * Join button
-         */
-        btnJoinGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getClientModel().requestJoinGame(getGameName());
-            }
-        });
-        btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        btnJoinGame.setBackground(Color.WHITE);
-        btnJoinGame.setBounds(screenFactory.getxOrigin() + 836, screenFactory.getyOrigin() + 500, 150, 23);
-        add(btnJoinGame);
+		/**
+		 * Join button
+		 */
+		btnJoinGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+			    getClientModel().requestJoinGame(getGameName());
+			}
+		});
+		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+		btnJoinGame.setBackground(Color.WHITE);
+		add(btnJoinGame);
 
         /**
          * Create game button
@@ -144,21 +143,18 @@ public class LobbyScreen extends JPanel implements Observer {
                 defaultListModel.addElement(getListOfGames());
             }
         });
-        btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        btnCreateGame.setBackground(Color.WHITE);
-        btnCreateGame.setBounds(screenFactory.getxOrigin() + 428, screenFactory.getyOrigin() + 500, 150, 23);
+		btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+		btnCreateGame.setBackground(Color.WHITE);
         add(btnCreateGame);
-
-
     }
 
-    public void updateBounds() {
-        lblLobby.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 11, 242, 34);
-        btnBack.setBounds(screenFactory.getxOrigin() + 40, screenFactory.getyOrigin() + 500, 150, 23);
-        list.setBounds(screenFactory.getxOrigin() + 40, screenFactory.getyOrigin() + 56, 946, 400);
-        btnJoinGame.setBounds(screenFactory.getxOrigin() + 836, screenFactory.getyOrigin() + 500, 150, 23);
-        btnCreateGame.setBounds(screenFactory.getxOrigin() + 428, screenFactory.getyOrigin() + 500, 150, 23);
-    }
+	public void updateBounds(){
+		lblLobby.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
+		btnBack.setBounds(10,screenFactory.getScreenHeightCurrent()-70, 150, 23);
+		list.setBounds(50, 50,screenFactory.getScreenWidthCurrent()-120, screenFactory.getScreenHeightCurrent()-160);
+		btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent()-180, screenFactory.getScreenHeightCurrent()-70, 150, 23);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getScreenHeightCurrent()-70, 150, 23);
+	}
 
     public ArrayList<String> getListOfGames() {
         return listOfGames;
