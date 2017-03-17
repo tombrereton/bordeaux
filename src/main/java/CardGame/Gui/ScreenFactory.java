@@ -48,6 +48,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     private int screenHeightCurrent;
     private int xOrigin;
     private int yOrigin;
+
     /**
      * Constructor for the frame
      */
@@ -62,8 +63,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
 
         screenWidthCurrent = screenWidthMin;
         screenHeightCurrent = screenHeightMin;
-        xOrigin = ((screenWidthCurrent -screenWidthMin)/2);
-        yOrigin = ((screenHeightCurrent-screenHeightMin)/2);
+        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
+        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
 
         // this screen should be created at run time so it can access the
         // logged in user after the user has logged in
@@ -116,23 +117,25 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * @param panelAdd Panel to add
      */
     public void setPane(JPanel panelAdd) {
-        frame.remove(centerPane);
-        centerPane = panelAdd;
-        centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setLayout(null);
-        updatePanelBounds();
-        frame.add(centerPane);
-        frame.repaint();
-        frame.revalidate();
+        if (centerPane != panelAdd) {
+            frame.remove(centerPane);
+            centerPane = panelAdd;
+            centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+            centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+            centerPane.setLayout(null);
+            updatePanelBounds();
+            frame.add(centerPane);
+            frame.repaint();
+            frame.revalidate();
+        }
     }
 
     @Override
     public void componentResized(ComponentEvent e) {
         screenWidthCurrent = frame.getWidth();
         screenHeightCurrent = frame.getHeight();
-        xOrigin = ((screenWidthCurrent - screenWidthMin)/2);
-        yOrigin = ((screenHeightCurrent- screenHeightMin)/2);
+        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
+        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
@@ -153,9 +156,9 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     public void componentHidden(ComponentEvent e) {
     }
 
-    public void updatePanelBounds(){
+    public void updatePanelBounds() {
         int currentScreen = client.getCurrentScreen();
-        switch (currentScreen){
+        switch (currentScreen) {
             case 0:
                 loginScreen.updateBounds();
                 break;
@@ -200,7 +203,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     }
 
 
-
     /**
      * This update method will change the current jpanel
      * and repaint it as per ClientModel.currentScreen.
@@ -222,31 +224,31 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     setPane(this.createAccountScreen);
                     break;
                 case HOMESCREEN:
-                    if (this.homeScreen == null){
+                    if (this.homeScreen == null) {
                         this.homeScreen = new HomeScreen(model, this);
                     }
                     setPane(this.homeScreen);
                     break;
                 case LOBBYSCREEN:
-                    if (this.lobbyScreen == null){
+                    if (this.lobbyScreen == null) {
                         this.lobbyScreen = new LobbyScreen(model, this);
                     }
                     setPane(this.lobbyScreen);
                     break;
                 case GAMESCREEN:
-                    if (this.gameScreen == null){
+                    if (this.gameScreen == null) {
                         this.gameScreen = new GameScreen(model, this);
                     }
                     setPane(this.gameScreen);
                     break;
                 case STATISTICSSCREEN:
-                    if (this.statisticsScreen == null){
+                    if (this.statisticsScreen == null) {
                         this.statisticsScreen = new StatisticsScreen(model, this);
                     }
                     setPane(this.statisticsScreen);
                     break;
                 case SETTINGSSCREEN:
-                    if (this.settingsScreen == null){
+                    if (this.settingsScreen == null) {
                         this.settingsScreen = new SettingsScreen(model, this);
                     }
                     setPane(this.settingsScreen);

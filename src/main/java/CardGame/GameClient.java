@@ -639,7 +639,7 @@ public class GameClient extends Observable {
                 }
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

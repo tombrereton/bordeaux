@@ -92,7 +92,6 @@ public class GameScreen extends JPanel implements Observer {
         // chat variables
         this.gameScreenChatOffset = 0;
         this.chatMessageModel = new DefaultListModel<>();
-//        addMessagesToChatModel(new ArrayList<>(getClientModel().getMessages()));
         this.listChat = new JList<>(this.chatMessageModel);
 
         // create chat window
@@ -467,13 +466,6 @@ public class GameScreen extends JPanel implements Observer {
 
     public void setCredits(int credits) {
         this.credits = credits;
-    }
-
-    public void addMessagesToChatModel(ArrayList<MessageObject> messages) {
-        for (MessageObject mo : messages) {
-            this.chatMessageModel.addElement(mo.toString());
-        }
-
     }
 
 
