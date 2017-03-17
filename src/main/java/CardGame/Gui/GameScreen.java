@@ -39,6 +39,8 @@ public class GameScreen extends JPanel {
 	private JLabel lblCreditsBox;
 	private JLabel lblBetBox;
 	private JLabel lblBackHud;
+    private JLabel lblSideHud;
+    private JLabel lblSideFillHud;
 
     private int amountToBet;
     private int credits;
@@ -70,6 +72,8 @@ public class GameScreen extends JPanel {
         lblCreditsBox = new JLabel();
         lblBetBox = new JLabel();
         lblBackHud = new JLabel();
+        lblSideHud = new JLabel();
+        lblSideFillHud = new JLabel();
         setBackground(new Color(46, 139, 87));
         initialize();
 		updateBounds();
@@ -89,6 +93,7 @@ public class GameScreen extends JPanel {
 		 * chat label
 		 */
 		lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
+		lblChat.setForeground(Color.WHITE);
 		add(lblChat);
 
 		/**
@@ -317,7 +322,7 @@ public class GameScreen extends JPanel {
 			}
 		});
 		btnLeaveGame.setBackground(Color.WHITE);
-		btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 12));
+		btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
 		add(btnLeaveGame);
 
 
@@ -354,18 +359,33 @@ public class GameScreen extends JPanel {
 		}
 		add(lblBackHud);
 
+        lblSideFillHud.setOpaque(true);
+        lblSideFillHud.setBackground(new Color(127, 37, 27));
+        add(lblSideFillHud);
+
+        try {
+            Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
+            lblSideHud.setIcon(new ImageIcon(imgSideHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblSideHud);
+
 	}
 
     public ClientModel getClientModel() {
         return clientModel;
     }
 
+
 	public void updateBounds(){
-		scrollPane.setBounds(screenFactory.getxOrigin()+850, 40, screenFactory.getScreenWidthCurrent()-130, screenFactory.getScreenHeightCurrent()-270);
-		lblChat.setBounds(screenFactory.getxOrigin()+850, 10, 205, 35);
-		btnSendMessage.setBounds(screenFactory.getScreenWidthCurrent()-175, screenFactory.getScreenHeightCurrent()-100, 159, 60);
-		textArea.setBounds(screenFactory.getxOrigin()+850, screenFactory.getScreenHeightCurrent()-220, screenFactory.getScreenWidthCurrent()-130, 120);
-		btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent()-124, 10, 100, 23);
+		scrollPane.setBounds(screenFactory.getxOrigin()+850, 50,screenFactory.getxOrigin()+150, screenFactory.getyOrigin()+360);
+		textArea.setBounds(screenFactory.getxOrigin()+850, screenFactory.getyOrigin()+420, screenFactory.getxOrigin()+150, screenFactory.getyOrigin()+50);
+        lblChat.setBounds(screenFactory.getxOrigin()+850, 10, 205, 35);
+        lblSideHud.setBounds(screenFactory.getxOrigin()+800, screenFactory.getScreenHeightCurrent()-1390, 66, 1324);
+        lblSideFillHud.setBounds(screenFactory.getxOrigin()+850, 0,screenFactory.getScreenWidthCurrent(), screenFactory.getyOrigin()+600);
+        btnSendMessage.setBounds(845+(int)(screenFactory.getxOrigin()*1.5), screenFactory.getScreenHeightCurrent()-105, 159, 60);
+		btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent()-120, 12, 100, 23);
 		btnDoubleDown.setBounds(740, screenFactory.getScreenHeightCurrent()-100, 98, 55);
 		btnStand.setBounds(640, screenFactory.getScreenHeightCurrent()-100, 98, 55);
 		btnHit.setBounds(540, screenFactory.getScreenHeightCurrent()-100, 98, 55);
