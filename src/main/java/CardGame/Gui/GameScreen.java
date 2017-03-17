@@ -1,5 +1,6 @@
 package CardGame.Gui;
 
+import CardGame.Client;
 import CardGame.ClientModel;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseGetMessages;
@@ -21,7 +22,7 @@ import static CardGame.Gui.Screens.LOBBYSCREEN;
  */
 public class GameScreen extends JPanel {
 
-    private ClientModel clientModel;
+    private Client client;
     private ScreenFactory screenFactory;
 
     private JTextArea textArea;
@@ -49,8 +50,8 @@ public class GameScreen extends JPanel {
     /**
      * Create the application.
      */
-    public GameScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-        this.clientModel = clientModel;
+    public GameScreen(Client clientModel, ScreenFactory screenFactory) {
+        this.client = clientModel;
         this.screenFactory = screenFactory;
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
@@ -125,7 +126,7 @@ public class GameScreen extends JPanel {
                             JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                clientModel.requestSendMessages(textArea.getText());
+                client.requestSendMessage(textArea.getText());
                 textArea.setText("");
                 textArea.grabFocus();
 
@@ -432,8 +433,8 @@ public class GameScreen extends JPanel {
 
     }
 
-    public ClientModel getClientModel() {
-        return clientModel;
+    public Client getClientModel() {
+        return client;
     }
 
     public DefaultListModel<String> getChatMessageModel() {
@@ -468,18 +469,18 @@ public class GameScreen extends JPanel {
             @Override
             public void run() {
                 while (true) {
-                    ResponseProtocol response = clientModel.requestGetMessages(clientModel.getChatOffset());
+                    ResponseProtocol response = client.requestGetMessages(client.getChatOffset());
                     ResponseGetMessages responseGetMessages = (ResponseGetMessages) response;
                     if (response.getRequestSuccess() == 1) {
                         if (responseGetMessages.getMessages() != null && !responseGetMessages.getMessages().isEmpty()) {
-                            if(clientModel.getChatOffset() < responseGetMessages.getOffset()){
+                            if(client.getChatOffset() < responseGetMessages.getOffset()){
                                 ArrayList<MessageObject> getMessageList = responseGetMessages.getMessages();
                                     // add all messages to chat message model
                                     for (MessageObject mo : getMessageList) {
                                         chatMessageModel.addElement(mo.toString());
                                     }
                                 // change offest to size of message arraylist
-                                clientModel.setChatOffset(responseGetMessages.getOffset()-1);
+                                client.setChatOffset(responseGetMessages.getOffset()-1);
                             }
                         }
 

@@ -1,5 +1,6 @@
 package CardGame.Gui;
 
+import CardGame.Client;
 import CardGame.ClientModel;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     public StatisticsScreen statisticsScreen;
     public LobbyScreen lobbyScreen;
     public GameScreen gameScreen;
-    private ClientModel clientModel;
+    private Client client;
 
 
     /**
@@ -52,15 +53,15 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     /**
      * Constructor for the frame
      */
-    public ScreenFactory(ClientModel clientModel) {
+    public ScreenFactory(Client client) {
         // add to observer list for notify all
-        this.clientModel = clientModel;
-        clientModel.addObserver(this);
+        this.client = client;
+        client.addObserver(this);
 
 
         // instantiate create account and login screen in constructor
-        this.createAccountScreen = new CreateAccountScreen(clientModel, this);
-        this.loginScreen = new LoginScreen(clientModel, this);
+        this.createAccountScreen = new CreateAccountScreen(client, this);
+        this.loginScreen = new LoginScreen(client, this);
 
         screenWidthCurrent = screenWidthMin;
         screenHeightCurrent = screenHeightMin;
@@ -148,7 +149,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     }
 
     public void updatePanelBounds(){
-        int currentScreen = clientModel.getCurrentScreen();
+        int currentScreen = client.getCurrentScreen();
         switch (currentScreen){
             case 0:
                 loginScreen.updateBounds();
@@ -183,8 +184,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    ClientModel clientModel = new ClientModel();
-                    frame = new ScreenFactory(clientModel);
+                    Client client = new Client("localhost", 7654);
+                    frame = new ScreenFactory(client);
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -204,8 +205,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      */
     @Override
     public void update(Observable observable, Object o) {
-        if (observable instanceof ClientModel) {
-            ClientModel model = (ClientModel) observable;
+        if (observable instanceof Client) {
+            Client model = (Client) observable;
             int currentScreen = model.getCurrentScreen();
 
             switch (currentScreen) {
