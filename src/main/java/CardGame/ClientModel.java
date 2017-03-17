@@ -3,7 +3,6 @@ package CardGame;
 import CardGame.GameEngine.BlackjackHand;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
-import CardGame.Pushes.PushGameNames;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -52,7 +51,7 @@ public class ClientModel extends Observable {
     ArrayList<User> users;
 
     // Game variables
-    private volatile LinkedBlockingQueue<PushProtocol> pushProtocolQueue;
+    private volatile LinkedBlockingQueue<ResponseProtocol> pushProtocolQueue;
     private volatile CopyOnWriteArrayList<String> playerNames;
     private volatile Hand dealerHand;
     private volatile ConcurrentHashMap<String, Hand> playerHands;
@@ -87,7 +86,7 @@ public class ClientModel extends Observable {
 
         this.connected = false;
         this.loggedIn = false;
-        this.pushProtocolQueue = new LinkedBlockingQueue<PushProtocol>();
+        this.pushProtocolQueue = new LinkedBlockingQueue<ResponseProtocol>();
         this.currentScreen = Screens.LOGINSCREEN;
 
         // instantiate game variables
@@ -374,55 +373,6 @@ public class ClientModel extends Observable {
         return responseQuitGame;
     }
 
-    // PUSHES
-
-    /**
-     * This method gets pushes from the queue
-     */
-    public void getPushFromQueue(){
-
-        // We start a new thread to handle incoming pushes
-        Thread pushThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                // loop while the queue is not empty
-                while (true){
-
-                    // get the push from the queue
-                    try {
-                        PushProtocol push = pushProtocolQueue.take();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    // make thread sleep
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
-
-    public void handlePush(String jsonString){
-        ResponseProtocol push = PushProtocol.decodeResponse(jsonString);
-        int pushType = push.getType();
-
-        switch (pushType){
-            case ProtocolTypes.PUSH_GAME_NAMES:
-                PushGameNames pushGameNames = gson.fromJson(jsonString, PushGameNames.class);
-                ArrayList<String> gamesNames =  pushGameNames.getGameNames();
-                this.getListOfGames().remove(gamesNames);
-                this.getListOfGames().addAll(gamesNames);
-                notifyObservers();
-                break;
-        }
-
-    }
 
 
     /**
@@ -696,7 +646,7 @@ public class ClientModel extends Observable {
      * getter for the push protocol queue
      * @return
      */
-    public LinkedBlockingQueue<PushProtocol> getPushProtocolQueue() {
+    public LinkedBlockingQueue<ResponseProtocol> getPushProtocolQueue() {
         return pushProtocolQueue;
     }
 }

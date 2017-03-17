@@ -172,31 +172,78 @@ public class ServerThread implements Runnable {
             case DOUBLE:
                 return handleDouble(JSONInput, protocolId);
             case PUSH_GAME_NAMES:
-                return handleGetPlayerNames(JSONInput, protocolId);
+                return handleGetGameNames(protocolId);
             case PUSH_PLAYER_NAMES:
-                return handleGetPlayerNames(JSONInput, protocolId);
+                return handleGetPlayerNames(protocolId);
             case PUSH_PLAYER_HANDS:
-                return handleGetPlayerHands(JSONInput,protocolId);
+                return handleGetPlayerHands(protocolId);
             case PUSH_PLAYER_BETS:
-                return handleGetPlayerBets(JSONInput, protocolId);
+                return handleGetPlayerBets(protocolId);
             case PUSH_PLAYER_BUDGETS:
-                return handleGetPlayerBudgets(JSONInput, protocolId);
+                return handleGetPlayerBudgets(protocolId);
             case PUSH_PLAYERS_STAND:
-                return handleGetPlayersStand(JSONInput, protocolId);
+                return handleGetPlayersStand(protocolId);
             case PUSH_PLAYERS_WON:
-                return handleGetPlayersWon(JSONInput, protocolId);
+                return handleGetPlayersWon(protocolId);
             case PUSH_PLAYERS_BUST:
-                return handleGetPlayersBust(JSONInput, protocolId);
+                return handleGetPlayersBust(protocolId);
             case PUSH_DEALER_HAND:
-                return handleGetDealerhand(JSONInput, protocolId);
+                return handleGetDealerhand(protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
 
-    private ResponseProtocol handleGetPlayerNames(String jsonInput, int protocolId) {
-        return null;
-        pushPlayerNames();
+    private ResponseProtocol handleGetDealerhand(int protocolId) {
+        Hand dealerHand = this.getGame(gameJoined).getDealerHand();
+
+        return new PushDealerHand(protocolId, SUCCESS, dealerHand);
+    }
+
+    private ResponseProtocol handleGetPlayersBust(int protocolId) {
+        Map<String, Boolean> playersBust = this.getGame(gameJoined).getPlayersBust();
+
+        return new PushPlayersBust(protocolId, SUCCESS, playersBust);
+    }
+
+    private ResponseProtocol handleGetPlayersWon(int protocolId) {
+        Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
+
+        return new PushPlayersWon(protocolId, SUCCESS, playersWon);
+    }
+
+    private ResponseProtocol handleGetPlayersStand(int protocolId) {
+        Map<String, Boolean> playersStand = this.getGame(gameJoined).getPlayersStand();
+
+        return new PushPlayersStand(protocolId, SUCCESS, playersStand);
+    }
+
+    private ResponseProtocol handleGetPlayerBudgets(int protocolId) {
+        Map<String, Integer> playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
+
+        return new PushPlayerBudgets(protocolId, SUCCESS, playerBudgets);
+    }
+
+    private ResponseProtocol handleGetPlayerBets(int protocolId) {
+        Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
+
+        return new PushPlayerBets(protocolId, SUCCESS, playerBets);
+    }
+
+    private ResponseProtocol handleGetPlayerHands(int protocolId) {
+        Map<String, Hand> playerHands = this.getGame(gameJoined).getPlayerHands();
+
+        return new PushPlayerHands(protocolId, SUCCESS, playerHands);
+    }
+
+    private ResponseProtocol handleGetGameNames(int protocolId) {
+        return new PushGameNames(protocolId, SUCCESS, getGameNames());
+    }
+
+    private ResponseProtocol handleGetPlayerNames(int protocolId) {
+        ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
+
+        return new PushPlayerNames(protocolId, SUCCESS, playerNames);
     }
 
     private ResponseProtocol handleDouble(String jsonInput, int protocolId) {
@@ -248,13 +295,6 @@ public class ServerThread implements Runnable {
             // if the player is not standing, make player fold
             getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
 
-            pushPlayersBust();
-            pushDealerHand();
-            pushPlayersStand();
-            pushPlayerWon();
-            pushPlayerBets();
-            pushPlayerBudgets();
-
             // return success if player is now standing
             return new ResponseFold(protocolId, SUCCESS);
         } else {
@@ -287,11 +327,6 @@ public class ServerThread implements Runnable {
             // if the player is not standing, make player stand
             getGame(gameJoined).setPlayerStand(getLoggedInUser().getUserName());
 
-            pushPlayerHands();
-            pushPlayersBust();
-            pushPlayersStand();
-            pushPlayerWon();
-
             // return success if player is now standing
             return new ResponseStand(protocolId, SUCCESS);
         } else {
@@ -322,10 +357,6 @@ public class ServerThread implements Runnable {
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-
-            pushPlayerHands();
-            pushPlayersBust();
-            pushPlayerWon();
 
             // return success if bet within budget
             return new ResponseHit(protocolId, SUCCESS);
@@ -388,13 +419,6 @@ public class ServerThread implements Runnable {
         getGame(gameJoined).hit(getLoggedInUser().getUserName());
         getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
 
-        // push update to all users
-        pushPlayerHands();
-        pushPlayerBets();
-        pushPlayerBudgets();
-        pushPlayerWon();
-        pushPlayersBust();
-        pushAreAllPlayersFinished();
     }
 
     /**
@@ -414,16 +438,10 @@ public class ServerThread implements Runnable {
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
         getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
 
-        // push update to all users
-        pushPlayerBets();
-        pushPlayerBudgets();
-        pushAreAllPlayersFinished();
 
         if (getGame(gameJoined).allPlayersFinished()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
-            // if all finished push hands
-            pushPlayerHands();
         }
 
     }
@@ -600,137 +618,6 @@ public class ServerThread implements Runnable {
 
 
     /**
-     * This method pushes all the player stand state to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayersStand() {
-        Map<String, Boolean> playersStand = this.getGame(gameJoined).getPlayersStand();
-
-        PushPlayersStand push = new PushPlayersStand(playersStand);
-
-        return pushToPlayers(push);
-    }
-
-    /**
-     * This method pushes all the player bust state to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayersBust() {
-        Map<String, Boolean> playersBust = this.getGame(gameJoined).getPlayersBust();
-
-        PushPlayersBust push = new PushPlayersBust(playersBust);
-
-        return pushToPlayers(push);
-
-    }
-
-    /**
-     * This method pushes all the player bets to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayerBets() {
-        Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
-
-        PushPlayerBets push = new PushPlayerBets(playerBets);
-
-        return pushToPlayers(push);
-
-    }
-
-    /**
-     * This method pushes all the player statuses for if they have finished their move to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushAreAllPlayersFinished() {
-        Map<String, Boolean> playersFinished = this.getGame(gameJoined).getPlayersFinished();
-
-        PushAreAllPlayersFinished push = new PushAreAllPlayersFinished(playersFinished);
-
-        return pushToPlayers(push);
-
-    }
-
-    /**
-     * This method pushes all the player hands to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayerHands() {
-        Map<String, Hand> playerHands = this.getGame(gameJoined).getPlayerHands();
-
-        PushPlayerHands push = new PushPlayerHands(playerHands);
-
-        return pushToPlayers(push);
-
-    }
-
-    /**
-     * This method pushes the dealer hand to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushDealerHand() {
-        Hand dealerHand = this.getGame(gameJoined).getDealerHand();
-
-        PushDealerHand push = new PushDealerHand(dealerHand);
-
-        return pushToPlayers(push);
-    }
-
-    /**
-     * This method pushes all the player budgets to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayerBudgets() {
-        Map<String, Integer> playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
-
-        PushPlayerBudgets push = new PushPlayerBudgets(playerBudgets);
-
-        return pushToPlayers(push);
-    }
-
-    /**
-     * This method pushes all the player names to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayerNames() {
-        ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
-
-        PushPlayerNames push = new PushPlayerNames(playerNames);
-
-        return pushToPlayers(push);
-    }
-
-
-    /**
-     * This method pushes a map player who have won to
-     * all the clients joined in the same game for this clientSideThread.
-     *
-     * @return true if pushed, false if not.
-     */
-    private boolean pushPlayerWon() {
-        Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
-
-        PushPlayersWon push = new PushPlayersWon(0,0,playersWon);
-
-        return false;
-    }
-
-    /**
      * This method takes in any PushProtocol subtype and
      * pushes it to all the players in the game.
      *
@@ -768,10 +655,6 @@ public class ServerThread implements Runnable {
 
     private void joinGame(String lobbyname) {
         getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
-        pushDealerHand();
-        pushPlayerBudgets();
-        pushPlayerHands();
-        pushPlayerNames();
     }
 
     /**
@@ -787,7 +670,6 @@ public class ServerThread implements Runnable {
         this.getGames().add(newGame);
 
         this.updateGameNames();
-        this.pushGameListToClient();
 
         return newGame;
     }
@@ -928,9 +810,6 @@ public class ServerThread implements Runnable {
             this.user = userFromDatabase;
             this.addUsertoUsers(this.user);
 
-            // we push the gameList to the client
-            pushGameListToClient();
-
             // return success if password and username match
             return new ResponseLoginUser(protocolId, SUCCESS, userFromDatabase);
         } else {
@@ -1000,28 +879,6 @@ public class ServerThread implements Runnable {
             }
         }
     }
-
-    public synchronized PushGameNames pushGameListToClient() {
-        DataOutputStream outputStream;
-
-        PushGameNames pushGameNames = new PushGameNames(getGameNames());
-
-        if (!this.socketList.isEmpty()) {
-            try {
-                for (Socket sock : this.socketList) {
-                    outputStream = new DataOutputStream(sock.getOutputStream());
-                    outputStream.writeUTF(encodeResponse(pushGameNames));
-                }
-                System.out.println(pushGameNames);
-            } catch (IOException e) {
-                System.out.println("Failed to send out list of game names");
-            } finally {
-                return pushGameNames;
-            }
-        }
-        return pushGameNames;
-    }
-
 
     /**
      * Add a message to the message queue.

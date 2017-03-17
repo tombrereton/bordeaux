@@ -28,7 +28,6 @@ public class ClientSideThread implements Runnable {
 
                 if (responseProtocol.getType() >= 50 && responseProtocol.getType() <= 60) {
                     // if the response is a push, handle it as a push
-                    clientModel.handlePush(response);
 //                    clientModel.getPushProtocolQueue().put(pushProtocol);
                 } else {
                     // else, handle it as a normal response

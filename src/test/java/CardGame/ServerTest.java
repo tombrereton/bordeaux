@@ -1,7 +1,6 @@
 package CardGame;
 
 import CardGame.GameEngine.GameLobby;
-import CardGame.Pushes.PushGameNames;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -531,8 +530,7 @@ public class ServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
+
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());
@@ -603,8 +601,6 @@ public class ServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());
@@ -695,8 +691,6 @@ public class ServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());
