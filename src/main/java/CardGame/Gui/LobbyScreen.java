@@ -2,6 +2,7 @@ package CardGame.Gui;
 
 import CardGame.ClientModel;
 import CardGame.GameClient;
+import CardGame.Responses.ResponseCreateGame;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -133,10 +134,15 @@ public class LobbyScreen extends JPanel implements Observer {
         btnCreateGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                // we add the list of games to the list in the GUI
-                getClientModel().requestCreateGame();
-                getListOfGames().remove(getClientModel().getListOfGames());
-                getListOfGames().addAll(getClientModel().getListOfGames());
+                // send request to create a game
+                ResponseCreateGame responseCreateGame = getClientModel().requestCreateGame();
+                String gameNameFromServer = responseCreateGame.getGameName();
+
+                ArrayList<String> games = new ArrayList<>();
+                games.add(gameNameFromServer);
+
+                setListOfGames(games);
+
                 defaultListModel.removeAllElements();
                 defaultListModel.addElement(getListOfGames());
             }
