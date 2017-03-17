@@ -12,10 +12,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Observable;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-import static CardGame.ProtocolTypes.LOGIN_USER;
-import static CardGame.ProtocolTypes.REGISTER_USER;
+import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * This client connects to the servers.
@@ -40,7 +39,8 @@ public class Client extends Observable {
     // Screen state variable
     private int currentScreen;
 
-    private volatile CopyOnWriteArrayList<String> listOfGames;
+    // game variables
+    private volatile ConcurrentSkipListSet<String> listOfGames;
 
     // chat variables
     private int chatOffset;
@@ -98,9 +98,6 @@ public class Client extends Observable {
         }
     }
 
-
-
-
     /**
      * getter for logged in user
      *
@@ -156,6 +153,8 @@ public class Client extends Observable {
             // read response from server
             jsonInput = this.serverInputStream.readUTF();
 
+            // print out response
+            System.out.println(jsonInput);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -181,18 +180,20 @@ public class Client extends Observable {
         // get the response type
         int responseType = response.getType();
 
+        return responseClass.cast(gson.fromJson(jsonInput, responseClass));
+
         // return the correct response
-        switch (responseType) {
-            case REGISTER_USER:
-                ResponseRegisterUser responseToCast = gson.fromJson(jsonInput, ResponseRegisterUser.class);
-                return responseClass.cast(responseToCast);
-            case LOGIN_USER:
-                ResponseLoginUser responseLoginUser = gson.fromJson(jsonInput, ResponseLoginUser.class);
-                return responseClass.cast(responseLoginUser);
-            default:
-                ResponseProtocol responseProtocol = gson.fromJson(jsonInput, ResponseRegisterUser.class);
-                return responseClass.cast(responseProtocol);
-        }
+//        switch (responseType) {
+//            case REGISTER_USER:
+//                ResponseRegisterUser responseToCast = gson.fromJson(jsonInput, ResponseRegisterUser.class);
+//                return responseClass.cast(responseToCast);
+//            case LOGIN_USER:
+//                ResponseLoginUser responseLoginUser = gson.fromJson(jsonInput, ResponseLoginUser.class);
+//                return responseClass.cast(responseLoginUser);
+//            default:
+//                ResponseProtocol responseProtocol = gson.fromJson(jsonInput, ResponseRegisterUser.class);
+//                return responseClass.cast(responseProtocol);
+//        }
     }
 
     /**
@@ -224,8 +225,18 @@ public class Client extends Observable {
         RequestLoginUser requestLoginUser = new RequestLoginUser(user);
         sendRequest(requestLoginUser);
 
-        // read response from server
-        return getResponse(ResponseLoginUser.class);
+        // get the response from the server
+        ResponseLoginUser responseLoginUser = getResponse(ResponseLoginUser.class);
+        int success = responseLoginUser.getRequestSuccess();
+
+        // log user in if successful
+        if (success == 1){
+            setLoggedInUser(responseLoginUser.getUser());
+            setCurrentScreen(HOMESCREEN);
+        }
+
+        // return response
+        return responseLoginUser;
     }
 
     /**
@@ -267,7 +278,6 @@ public class Client extends Observable {
     /**
      * send message request
      *
-     * @param username
      * @param message
      * @return
      */
@@ -282,6 +292,7 @@ public class Client extends Observable {
 
     /**
      * send message request
+     *
      * @param offset offset
      * @return
      */
@@ -297,6 +308,7 @@ public class Client extends Observable {
 
     /**
      * send create game request
+     *
      * @return
      */
     public ResponseCreateGame requestCreateGame() {
@@ -310,12 +322,13 @@ public class Client extends Observable {
 
     /**
      * send join game request
+     *
      * @param gameToJoin
      * @return
      */
     public ResponseJoinGame requestJoinGame(String gameToJoin) {
         // create request and send request
-        RequestJoinGame requestJoinGame = new RequestJoinGame(gameToJoin,getLoggedInUser().getUserName());
+        RequestJoinGame requestJoinGame = new RequestJoinGame(gameToJoin, getLoggedInUser().getUserName());
         sendRequest(requestJoinGame);
 
         // get response from server and returnit
@@ -324,12 +337,13 @@ public class Client extends Observable {
 
     /**
      * send quit game request
+     *
      * @param gameToQuit
      * @return
      */
     public ResponseQuitGame requestQuitGame(String gameToQuit) {
         // create request and send request
-        RequestQuitGame requestQuitGame = new RequestQuitGame(gameToQuit,getLoggedInUser().getUserName());
+        RequestQuitGame requestQuitGame = new RequestQuitGame(gameToQuit, getLoggedInUser().getUserName());
         sendRequest(requestQuitGame);
 
         // get response from server and returnit
@@ -338,6 +352,7 @@ public class Client extends Observable {
 
     /**
      * send bet request
+     *
      * @param betAmount
      * @return
      */
@@ -352,6 +367,7 @@ public class Client extends Observable {
 
     /**
      * send hit request
+     *
      * @return
      */
     public ResponseHit requestHit() {
@@ -365,6 +381,7 @@ public class Client extends Observable {
 
     /**
      * send double bet request
+     *
      * @return
      */
     public ResponseDoubleBet requestDoubleBet() {
@@ -378,6 +395,7 @@ public class Client extends Observable {
 
     /**
      * send fold bet request
+     *
      * @return
      */
     public ResponseFold requestFold() {
@@ -391,6 +409,7 @@ public class Client extends Observable {
 
     /**
      * send stand request
+     *
      * @return
      */
     public ResponseStand requestStand() {
@@ -505,7 +524,7 @@ public class Client extends Observable {
     }
 
 
-    public CopyOnWriteArrayList<String> getListOfGames() {
+    public ConcurrentSkipListSet<String> getListOfGames() {
         return listOfGames;
     }
 

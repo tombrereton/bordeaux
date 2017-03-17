@@ -1,7 +1,6 @@
 package CardGame.Gui;
 
 import CardGame.Client;
-import CardGame.ClientModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -217,7 +216,9 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     setPane(this.createAccountScreen);
                     break;
                 case HOMESCREEN:
-                    this.homeScreen = new HomeScreen(model, this);
+                    if (this.homeScreen == null){
+                        this.homeScreen = new HomeScreen(model, this);
+                    }
                     setPane(this.homeScreen);
                     break;
                 case LOBBYSCREEN:
