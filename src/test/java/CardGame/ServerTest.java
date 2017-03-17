@@ -18,21 +18,21 @@ import static CardGame.Requests.RequestProtocol.encodeRequest;
 import static org.junit.Assert.*;
 
 /**
- * This class tests the CardGameServer.
+ * This class tests the Server.
  * <p>
  * This inlcudes handling json objects and retrieving
  * and querying from the database.
  * <p>
  * Created by tom on 25/02/17.
  */
-public class CardGameServerTest {
+public class ServerTest {
 
     // SET UP
 
-    CardGameServer server;
+    Server server;
     FunctionDB functionDB;
-    CardGameServerThread cardGameServerThread;
-    CardGameServerThread cardGameServerThreadTwo;
+    ServerThread cardGameServerThread;
+    ServerThread cardGameServerThreadTwo;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
@@ -44,10 +44,10 @@ public class CardGameServerTest {
     @Before
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
-        server = new CardGameServer();
-        cardGameServerThread = new CardGameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
+        server = new Server();
+        cardGameServerThread = new ServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        cardGameServerThreadTwo = new CardGameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
+        cardGameServerThreadTwo = new ServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
     }
 
@@ -431,8 +431,8 @@ public class CardGameServerTest {
     public void CreateGameRequest02_test() {
         int expected = 0;
 
-        CardGameServerThread cardGameServerThreadEmpty = new CardGameServerThread(
-                new CardGameServer(),
+        ServerThread cardGameServerThreadEmpty = new ServerThread(
+                new Server(),
                 new Socket(),
                 new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(),
