@@ -49,7 +49,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
 
         // gameList variables
-//        this.listOfGames = new ArrayList<>(getClientModel().getListOfGames());
         this.listModel = new DefaultListModel();
         addToList(new ArrayList<>(getClientModel().getListOfGames()));
         this.gameList = new JList(this.listModel);
@@ -150,15 +149,7 @@ public class LobbyScreen extends JPanel implements Observer {
 
                 // send request to create a game
                 getClientModel().requestCreateGame();
-//                String gameNameFromServer = responseCreateGame.getGameName();
-//
-//                ArrayList<String> games = new ArrayList<>();
-//                games.add(gameNameFromServer);
-//
-//                setListOfGames(games);
-//
-//                defaultListModel.removeAllElements();
-//                defaultListModel.addElement(getListOfGames());
+                getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
             }
         });
         btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -205,17 +196,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
             // add to list
             addToList(new ArrayList<>(model.getListOfGames()));
-
-//            CopyOnWriteArrayList<String> gameNameList = model.getListOfGames();
-//
-//            // add games to list model
-//            listModel.addElement(gameNameList);
-
-
-//            getListOfGames().remove(gameNameList);
-//            getListOfGames().addAll(gameNameList);
-//            defaultListModel.removeAllElements();
-//            defaultListModel.addElement(getListOfGames());
         }
     }
 }

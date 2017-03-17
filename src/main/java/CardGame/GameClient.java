@@ -14,8 +14,7 @@ import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import static CardGame.Gui.Screens.HOMESCREEN;
-import static CardGame.Gui.Screens.LOGINSCREEN;
+import static CardGame.Gui.Screens.*;
 
 /**
  * This client connects to the servers.
@@ -332,8 +331,16 @@ public class GameClient extends Observable {
         RequestJoinGame requestJoinGame = new RequestJoinGame(gameToJoin, getLoggedInUser().getUserName());
         sendRequest(requestJoinGame);
 
-        // get response from server and returnit
-        return getResponse(ResponseJoinGame.class);
+
+        // get response from server
+        ResponseJoinGame responseJoinGame = getResponse(ResponseJoinGame.class);
+        int success = responseJoinGame.getRequestSuccess();
+
+        if (success == 1) {
+            setCurrentScreen(GAMESCREEN);
+        }
+
+        return responseJoinGame;
     }
 
     /**
@@ -551,7 +558,7 @@ public class GameClient extends Observable {
                 PushGameNames pushGameNames = requestGetGameNames();
                 getListOfGames().addAll(pushGameNames.getGameNames());
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
