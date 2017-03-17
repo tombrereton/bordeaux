@@ -171,9 +171,32 @@ public class ServerThread implements Runnable {
                 return handleFold(JSONInput, protocolId);
             case DOUBLE:
                 return handleDouble(JSONInput, protocolId);
+            case PUSH_GAME_NAMES:
+                return handleGetPlayerNames(JSONInput, protocolId);
+            case PUSH_PLAYER_NAMES:
+                return handleGetPlayerNames(JSONInput, protocolId);
+            case PUSH_PLAYER_HANDS:
+                return handleGetPlayerHands(JSONInput,protocolId);
+            case PUSH_PLAYER_BETS:
+                return handleGetPlayerBets(JSONInput, protocolId);
+            case PUSH_PLAYER_BUDGETS:
+                return handleGetPlayerBudgets(JSONInput, protocolId);
+            case PUSH_PLAYERS_STAND:
+                return handleGetPlayersStand(JSONInput, protocolId);
+            case PUSH_PLAYERS_WON:
+                return handleGetPlayersWon(JSONInput, protocolId);
+            case PUSH_PLAYERS_BUST:
+                return handleGetPlayersBust(JSONInput, protocolId);
+            case PUSH_DEALER_HAND:
+                return handleGetDealerhand(JSONInput, protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    private ResponseProtocol handleGetPlayerNames(String jsonInput, int protocolId) {
+        return null;
+        pushPlayerNames();
     }
 
     private ResponseProtocol handleDouble(String jsonInput, int protocolId) {
@@ -715,7 +738,7 @@ public class ServerThread implements Runnable {
      * @param <T>
      * @return True if push successful, false if not
      */
-    private <T extends PushProtocol> boolean pushToPlayers(T push) {
+    private <T extends ResponseProtocol> boolean pushToPlayers(T push) {
         pushOutputStream = null;
         Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
 
