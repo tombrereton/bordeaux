@@ -11,10 +11,12 @@ import static CardGame.ProtocolTypes.GET_MESSAGE;
  */
 public class ResponseGetMessages extends ResponseProtocol {
     private ArrayList<MessageObject> messages;
+    private int offset;
 
-    public ResponseGetMessages(int protocolId, int requestSuccess, ArrayList<MessageObject> messages) {
+    public ResponseGetMessages(int protocolId, int requestSuccess, ArrayList<MessageObject> messages, int offset) {
         super(protocolId, GET_MESSAGE, requestSuccess);
         this.messages = messages;
+        this.offset = offset;
     }
 
     public ResponseGetMessages(int protocolId, int requestSuccess, ArrayList<MessageObject> messages, String errorMsg) {
@@ -24,6 +26,10 @@ public class ResponseGetMessages extends ResponseProtocol {
 
     public ArrayList<MessageObject> getMessages() {
         return messages;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 
     @Override
