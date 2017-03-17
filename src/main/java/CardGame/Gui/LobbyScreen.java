@@ -34,8 +34,9 @@ public class LobbyScreen extends JPanel implements Observer {
     private JButton btnCreateGame;
 
     // gameList variables
-    private DefaultListModel listModel;
+    private DefaultListModel gameNameListModel;
     private JList gameList;
+    private int lobbyGamesOffset;
 
     /**
      * Create the application.
@@ -48,9 +49,10 @@ public class LobbyScreen extends JPanel implements Observer {
 
 
         // gameList variables
-        this.listModel = new DefaultListModel();
-        addToList(new ArrayList<>(getClientModel().getListOfGames()));
-        this.gameList = new JList(this.listModel);
+        this.gameNameListModel = new DefaultListModel();
+//        addToList(new ArrayList<>(getClientModel().getListOfGames()));
+        this.gameList = new JList(this.gameNameListModel);
+        this.lobbyGamesOffset = 0;
 
         lblLobby = new JLabel("Lobby");
         btnBack = new JButton("Back");
@@ -61,11 +63,6 @@ public class LobbyScreen extends JPanel implements Observer {
         updateBounds();
     }
 
-    private void addToList(ArrayList<String> gamesNames) {
-        for (String game : gamesNames) {
-            this.listModel.addElement(game);
-        }
-    }
 
     /**
      * Initialize the contents of the frame.
@@ -188,13 +185,32 @@ public class LobbyScreen extends JPanel implements Observer {
         this.listOfGames = listOfGames;
     }
 
+    private void addToList(ArrayList<String> gamesNames) {
+
+        int clientGameOffset = getClientModel().getListOfGames().size();
+
+        while (lobbyGamesOffset < clientGameOffset){
+            ArrayList<String> gameNames = new ArrayList<>(getClientModel().getListOfGames());
+            this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
+
+        }
+    }
+
     @Override
     public void update(Observable observable, Object o) {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            // get clientGameOf
+            int clientGameOffset = model.getListOfGames().size();
+
             // add to list
-            addToList(new ArrayList<>(model.getListOfGames()));
+            while (lobbyGamesOffset < clientGameOffset){
+                ArrayList<String> gameNames = new ArrayList<>(model.getListOfGames());
+                this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
+                lobbyGamesOffset++;
+            }
+
         }
     }
 }

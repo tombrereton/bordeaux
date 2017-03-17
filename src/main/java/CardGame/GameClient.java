@@ -584,8 +584,9 @@ public class GameClient extends Observable {
             while (isGettingGames) {
                 PushGameNames pushGameNames = requestGetGameNames();
                 getListOfGames().addAll(pushGameNames.getGameNames());
+
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
