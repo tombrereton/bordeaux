@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  *
  * @Author Tom Brereton
  */
-public class CardGameServer {
+public class Server {
     private final int port = 7654;
     private ServerSocket serverSocket;
     private final int numberOfThreads = 20;
@@ -32,7 +32,7 @@ public class CardGameServer {
     private volatile CopyOnWriteArrayList<GameLobby> games;
     private volatile CopyOnWriteArrayList<String> gameNames;
 
-    public CardGameServer() {
+    public Server() {
         this.gameNames = new CopyOnWriteArrayList<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
@@ -63,7 +63,7 @@ public class CardGameServer {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new CardGameServerThread(this,socket, this.messageQueue,
+                threadPool.execute(new ServerThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class CardGameServer {
 
     public static void main(String[] args) throws IOException {
 
-        CardGameServer server = new CardGameServer();
+        Server server = new Server();
         server.connectToDatabase();
         server.connectToClients();
     }
