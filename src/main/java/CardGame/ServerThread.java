@@ -702,9 +702,9 @@ public class ServerThread implements Runnable {
     private boolean pushPlayerWon() {
         Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
 
-        PushPlayersWon push = new PushPlayersWon(playersWon);
+        PushPlayersWon push = new PushPlayersWon(0,0,playersWon);
 
-        return pushToPlayers(push);
+        return false;
     }
 
     /**

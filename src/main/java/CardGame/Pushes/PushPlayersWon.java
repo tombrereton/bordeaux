@@ -12,7 +12,7 @@ import static CardGame.ProtocolTypes.PUSH_PLAYERS_WON;
 public class PushPlayersWon extends ResponseProtocol {
     private Map<String, Boolean> playersWon;
 
-    public PushPlayersWon(int protocolID, int success,Map<String, Boolean> playersWon) {
+    public PushPlayersWon(int protocolID, int success, Map<String, Boolean> playersWon) {
         super(protocolID, PUSH_PLAYERS_WON, success);
         this.playersWon = playersWon;
     }
