@@ -379,6 +379,7 @@ public class GameClient extends Observable {
         }
 
         return responseQuitGame;
+
     }
 
     /**

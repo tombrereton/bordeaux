@@ -228,19 +228,27 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     setPane(this.homeScreen);
                     break;
                 case LOBBYSCREEN:
-                    this.lobbyScreen = new LobbyScreen(model, this);
+                    if (this.lobbyScreen == null){
+                        this.lobbyScreen = new LobbyScreen(model, this);
+                    }
                     setPane(this.lobbyScreen);
                     break;
                 case GAMESCREEN:
-                    this.gameScreen = new GameScreen(model, this);
+                    if (this.gameScreen == null){
+                        this.gameScreen = new GameScreen(model, this);
+                    }
                     setPane(this.gameScreen);
                     break;
                 case STATISTICSSCREEN:
-                    this.statisticsScreen = new StatisticsScreen(model, this);
+                    if (this.statisticsScreen == null){
+                        this.statisticsScreen = new StatisticsScreen(model, this);
+                    }
                     setPane(this.statisticsScreen);
                     break;
                 case SETTINGSSCREEN:
-                    this.settingsScreen = new SettingsScreen(model, this);
+                    if (this.settingsScreen == null){
+                        this.settingsScreen = new SettingsScreen(model, this);
+                    }
                     setPane(this.settingsScreen);
                     break;
             }
