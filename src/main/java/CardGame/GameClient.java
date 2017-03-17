@@ -68,6 +68,9 @@ public class GameClient extends Observable {
         this.chatOffset = -1;
         this.listOfGames = new ConcurrentSkipListSet<>();
 
+        // chat variables
+        this.messages = new ConcurrentLinkedDeque<>();
+
     }
 
     /**
@@ -346,6 +349,7 @@ public class GameClient extends Observable {
         if (success == 1) {
             setCurrentScreen(GAMESCREEN);
             stopGettingGameNames();
+            startGettingMessages();
         }
 
         return responseJoinGame;
@@ -588,7 +592,7 @@ public class GameClient extends Observable {
 
     // THREAD FOR GETTING MESSAGES
 
-    public void startCheckingMessages() {
+    public void startGettingMessages() {
 
 
         // create the job

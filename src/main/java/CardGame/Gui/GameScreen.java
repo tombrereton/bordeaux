@@ -44,12 +44,14 @@ public class GameScreen extends JPanel implements Observer {
     private JLabel lblBackHud = new JLabel();
     private JList<String> listChat;
     private JScrollPane scrollPane;
-    public DefaultListModel<String> chatMessageModel;
     private JLabel lblSideHud;
     private JLabel lblSideFillHud;
 
     private int amountToBet;
     private int credits;
+
+    // chat variables
+    public DefaultListModel<String> chatMessageModel;
 
     /**
      * Create the application.
@@ -58,6 +60,8 @@ public class GameScreen extends JPanel implements Observer {
         // we add this to list of observers
         this.client = clientModel;
         clientModel.addObserver(this);
+
+        // chat variables
 
         this.screenFactory = screenFactory;
         this.amountToBet = amountToBet;
@@ -83,23 +87,20 @@ public class GameScreen extends JPanel implements Observer {
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
-        /**
-         * Create a JList into Chat message box
-         */
-        listChat = new JList<String>();
-        listChat.setValueIsAdjusting(true);
-        listChat.setModel(new DefaultListModel<String>());
 
+        // chat variables
+        this.chatMessageModel = new DefaultListModel<>();
+        addMessagesToChatModel(new ArrayList<>(getClientModel().getMessages()));
+        this.listChat = new JList<>(this.chatMessageModel);
+
+        // create chat window
+        this.listChat.setValueIsAdjusting(true);
         scrollPane = new JScrollPane(listChat);
 
-        /** test
-         *
-         */
-        chatMessageModel = (DefaultListModel<String>) listChat.getModel();
+        // set background and initialize
         setBackground(new Color(46, 139, 87));
         initialize();
         updateBounds();
-
     }
 
     /**
