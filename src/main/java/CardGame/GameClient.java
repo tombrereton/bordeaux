@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static CardGame.Gui.Screens.*;
@@ -44,6 +46,11 @@ public class GameClient extends Observable {
 
     // chat variables
     private int chatOffset;
+    private ConcurrentLinkedDeque<MessageObject> messages;
+
+    // Threads
+    Thread gameNamesThread;
+    private volatile boolean isGettingGames;
 
 
     public GameClient(String HOST, int PORT) {
@@ -130,7 +137,7 @@ public class GameClient extends Observable {
      * @param request
      * @param <T>
      */
-    public <T extends RequestProtocol> void sendRequest(T request) {
+    public synchronized <T extends RequestProtocol> void sendRequest(T request) {
         // convert to json string
         String jsonOutput = gson.toJson(request);
 
@@ -153,7 +160,7 @@ public class GameClient extends Observable {
      * @param <T>
      * @return
      */
-    public <T> T getResponse(Class<T> responseClass) {
+    public synchronized <T> T getResponse(Class<T> responseClass) {
         String jsonInput = null;
         try {
             // read response from server
@@ -316,7 +323,7 @@ public class GameClient extends Observable {
         RequestCreateGame requestCreateGame = new RequestCreateGame(getLoggedInUser().getUserName());
         sendRequest(requestCreateGame);
 
-        // get response from server and returnit
+        // get response from server and return it
         return getResponse(ResponseCreateGame.class);
     }
 
@@ -338,6 +345,7 @@ public class GameClient extends Observable {
 
         if (success == 1) {
             setCurrentScreen(GAMESCREEN);
+            stopGettingGameNames();
         }
 
         return responseJoinGame;
@@ -551,10 +559,13 @@ public class GameClient extends Observable {
      */
     public void startGettingGameNames() {
 
+        // set flag to true
+        isGettingGames = true;
+
         // create the job
         Runnable gameNamesJob = () -> {
 
-            while (true) {
+            while (isGettingGames) {
                 PushGameNames pushGameNames = requestGetGameNames();
                 getListOfGames().addAll(pushGameNames.getGameNames());
                 try {
@@ -565,11 +576,68 @@ public class GameClient extends Observable {
             }
         };
 
-        // create the thread
-        Thread gameNamesThread = new Thread(gameNamesJob);
+        gameNamesThread = new Thread(gameNamesJob);
 
         // start the thread
         gameNamesThread.start();
+    }
+
+    public void stopGettingGameNames(){
+        isGettingGames = false;
+    }
+
+    // THREAD FOR GETTING MESSAGES
+
+    public void startCheckingMessages() {
+
+
+        // create the job
+        Runnable getMessagesJob = () -> {
+
+            while (true) {
+
+                // get the client offset and send a request for the messages
+                int clientOffset = getChatOffset();
+                ResponseGetMessages responseGetMessages = requestGetMessages(clientOffset);
+
+                // if the response is successful and client offset is less than response offset
+                int success = responseGetMessages.getRequestSuccess();
+                int responseOffset = responseGetMessages.getOffset();
+                if (success == 1 && clientOffset < responseOffset) {
+
+                    // get message arrayList
+                    ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+
+                    // add messages to message queue
+                    addMessages(messages);
+
+                    // set client offset to response offset to avoid getting old messages
+                    setChatOffset(responseOffset - 1);
+                }
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        // create the thread
+        Thread getMessagesThread = new Thread(getMessagesJob);
+
+        // start the thread
+        getMessagesThread.start();
+    }
+
+    public ConcurrentLinkedDeque<MessageObject> getMessages() {
+        return messages;
+    }
+
+    public void addMessages(ArrayList<MessageObject> messages){
+        for (MessageObject mo : messages){
+            this.messages.add(mo);
+        }
     }
 
     public static void main(String[] args) {

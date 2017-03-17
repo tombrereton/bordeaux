@@ -1,6 +1,5 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
 import CardGame.GameClient;
 
 import javax.swing.*;
@@ -191,8 +190,8 @@ public class LobbyScreen extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if (observable instanceof ClientModel) {
-            ClientModel model = (ClientModel) observable;
+        if (observable instanceof GameClient) {
+            GameClient model = (GameClient) observable;
 
             // add to list
             addToList(new ArrayList<>(model.getListOfGames()));
