@@ -1,5 +1,6 @@
 package CardGame;
 
+import CardGame.Gui.Screens;
 import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Observable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static CardGame.ProtocolTypes.LOGIN_USER;
 import static CardGame.ProtocolTypes.REGISTER_USER;
@@ -35,10 +37,25 @@ public class Client extends Observable {
     private Gson gson;
     private User loggedInUser;
 
+    // Screen state variable
+    private int currentScreen;
+
+    private volatile CopyOnWriteArrayList<String> listOfGames;
+
+    // chat variables
+    private int chatOffset;
+
+
     public Client(String HOST, int PORT) {
         this.HOST = HOST;
         this.PORT = PORT;
         this.gson = new Gson();
+
+        this.currentScreen = Screens.LOGINSCREEN;
+        // instantiate game variables
+
+        this.chatOffset = -1;
+
         connectToServer();
     }
 
@@ -80,6 +97,9 @@ public class Client extends Observable {
             e.printStackTrace();
         }
     }
+
+
+
 
     /**
      * getter for logged in user
@@ -464,6 +484,39 @@ public class Client extends Observable {
     }
 
 
+    /**
+     * getter for current screen
+     *
+     * @return
+     */
+    public int getCurrentScreen() {
+        return currentScreen;
+    }
+
+    /**
+     * Setter for current screen.
+     *
+     * @param currentScreen
+     */
+    public void setCurrentScreen(int currentScreen) {
+        this.currentScreen = currentScreen;
+        setChanged();
+        notifyObservers();
+    }
+
+
+    public CopyOnWriteArrayList<String> getListOfGames() {
+        return listOfGames;
+    }
+
+    public int getChatOffset() {
+        return chatOffset;
+    }
+
+    public void setChatOffset(int chatOffset) {
+        this.chatOffset = chatOffset;
+    }
+
     public static void main(String[] args) {
         // connect to server
         Client client = new Client("localhost", 7654);
@@ -476,5 +529,6 @@ public class Client extends Observable {
         // close connections
         client.closeConnections();
     }
+
 
 }

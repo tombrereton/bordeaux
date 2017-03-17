@@ -43,8 +43,6 @@ public class ClientModel extends Observable {
     private boolean connected, loggedIn;
 
     // Screen state variable
-    // this variable can only be set the predefined screens
-    // in CardGame.Gui.Screens
     private int currentScreen;
 
     // fields

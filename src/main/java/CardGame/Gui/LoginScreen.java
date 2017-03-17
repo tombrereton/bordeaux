@@ -1,5 +1,6 @@
 package CardGame.Gui;
 
+import CardGame.Client;
 import CardGame.ClientModel;
 import CardGame.Responses.ResponseProtocol;
 
@@ -18,7 +19,7 @@ import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
  */
 public class LoginScreen extends JPanel {
 
-	private ClientModel clientModel;
+	private Client client;
 	private ScreenFactory screenFactory;
 
 	private JLabel lblLogin;
@@ -32,8 +33,8 @@ public class LoginScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
+	public LoginScreen(Client client, ScreenFactory screenFactory) {
+		this.client = client;
 		this.screenFactory = screenFactory;
 		lblLogin = new JLabel("BlackJack Online");
 		btnCreateAccount = new JButton("Create Account");
@@ -126,8 +127,8 @@ public class LoginScreen extends JPanel {
 		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+226, 127, 31);
 	}
 
-	public ClientModel getClientModel() {
-		return clientModel;
+	public Client getClientModel() {
+		return client;
 	}
 
 }
