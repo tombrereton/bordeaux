@@ -173,27 +173,8 @@ public class Client extends Observable {
      * @return
      */
     private <T> T handleResponse(Class<T> responseClass, String jsonInput) {
-
-        // Get the response
-        ResponseProtocol response = this.gson.fromJson(jsonInput, ResponseProtocol.class);
-
-        // get the response type
-        int responseType = response.getType();
-
-        return responseClass.cast(gson.fromJson(jsonInput, responseClass));
-
         // return the correct response
-//        switch (responseType) {
-//            case REGISTER_USER:
-//                ResponseRegisterUser responseToCast = gson.fromJson(jsonInput, ResponseRegisterUser.class);
-//                return responseClass.cast(responseToCast);
-//            case LOGIN_USER:
-//                ResponseLoginUser responseLoginUser = gson.fromJson(jsonInput, ResponseLoginUser.class);
-//                return responseClass.cast(responseLoginUser);
-//            default:
-//                ResponseProtocol responseProtocol = gson.fromJson(jsonInput, ResponseRegisterUser.class);
-//                return responseClass.cast(responseProtocol);
-//        }
+        return responseClass.cast(gson.fromJson(jsonInput, responseClass));
     }
 
     /**
