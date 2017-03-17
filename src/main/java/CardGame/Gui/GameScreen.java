@@ -57,10 +57,10 @@ public class GameScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public GameScreen(GameClient clientModel, ScreenFactory screenFactory) {
+    public GameScreen(GameClient gameClient, ScreenFactory screenFactory) {
         // we add this to list of observers
-        this.client = clientModel;
-        clientModel.addObserver(this);
+        this.client = gameClient;
+        gameClient.addObserver(this);
 
         // chat variables
 
@@ -102,6 +102,8 @@ public class GameScreen extends JPanel implements Observer {
         setBackground(new Color(46, 139, 87));
         initialize();
         updateBounds();
+
+        updateMessageList(gameClient);
     }
 
     /**
@@ -473,16 +475,21 @@ public class GameScreen extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
+            updateMessageList(model);
 
-            // get clientGameOf
-            int clientMsgOffset = model.getMessages().size();
 
-            // add to list
-            while (gameScreenChatOffset < clientMsgOffset){
-                ArrayList<MessageObject> msg = new ArrayList<>(model.getMessages());
-                this.chatMessageModel.addElement(msg.get(gameScreenChatOffset).toString());
-                gameScreenChatOffset++;
-            }
+        }
+    }
+
+    private void updateMessageList(GameClient model) {
+        // get clientGameOf
+        int clientMsgOffset = model.getMessages().size();
+
+        // add to list
+        while (gameScreenChatOffset < clientMsgOffset){
+            ArrayList<MessageObject> msg = new ArrayList<>(model.getMessages());
+            this.chatMessageModel.addElement(msg.get(gameScreenChatOffset).toString());
+            gameScreenChatOffset++;
         }
     }
 

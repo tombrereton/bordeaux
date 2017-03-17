@@ -283,6 +283,7 @@ public class GameClient extends Observable {
         if (success == 1) {
             setLoggedInUser(null);
             setCurrentScreen(LOGINSCREEN);
+            stopGettingGameNames();
         }
 
         return responseLogOut;
