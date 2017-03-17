@@ -795,8 +795,12 @@ public class CardGameServerThread implements Runnable {
         } else if (offset >= -1) {
             // get messages from queue as per the offset
             ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
+
+            // get offset
+            int offsetFromQueue = this.messageQueue.size();
+
             // return success if offset greater than -2
-            return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient);
+            return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient, offsetFromQueue);
         } else {
             // return fail for unknown error
             return new ResponseGetMessages(protocolId, FAIL, null, UNKNOWN_ERROR);
