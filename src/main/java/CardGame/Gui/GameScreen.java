@@ -457,7 +457,7 @@ public class GameScreen extends JPanel {
                         DefaultListModel<String> chatMessageModel = (DefaultListModel<String>) listChat.getModel();
 
                         // keep offset to -1 if getMessages is null
-                        if (!responseGetMessages.getMessages().isEmpty()) {
+                        if (responseGetMessages.getMessages() != null && !responseGetMessages.getMessages().isEmpty()) {
 
                             if (clientModel.getChatOffset() < responseGetMessages.getMessages().size()) {
                                 // change offest to size of message arraylist
