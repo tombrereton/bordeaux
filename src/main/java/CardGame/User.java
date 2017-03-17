@@ -132,9 +132,7 @@ public class User {
         User user = (User) o;
 
         return this.getUserName().equals(user.getUserName()) &&
-                this.getPassword().equals(user.getPassword()) &&
-                this.getFirstName().equals(user.getFirstName()) &&
-                this.getLastName().equals(user.getLastName());
+                this.getPassword().equals(user.getPassword());
     }
 
     public boolean checkPassword(User user) {

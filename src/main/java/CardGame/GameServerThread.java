@@ -793,7 +793,10 @@ public class GameServerThread implements Runnable {
             e.printStackTrace();
         }
 
-        if (!isLoggedInUserNull()) {
+        if (isUserLoggedIn(userFromRequest)) {
+            // return fail if user logged in on any client
+            return new ResponseLoginUser(protocolId, FAIL, null, ALREADY_LOGGED_IN);
+        } else if (!isLoggedInUserNull()) {
             // return fail if already logged in
             return new ResponseLoginUser(protocolId, FAIL, null, ALREADY_LOGGED_IN);
         } else if (userFromRequest.getUserName().equals("") || userFromRequest.getPassword().equals("")) {
@@ -816,6 +819,15 @@ public class GameServerThread implements Runnable {
             // return fail for unknown error
             return new ResponseLoginUser(protocolId, FAIL, null, UNKNOWN_ERROR);
         }
+    }
+
+    private boolean isUserLoggedIn(User userFromRequest) {
+        for (User user : users) {
+            if (userFromRequest.getUserName().equals(user.getUserName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

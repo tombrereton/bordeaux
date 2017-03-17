@@ -83,8 +83,12 @@ public class LoginScreen extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 			    // We send a request and get the response
-                ResponseProtocol responseProtocol = getClientModel().requestLogin(usernameField.getText(),
-                        String.valueOf(passwordField.getPassword()));
+				String username = usernameField.getText();
+                char[] password = passwordField.getPassword();
+                ResponseProtocol responseProtocol = getClientModel().requestLogin(username, String.valueOf(password));
+
+                usernameField.setText("");
+                passwordField.setText("");
 
                 // We display the error if not null
                 String errorMsg = responseProtocol.getErrorMsg();
