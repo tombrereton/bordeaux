@@ -100,7 +100,7 @@ public class CardGameServerThread implements Runnable {
                 Thread.sleep(10);
                 closeConnections();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("connection couldn't be closed");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -373,6 +373,7 @@ public class CardGameServerThread implements Runnable {
         pushPlayersBust();
         pushAreAllPlayersFinished();
     }
+
     /**
      * This method sets the bet for the logged in user and sets
      * the player to isFinishedRound to true. The method
@@ -382,7 +383,7 @@ public class CardGameServerThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersStand()){
+        if (getGame(gameJoined).isAllPlayersStand()) {
             getGame(gameJoined).nextGame();
         }
 
@@ -979,15 +980,16 @@ public class CardGameServerThread implements Runnable {
         PushGameNames pushGameNames = new PushGameNames(getGameNames());
 
         if (!this.socketList.isEmpty()) {
-            for (Socket sock : this.socketList) {
-                try {
+            try {
+                for (Socket sock : this.socketList) {
                     outputStream = new DataOutputStream(sock.getOutputStream());
                     outputStream.writeUTF(encodeResponse(pushGameNames));
-                } catch (IOException e) {
-                    System.out.println("Failed to send out list of game names");
-                } finally {
-                    return pushGameNames;
                 }
+                System.out.println(pushGameNames);
+            } catch (IOException e) {
+                System.out.println("Failed to send out list of game names");
+            } finally {
+                return pushGameNames;
             }
         }
         return pushGameNames;

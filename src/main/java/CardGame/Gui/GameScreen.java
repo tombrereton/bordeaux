@@ -438,11 +438,11 @@ public class GameScreen extends JPanel {
 //				while (true) {
 //					ResponseGetMessages response = clientModel.requestGetMessages();
 //					if (response[0].equals("get-message")) {
-//						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
+//						DefaultListModel<String> defaultListModel = (DefaultListModel<String>) listChat.getModel();
 //						for (int i = 1; i < response.length; i = i + 4) {
 //							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
 //								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
-//								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
+//								defaultListModel.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
 //								try {
 //									Thread.sleep(10);
 //								} catch (InterruptedException e) {
