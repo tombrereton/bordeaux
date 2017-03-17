@@ -65,6 +65,9 @@ public class ClientModel extends Observable {
     private volatile ConcurrentHashMap<String, Boolean> playersStand;
     private volatile CopyOnWriteArrayList<String> listOfGames;
 
+    // chat variables
+    private int chatOffset;
+
     /**
      * Constructor.
      *
@@ -493,6 +496,22 @@ public class ClientModel extends Observable {
         this.currentScreen = currentScreen;
         setChanged();
         notifyObservers();
+    }
+
+    /**
+     * Getter for chatoffset
+     * @return
+     */
+    public int getChatOffset() {
+        return chatOffset;
+    }
+
+    /**
+     * setter for chat offset
+     * @param chatOffset
+     */
+    public void setChatOffset(int chatOffset) {
+        this.chatOffset = chatOffset;
     }
 
     /**

@@ -1,12 +1,17 @@
 package CardGame.Gui;
 
 import CardGame.ClientModel;
+import CardGame.MessageObject;
+import CardGame.Responses.ResponseGetMessages;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
 
@@ -21,7 +26,6 @@ public class GameScreen extends JPanel {
 	private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private JScrollPane scrollPane = new JScrollPane();
 	private JLabel lblChat = new JLabel("Chat");
 	private JButton btnSendMessage = new JButton();
 	private JButton btnDoubleDown = new JButton();
@@ -39,6 +43,8 @@ public class GameScreen extends JPanel {
 	private JLabel lblCreditsBox = new JLabel();
 	private JLabel lblBetBox = new JLabel();
 	private JLabel lblBackHud = new JLabel();
+	private JList<String> listChat = new JList<>();
+    private JScrollPane scrollPane = new JScrollPane(listChat);
 
 	/**
 	 * Create the application.
@@ -442,12 +448,13 @@ public class GameScreen extends JPanel {
 			@Override
 			public void run() {
 				while (true) {
-					ResponseGetMessages response = clientModel.requestGetMessages(clientModel.getChatOffset());
+					ResponseProtocol response = clientModel.requestGetMessages(clientModel.getChatOffset());
+                    ResponseGetMessages responseGetMessages = (ResponseGetMessages) response;
 					if (response.getRequestSuccess() == 1) {
 						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
-							if (clientModel.getChatOffset()< response.getMessages().size()) {
-								clientModel.setChatOffset(response.getMessages().size());
-								for(MessageObject mo: response.getMessages()){
+							if (clientModel.getChatOffset()< responseGetMessages .getMessages().size()) {
+								clientModel.setChatOffset(responseGetMessages .getMessages().size());
+								for(MessageObject mo: responseGetMessages .getMessages()){
 									model.addElement(mo.toString());
 								}
 								try {
