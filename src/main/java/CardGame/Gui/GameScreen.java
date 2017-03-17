@@ -2,6 +2,13 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.MessageObject;
+import CardGame.Pushes.PushGameNames;
+import CardGame.Pushes.PushPlayerBudgets;
+import CardGame.Requests.RequestGetPlayerBudgets;
+import CardGame.Requests.RequestProtocol;
+import CardGame.Responses.ResponseBet;
+import CardGame.Responses.ResponseProtocol;
+import CardGame.Responses.ResponseQuitGame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -248,8 +255,14 @@ public class GameScreen extends JPanel implements Observer {
         btnSubmitBet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 credits = credits - amountToBet;
+                ResponseProtocol response = client.requestBet(amountToBet);
+                if (response.getRequestSuccess() == 1){
+                    PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
+                    if(responseBudgets.getRequestSuccess() == 1){
+                        lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
+                    }
+                }
                 amountToBet = 0;
-                lblCredits.setText("Credits: £ " + Integer.toString(credits));
                 lblSubmitBet.setText(Integer.toString(amountToBet));
             }
         });
@@ -351,7 +364,7 @@ public class GameScreen extends JPanel implements Observer {
 
         btnLeaveGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // todo make this a request leave game
+                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameName());
                 getClientModel().setCurrentScreen(LOBBYSCREEN);
             }
         });
