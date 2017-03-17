@@ -1,13 +1,7 @@
 package CardGame;
 
-import CardGame.Requests.RequestLogOut;
-import CardGame.Requests.RequestLoginUser;
-import CardGame.Requests.RequestProtocol;
-import CardGame.Requests.RequestRegisterUser;
-import CardGame.Responses.ResponseLogOut;
-import CardGame.Responses.ResponseLoginUser;
-import CardGame.Responses.ResponseProtocol;
-import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Requests.*;
+import CardGame.Responses.*;
 import com.google.gson.Gson;
 
 import java.io.DataInputStream;
@@ -38,7 +32,7 @@ public class Client extends Observable {
     private DataInputStream serverInputStream;
     private DataOutputStream serverOutputStream;
     private Gson gson;
-    private String username;
+    private User loggedInUser;
 
     public Client(String HOST, int PORT) {
         this.HOST = HOST;
@@ -84,6 +78,24 @@ public class Client extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * getter for logged in user
+     *
+     * @return
+     */
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    /**
+     * setter for logged in user
+     *
+     * @param loggedInUser
+     */
+    public void setLoggedInUser(User loggedInUser) {
+        this.loggedInUser = loggedInUser;
     }
 
     // OVERALL REQUEST METHOD
@@ -197,13 +209,14 @@ public class Client extends Observable {
 
     /**
      * This method send a request and returns a response for register user.
+     *
      * @param username
      * @param password
      * @param firstName
      * @param lastName
      * @return
      */
-    public ResponseRegisterUser requestRegisterUser(String username, String password, String firstName, String lastName){
+    public ResponseRegisterUser requestRegisterUser(String username, String password, String firstName, String lastName) {
         // hash password and create user
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword, firstName, lastName);
@@ -216,16 +229,39 @@ public class Client extends Observable {
     }
 
 
+    /**
+     * log out request
+     *
+     * @return
+     */
     public ResponseLogOut requestLogOut() {
-
-
         // create request and send request
-        RequestLogOut requestLogOut = new RequestLogOut(this.username);
+        RequestLogOut requestLogOut = new RequestLogOut(getLoggedInUser().getUserName());
         sendRequest(requestLogOut);
 
         // get response from server and returnit
         return getResponse(ResponseLogOut.class);
     }
+
+    /**
+     * send message request
+     *
+     * @param username
+     * @param message
+     * @return
+     */
+    public ResponseSendMessage requestSendMessage(String username, String message) {
+
+
+        // create request and send request
+        RequestSendMessage requestSendMessage = new RequestSendMessage(username, message);
+        sendRequest(requestSendMessage);
+
+        // get response from server and returnit
+        return getResponse(ResponseSendMessage.class);
+    }
+
+
 
     public static void main(String[] args) {
         // connect to server
