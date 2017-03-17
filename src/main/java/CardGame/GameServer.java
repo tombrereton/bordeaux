@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  *
  * @Author Tom Brereton
  */
-public class Server {
+public class GameServer {
     private final int PORT = 7654;
     private final int NUMBER_OF_THREADS = 20;
     private ServerSocket serverSocket;
@@ -32,7 +32,7 @@ public class Server {
     private volatile CopyOnWriteArrayList<GameLobby> games;
     private volatile CopyOnWriteArrayList<String> gameNames;
 
-    public Server() {
+    public GameServer() {
         this.gameNames = new CopyOnWriteArrayList<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
@@ -53,7 +53,7 @@ public class Server {
 
             while (true) {
                 // Wait for a client to connect
-                System.out.println("Waiting for connection from Client");
+                System.out.println("Waiting for connection from GameClient");
                 Socket socket = this.serverSocket.accept();
 
 
@@ -63,7 +63,7 @@ public class Server {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new ServerThread(this,socket, this.messageQueue,
+                threadPool.execute(new GameServerThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
 
-        Server server = new Server();
+        GameServer server = new GameServer();
         server.connectToDatabase();
         server.connectToClients();
     }

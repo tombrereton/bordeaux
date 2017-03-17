@@ -29,7 +29,7 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  *
  * @Author Tom Brereton
  */
-public class ServerThread implements Runnable {
+public class GameServerThread implements Runnable {
     private Socket toClientSocket;
     private DataOutputStream pushOutputStream;
     private boolean clientAlive;
@@ -39,7 +39,7 @@ public class ServerThread implements Runnable {
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
     private Gson gson;
-    private Server server;
+    private GameServer server;
     private String gameJoined;
 
     // Shared data structures
@@ -50,14 +50,14 @@ public class ServerThread implements Runnable {
     private volatile CopyOnWriteArrayList<String> gameNames;
 
 
-    public ServerThread(Server server,
-                        Socket toClientSocket,
-                        ConcurrentLinkedDeque<MessageObject> messageQueue,
-                        ConcurrentLinkedDeque<Socket> socketList,
-                        CopyOnWriteArrayList<User> users,
-                        FunctionDB functionsDB,
-                        CopyOnWriteArrayList<GameLobby> games,
-                        CopyOnWriteArrayList<String> gameNames) {
+    public GameServerThread(GameServer server,
+                            Socket toClientSocket,
+                            ConcurrentLinkedDeque<MessageObject> messageQueue,
+                            ConcurrentLinkedDeque<Socket> socketList,
+                            CopyOnWriteArrayList<User> users,
+                            FunctionDB functionsDB,
+                            CopyOnWriteArrayList<GameLobby> games,
+                            CopyOnWriteArrayList<String> gameNames) {
         this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
@@ -89,7 +89,7 @@ public class ServerThread implements Runnable {
                 System.out.println(response);
             }
         } catch (EOFException e) {
-            System.out.println("Client disconnected.: " + e.toString());
+            System.out.println("GameClient disconnected.: " + e.toString());
             this.setLoggedInUser(null);
             System.out.println("Logged in user set to: " + getLoggedInUser());
         } catch (IOException e) {

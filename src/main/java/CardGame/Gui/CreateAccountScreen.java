@@ -1,7 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.Client;
-import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +11,7 @@ import static CardGame.Gui.Screens.LOGINSCREEN;
 
 public class CreateAccountScreen extends JPanel {
 
-	private Client client;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
 	private JTextField firstnameField;
@@ -34,7 +33,7 @@ public class CreateAccountScreen extends JPanel {
     /**
 	 * Create the application.
 	 */
-	public CreateAccountScreen(Client client, ScreenFactory screenFactory) {
+	public CreateAccountScreen(GameClient client, ScreenFactory screenFactory) {
         this.client = client;
 		this.screenFactory = screenFactory;
         setBackground(new Color(46, 139, 87));
@@ -159,7 +158,7 @@ public class CreateAccountScreen extends JPanel {
 		lblCreateNewAccount.setBounds(screenFactory.getxOrigin()+408, screenFactory.getyOrigin()+121, 207, 23);
 	}
 
-    public Client getClientModel() {
+    public GameClient getClientModel() {
         return client;
     }
 }

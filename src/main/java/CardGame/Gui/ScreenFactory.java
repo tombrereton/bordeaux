@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.Client;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +36,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     public StatisticsScreen statisticsScreen;
     public LobbyScreen lobbyScreen;
     public GameScreen gameScreen;
-    private Client client;
+    private GameClient client;
 
 
     /**
@@ -52,7 +52,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     /**
      * Constructor for the frame
      */
-    public ScreenFactory(Client client) {
+    public ScreenFactory(GameClient client) {
         // add to observer list for notify all
         this.client = client;
         client.addObserver(this);
@@ -183,7 +183,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    Client client = new Client("localhost", 7654);
+                    GameClient client = new GameClient("localhost", 7654);
                     frame = new ScreenFactory(client);
                     frame.setVisible(true);
                 } catch (Exception e) {
@@ -204,8 +204,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      */
     @Override
     public void update(Observable observable, Object o) {
-        if (observable instanceof Client) {
-            Client model = (Client) observable;
+        if (observable instanceof GameClient) {
+            GameClient model = (GameClient) observable;
             int currentScreen = model.getCurrentScreen();
 
             switch (currentScreen) {

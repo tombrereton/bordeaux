@@ -1,7 +1,7 @@
 package CardGame.Gui;
 
-import CardGame.Client;
 import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -27,7 +27,7 @@ public class LobbyScreen extends JPanel implements Observer {
     public DefaultListModel defaultListModel;
     private String gameName;
 
-    private Client client;
+    private GameClient client;
     private ScreenFactory screenFactory;
 
     private JLabel lblLobby;
@@ -39,7 +39,7 @@ public class LobbyScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public LobbyScreen(Client client, ScreenFactory screenFactory) {
+    public LobbyScreen(GameClient client, ScreenFactory screenFactory) {
         // we become an observer
         this.client = client;
         client.addObserver(this);
@@ -164,7 +164,7 @@ public class LobbyScreen extends JPanel implements Observer {
         return listOfGames;
     }
 
-    public Client getClientModel() {
+    public GameClient getClientModel() {
         return client;
     }
 

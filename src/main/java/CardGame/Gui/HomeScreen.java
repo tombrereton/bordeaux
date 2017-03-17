@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.Client;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +16,7 @@ import static CardGame.Gui.Screens.*;
  */
 public class HomeScreen extends JPanel {
 
-	private Client client;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
 	private JButton btnLogout;
@@ -33,7 +33,7 @@ public class HomeScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public HomeScreen(Client client, ScreenFactory screenFactory) {
+	public HomeScreen(GameClient client, ScreenFactory screenFactory) {
 		this.screenFactory = screenFactory;
 		this.client = client;
 		username = client.getLoggedInUser().getUserName();
@@ -145,7 +145,7 @@ public class HomeScreen extends JPanel {
 		lblGamesPlayed.setBounds(screenFactory.getxOrigin()+560, screenFactory.getyOrigin()+243, 225, 34);
 	}
 
-	public Client getClientModel() {
+	public GameClient getClientModel() {
 		return client;
 	}
 }

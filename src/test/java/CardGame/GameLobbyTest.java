@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
  *
  */
 public class GameLobbyTest {
-    Server server;
+    GameServer server;
 
     Socket s = new Socket();
     // SET UP

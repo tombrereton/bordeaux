@@ -1,7 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.Client;
-import CardGame.ClientModel;
+import CardGame.GameClient;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseGetMessages;
 import CardGame.Responses.ResponseProtocol;
@@ -22,7 +21,7 @@ import static CardGame.Gui.Screens.LOBBYSCREEN;
  */
 public class GameScreen extends JPanel {
 
-    private Client client;
+    private GameClient client;
     private ScreenFactory screenFactory;
 
     private JTextArea textArea;
@@ -50,7 +49,7 @@ public class GameScreen extends JPanel {
     /**
      * Create the application.
      */
-    public GameScreen(Client clientModel, ScreenFactory screenFactory) {
+    public GameScreen(GameClient clientModel, ScreenFactory screenFactory) {
         this.client = clientModel;
         this.screenFactory = screenFactory;
         scrollPane = new JScrollPane();
@@ -433,7 +432,7 @@ public class GameScreen extends JPanel {
 
     }
 
-    public Client getClientModel() {
+    public GameClient getClientModel() {
         return client;
     }
 

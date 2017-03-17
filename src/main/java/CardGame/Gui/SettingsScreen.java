@@ -1,7 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.Client;
-import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +14,7 @@ import java.awt.event.ActionListener;
  */
 public class SettingsScreen extends JPanel {
 
-	private Client client;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
 	private JLabel lblWelcome;
@@ -24,7 +23,7 @@ public class SettingsScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen(Client client, ScreenFactory screenFactory) {
+	public SettingsScreen(GameClient client, ScreenFactory screenFactory) {
 		this.client = client;
 		this.screenFactory = screenFactory;
 		lblWelcome = new JLabel("Settings");
@@ -65,7 +64,7 @@ public class SettingsScreen extends JPanel {
 		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+500, 89, 23);
 	}
 
-	public Client getClientModel() {
+	public GameClient getClientModel() {
 		return client;
 	}
 }

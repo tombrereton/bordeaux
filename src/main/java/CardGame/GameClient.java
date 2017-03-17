@@ -25,7 +25,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * <p>
  * Created by tom on 17/03/17.
  */
-public class Client extends Observable {
+public class GameClient extends Observable {
 
     // connection variables
     private final String HOST;
@@ -46,7 +46,7 @@ public class Client extends Observable {
     private int chatOffset;
 
 
-    public Client(String HOST, int PORT) {
+    public GameClient(String HOST, int PORT) {
         this.HOST = HOST;
         this.PORT = PORT;
         this.gson = new Gson();
@@ -519,7 +519,7 @@ public class Client extends Observable {
 
     public static void main(String[] args) {
         // connect to server
-        Client client = new Client("localhost", 7654);
+        GameClient client = new GameClient("localhost", 7654);
         client.connectToServer();
 
         // send login request to server
