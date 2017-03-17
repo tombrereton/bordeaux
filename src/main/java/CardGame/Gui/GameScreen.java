@@ -2,13 +2,8 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.MessageObject;
-import CardGame.Pushes.PushGameNames;
 import CardGame.Pushes.PushPlayerBudgets;
-import CardGame.Requests.RequestGetPlayerBudgets;
-import CardGame.Requests.RequestProtocol;
-import CardGame.Responses.ResponseBet;
 import CardGame.Responses.ResponseProtocol;
-import CardGame.Responses.ResponseQuitGame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,8 +13,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
-import static CardGame.Gui.Screens.LOBBYSCREEN;
 
 /**
  * gameScreen
@@ -59,6 +52,7 @@ public class GameScreen extends JPanel implements Observer {
 
     // chat variables
     public DefaultListModel<String> chatMessageModel;
+    public int gameScreenChatOffset;
 
     /**
      * Create the application.
@@ -96,8 +90,9 @@ public class GameScreen extends JPanel implements Observer {
 
 
         // chat variables
+        this.gameScreenChatOffset = 0;
         this.chatMessageModel = new DefaultListModel<>();
-        addMessagesToChatModel(new ArrayList<>(getClientModel().getMessages()));
+//        addMessagesToChatModel(new ArrayList<>(getClientModel().getMessages()));
         this.listChat = new JList<>(this.chatMessageModel);
 
         // create chat window
@@ -483,11 +478,15 @@ public class GameScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
-            // get client messages
-            ArrayList<MessageObject> messages = new ArrayList<>(model.getMessages());
+            // get clientGameOf
+            int clientMsgOffset = model.getMessages().size();
 
             // add to list
-            addMessagesToChatModel(messages);
+            while (gameScreenChatOffset < clientMsgOffset){
+                ArrayList<MessageObject> msg = new ArrayList<>(model.getMessages());
+                this.chatMessageModel.addElement(msg.get(gameScreenChatOffset).toString());
+                gameScreenChatOffset++;
+            }
         }
     }
 

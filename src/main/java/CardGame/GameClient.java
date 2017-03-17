@@ -607,6 +607,9 @@ public class GameClient extends Observable {
 
     // THREAD FOR GETTING MESSAGES
 
+    /**
+     * This method polls the server for messages
+     */
     public void startGettingMessages() {
 
         this.isGettingMessages = true;
