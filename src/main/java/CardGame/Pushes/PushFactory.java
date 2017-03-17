@@ -1,9 +1,9 @@
 package CardGame.Pushes;
 
-import CardGame.CardGameServerThread;
 import CardGame.GameEngine.GameLobby;
 import CardGame.GameEngine.Hand;
 import CardGame.GameEngine.Player;
+import CardGame.GameServerThread;
 import CardGame.User;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import static CardGame.ProtocolTypes.*;
  */
 public class PushFactory {
 
-    public PushProtocol createPush(int type, CardGameServerThread cardGameServerThread) {
+    public PushProtocol createPush(int type, GameServerThread cardGameServerThread) {
         PushProtocol push = null;
 
         GameLobby game = getGame(cardGameServerThread);
@@ -47,7 +47,7 @@ public class PushFactory {
         }
     }
 
-    private GameLobby getGame(CardGameServerThread cardGameServerThread) {
+    private GameLobby getGame(GameServerThread cardGameServerThread) {
         User user = cardGameServerThread.getLoggedInUser();
         return cardGameServerThread.getGame(user);
     }

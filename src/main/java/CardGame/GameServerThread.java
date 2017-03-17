@@ -29,7 +29,7 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  *
  * @Author Tom Brereton
  */
-public class CardGameServerThread implements Runnable {
+public class GameServerThread implements Runnable {
     private Socket toClientSocket;
     private DataOutputStream pushOutputStream;
     private boolean clientAlive;
@@ -39,7 +39,7 @@ public class CardGameServerThread implements Runnable {
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
     private Gson gson;
-    private CardGameServer server;
+    private GameServer server;
     private String gameJoined;
 
     // Shared data structures
@@ -50,14 +50,14 @@ public class CardGameServerThread implements Runnable {
     private volatile CopyOnWriteArrayList<String> gameNames;
 
 
-    public CardGameServerThread(CardGameServer server,
-                                Socket toClientSocket,
-                                ConcurrentLinkedDeque<MessageObject> messageQueue,
-                                ConcurrentLinkedDeque<Socket> socketList,
-                                CopyOnWriteArrayList<User> users,
-                                FunctionDB functionsDB,
-                                CopyOnWriteArrayList<GameLobby> games,
-                                CopyOnWriteArrayList<String> gameNames) {
+    public GameServerThread(GameServer server,
+                            Socket toClientSocket,
+                            ConcurrentLinkedDeque<MessageObject> messageQueue,
+                            ConcurrentLinkedDeque<Socket> socketList,
+                            CopyOnWriteArrayList<User> users,
+                            FunctionDB functionsDB,
+                            CopyOnWriteArrayList<GameLobby> games,
+                            CopyOnWriteArrayList<String> gameNames) {
         this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
