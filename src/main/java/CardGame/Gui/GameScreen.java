@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import static CardGame.Gui.Screens.LOBBYSCREEN;
 
@@ -41,8 +42,9 @@ public class GameScreen extends JPanel {
     private JLabel lblCreditsBox = new JLabel();
     private JLabel lblBetBox = new JLabel();
     private JLabel lblBackHud = new JLabel();
-    private JList<String> listChat = new JList<>();
-    private JScrollPane scrollPane = new JScrollPane(listChat);
+    private JList<String> listChat;
+    private JScrollPane scrollPane;
+    public DefaultListModel<String> chatMessageModel;
 
     /**
      * Create the application.
@@ -68,6 +70,20 @@ public class GameScreen extends JPanel {
         lblCreditsBox = new JLabel();
         lblBetBox = new JLabel();
         lblBackHud = new JLabel();
+
+        /**
+         * Create a JList into Chat message box
+         */
+        listChat = new JList<String>();
+        listChat.setValueIsAdjusting(true);
+        listChat.setModel(new DefaultListModel<String>());
+
+		scrollPane  = new JScrollPane(listChat);
+
+        /** test
+         *
+         */
+        chatMessageModel = (DefaultListModel<String>) listChat.getModel();
         setBackground(new Color(46, 139, 87));
         initialize();
 
@@ -81,17 +97,14 @@ public class GameScreen extends JPanel {
      */
     private void initialize() {
 
-        /**
-         * Create a JList into Chat message box
-         */
-        listChat = new JList<String>();
-        listChat.setValueIsAdjusting(true);
-        listChat.setModel(new DefaultListModel<String>());
+
         /**
          * Chat message box as a JScroll Pane
          */
         scrollPane.setBounds(screenFactory.getxOrigin() + 845, screenFactory.getyOrigin() + 40, 160, 340);
         add(scrollPane);
+
+
 
         /**
          * chat label
@@ -423,6 +436,10 @@ public class GameScreen extends JPanel {
         return clientModel;
     }
 
+    public DefaultListModel<String> getChatMessageModel() {
+        return chatMessageModel;
+    }
+
     public void updateBounds() {
         scrollPane.setBounds(screenFactory.getxOrigin() + 845, screenFactory.getyOrigin() + 40, 160, 340);
         lblChat.setBounds(screenFactory.getxOrigin() + 845, screenFactory.getyOrigin() + 10, 205, 35);
@@ -454,26 +471,43 @@ public class GameScreen extends JPanel {
                     ResponseProtocol response = clientModel.requestGetMessages(clientModel.getChatOffset());
                     ResponseGetMessages responseGetMessages = (ResponseGetMessages) response;
                     if (response.getRequestSuccess() == 1) {
-                        DefaultListModel<String> chatMessageModel = (DefaultListModel<String>) listChat.getModel();
-
-                        // keep offset to -1 if getMessages is null
                         if (responseGetMessages.getMessages() != null && !responseGetMessages.getMessages().isEmpty()) {
-
-                            if (clientModel.getChatOffset() < responseGetMessages.getMessages().size()) {
+                            if(clientModel.getChatOffset() < responseGetMessages.getOffset()){
+                                ArrayList<MessageObject> getMessageList = responseGetMessages.getMessages();
+                                    // add all messages to chat message model
+                                    for (MessageObject mo : getMessageList) {
+                                        chatMessageModel.addElement(mo.toString());
+                                    }
                                 // change offest to size of message arraylist
-                                clientModel.setChatOffset(responseGetMessages.getMessages().size());
-                                // add all messages to chat message model
-                                for (MessageObject mo : responseGetMessages.getMessages()) {
-                                    chatMessageModel.addElement(mo.toString());
-                                }
-                            }
-
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                clientModel.setChatOffset(responseGetMessages.getOffset()-1);
                             }
                         }
+
+
+//                        // keep offset to -1 if getMessages is null
+//                        if (responseGetMessages.getMessages() != null && !responseGetMessages.getMessages().isEmpty()) {
+//                            if (clientModel.getChatOffset() < responseGetMessages.getMessages().size()) {
+//                                ArrayList<MessageObject> getMessageList = responseGetMessages.getMessages();
+//
+//                                if(clientModel.getChatOffset() == -1){
+//                                    // add all messages to chat message model
+//                                    for (MessageObject mo : getMessageList) {
+//                                        chatMessageModel.addElement(mo.toString());
+//                                    }
+//                                }else{
+//                                    MessageObject mo = getMessageList.get(getMessageList.size()-1);
+//                                    chatMessageModel.addElement(mo.toString());
+//                                }
+//                                // change offest to size of message arraylist
+//                                clientModel.setChatOffset(getMessageList.size());
+//                            }
+//
+//                        }
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }

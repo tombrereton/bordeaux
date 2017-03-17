@@ -101,6 +101,8 @@ public class ClientModel extends Observable {
         this.dealerHand = new BlackjackHand();
         this.listOfGames = new CopyOnWriteArrayList<>();
 
+        this.chatOffset = -1;
+
         // method which starts a thread to listen for pushes
 //        getPushFromQueue();
     }

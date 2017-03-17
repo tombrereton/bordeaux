@@ -1,8 +1,12 @@
 package CardGame;
 
+import CardGame.Pushes.PushDealerHand;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
+import com.sun.tools.internal.ws.processor.model.Request;
+import com.sun.tools.internal.ws.processor.model.Response;
+import org.omg.CORBA.portable.ResponseHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -250,16 +254,146 @@ public class Client extends Observable {
      * @param message
      * @return
      */
-    public ResponseSendMessage requestSendMessage(String username, String message) {
-
-
+    public ResponseSendMessage requestSendMessage(String message) {
         // create request and send request
-        RequestSendMessage requestSendMessage = new RequestSendMessage(username, message);
+        RequestSendMessage requestSendMessage = new RequestSendMessage(getLoggedInUser().getUserName(), message);
         sendRequest(requestSendMessage);
 
         // get response from server and returnit
         return getResponse(ResponseSendMessage.class);
     }
+
+    /**
+     * send message request
+     * @param offset offset
+     * @return
+     */
+
+    public ResponseGetMessages requestGetMessages(int offset) {
+        // create request and send request
+        RequestGetMessages requestGetMessages = new RequestGetMessages(offset);
+        sendRequest(requestGetMessages);
+
+        // get response from server and returnit
+        return getResponse(ResponseGetMessages.class);
+    }
+
+    /**
+     * send create game request
+     * @return
+     */
+    public ResponseCreateGame requestCreateGame() {
+        // create request and send request
+        RequestCreateGame requestCreateGame = new RequestCreateGame(getLoggedInUser().getUserName());
+        sendRequest(requestCreateGame);
+
+        // get response from server and returnit
+        return getResponse(ResponseCreateGame.class);
+    }
+
+    /**
+     * send join game request
+     * @param gameToJoin
+     * @return
+     */
+    public ResponseJoinGame requestJoinGame(String gameToJoin) {
+        // create request and send request
+        RequestJoinGame requestJoinGame = new RequestJoinGame(gameToJoin,getLoggedInUser().getUserName());
+        sendRequest(requestJoinGame);
+
+        // get response from server and returnit
+        return getResponse(ResponseJoinGame.class);
+    }
+
+    /**
+     * send quit game request
+     * @param gameToQuit
+     * @return
+     */
+    public ResponseQuitGame requestQuitGame(String gameToQuit) {
+        // create request and send request
+        RequestQuitGame requestQuitGame = new RequestQuitGame(gameToQuit,getLoggedInUser().getUserName());
+        sendRequest(requestQuitGame);
+
+        // get response from server and returnit
+        return getResponse(ResponseQuitGame.class);
+    }
+
+    /**
+     * send bet request
+     * @param betAmount
+     * @return
+     */
+    public ResponseBet requestBet(int betAmount) {
+        // create request and send request
+        RequestBet requestBet = new RequestBet(betAmount, getLoggedInUser().getUserName());
+        sendRequest(requestBet);
+
+        // get response from server and returnit
+        return getResponse(ResponseBet.class);
+    }
+
+    /**
+     * send hit request
+     * @return
+     */
+    public ResponseHit requestHit() {
+        // create request and send request
+        RequestHit requestHit = new RequestHit(getLoggedInUser().getUserName());
+        sendRequest(requestHit);
+
+        // get response from server and returnit
+        return getResponse(ResponseHit.class);
+    }
+
+    /**
+     * send double bet request
+     * @return
+     */
+    public ResponseDoubleBet requestDoubleBet() {
+        // create request and send request
+        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(getLoggedInUser().getUserName());
+        sendRequest(requestDoubleBet);
+
+        // get response from server and returnit
+        return getResponse(ResponseDoubleBet.class);
+    }
+
+    /**
+     * send fold bet request
+     * @return
+     */
+    public ResponseFold requestFold() {
+        // create request and send request
+        RequestFold requestFold = new RequestFold(getLoggedInUser().getUserName());
+        sendRequest(requestFold);
+
+        // get response from server and returnit
+        return getResponse(ResponseFold.class);
+    }
+
+    /**
+     * send stand request
+     * @return
+     */
+    public ResponseStand requestStand() {
+        // create request and send request
+        RequestStand requestStand = new RequestStand(getLoggedInUser().getUserName());
+        sendRequest(requestStand);
+
+        // get response from server and returnit
+        return getResponse(ResponseStand.class);
+    }
+
+    public PushDealerHand requestPushDealerHand() {
+        // create request and send request
+        RequestGetDealerHand requestGetDealerHand = new RequestGetDealerHand();
+        sendRequest(requestGetDealerHand);
+
+        // get response from server and returnit
+        return getResponse(PushDealerHand.class);
+    }
+
 
 
 
