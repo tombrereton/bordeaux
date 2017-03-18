@@ -47,7 +47,7 @@ public class GameClient extends Observable {
 
     // chat variables
     private int chatOffset;
-    private ConcurrentLinkedDeque<MessageObject> messages;
+    private volatile ConcurrentLinkedDeque<MessageObject> messages;
 
     // Threads
     Thread gameNamesThread;
@@ -151,8 +151,10 @@ public class GameClient extends Observable {
             // write request to server
             this.serverOutputStream.writeUTF(jsonOutput);
             this.serverOutputStream.flush();
+        } catch (NullPointerException e) {
+            System.out.println("Server down.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server down.");
         }
     }
 
@@ -175,7 +177,7 @@ public class GameClient extends Observable {
             // print out response
             System.out.println(jsonInput);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server down. Please try restarting client");
         }
 
         setChanged();
@@ -228,8 +230,14 @@ public class GameClient extends Observable {
         RequestLoginUser requestLoginUser = new RequestLoginUser(user);
         sendRequest(requestLoginUser);
 
-        // get the response from the server
-        ResponseLoginUser responseLoginUser = getResponse(ResponseLoginUser.class);
+        ResponseLoginUser responseLoginUser = null;
+        try {
+            // get the response from the server
+            responseLoginUser = getResponse(ResponseLoginUser.class);
+        } catch (NullPointerException e) {
+            System.out.println("Cannot log in, trying to reconnect.");
+            connectToServer();
+        }
         int success = responseLoginUser.getRequestSuccess();
 
         // log user in if successful
@@ -265,7 +273,7 @@ public class GameClient extends Observable {
         ResponseRegisterUser responseRegisterUser = getResponse(ResponseRegisterUser.class);
         int success = responseRegisterUser.getRequestSuccess();
 
-        if (success == 1){
+        if (success == 1) {
             setCurrentScreen(LOGINSCREEN);
         }
 
@@ -319,7 +327,7 @@ public class GameClient extends Observable {
      * @return
      */
 
-    public ResponseGetMessages requestGetMessages(int offset) {
+    public synchronized ResponseGetMessages requestGetMessages(int offset) {
         // create request and send request
         RequestGetMessages requestGetMessages = new RequestGetMessages(offset);
         sendRequest(requestGetMessages);
@@ -390,6 +398,9 @@ public class GameClient extends Observable {
             startGettingGameNames();
             messages.clear();
             setChatOffset(-1);
+
+//            setChanged();
+//            notifyObservers();
         }
 
         return responseQuitGame;
@@ -476,7 +487,7 @@ public class GameClient extends Observable {
         return getResponse(PushDealerHand.class);
     }
 
-    public PushGameNames requestGetGameNames() {
+    public synchronized PushGameNames requestGetGameNames() {
         // create request and send request
         RequestGetGameNames requestGetGameNames = new RequestGetGameNames();
         sendRequest(requestGetGameNames);
@@ -595,16 +606,33 @@ public class GameClient extends Observable {
         // create the job
         Runnable gameNamesJob = () -> {
 
-            while (isGettingGames) {
-                PushGameNames pushGameNames = requestGetGameNames();
-                getListOfGames().addAll(pushGameNames.getGameNames());
+            try {
+                while (isGettingGames) {
+                    PushGameNames pushGameNames = requestGetGameNames();
 
-                try {
+                    ArrayList<String> responseGamesNames = pushGameNames.getGameNames();
+                    getListOfGames().clear();
+                    getListOfGames().addAll(responseGamesNames);
+
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
-            }
+            } catch (NullPointerException e) {
+                System.out.println("Can't get game names. Server down.");
+            } catch (InterruptedException e) {
+                System.out.println("Polling for game list interrupted.");
+            } //finally {
+//                    while (socket.isClosed()){
+//                        connectToServer();
+//                        try {
+//                            requestLogin(getLoggedInUser().getUserName(), getLoggedInUser().getPassword());
+//                            Thread.sleep(2000);
+//                        } catch (NullPointerException e){
+//                            System.out.println("Still can't log in, server is down.");
+//                        } catch (InterruptedException e) {
+//                            System.out.println("Trying to reconnect");
+//                        }
+//                    }
+//                }
         };
 
         gameNamesThread = new Thread(gameNamesJob);
@@ -652,6 +680,8 @@ public class GameClient extends Observable {
 
                 try {
                     Thread.sleep(100);
+                } catch (NullPointerException e) {
+                    System.out.println("Server down.");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -673,7 +703,7 @@ public class GameClient extends Observable {
         return messages;
     }
 
-    public void addMessages(ArrayList<MessageObject> messages) {
+    public synchronized void addMessages(ArrayList<MessageObject> messages) {
         for (MessageObject mo : messages) {
             this.messages.add(mo);
         }
