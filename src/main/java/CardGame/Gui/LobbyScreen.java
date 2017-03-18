@@ -153,13 +153,13 @@ public class LobbyScreen extends JPanel implements Observer {
         add(btnCreateGame);
     }
 
-    public void updateBounds() {
-        lblLobby.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
-        btnBack.setBounds(10, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
-        gameList.setBounds(50, 50, screenFactory.getScreenWidthCurrent() - 120, screenFactory.getScreenHeightCurrent() - 160);
-        btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent() - 180, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
-        btnCreateGame.setBounds(screenFactory.getxOrigin() + 428, screenFactory.getScreenHeightCurrent() - 70, 150, 23);
-    }
+	public void updateBounds(){
+		lblLobby.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
+		btnBack.setBounds(50, screenFactory.getScreenHeightCurrent()-100, 300, 50);
+		gameList.setBounds(50, 50, screenFactory.getScreenWidthCurrent()-120, screenFactory.getScreenHeightCurrent()-160);
+		btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent()-370, screenFactory.getScreenHeightCurrent()-100, 300, 50);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+352, screenFactory.getScreenHeightCurrent()-100, 300, 50);
+	}
 
     public ArrayList<String> getListOfGames() {
         return listOfGames;

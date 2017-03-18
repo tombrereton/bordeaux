@@ -136,7 +136,7 @@ public class HomeScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        btnLogout.setBounds(screenFactory.getScreenWidthCurrent() - 130, 10, 104, 23);
+        btnLogout.setBounds(screenFactory.getScreenWidthCurrent() - 130, 10, 100, 30);
         lblWelcome.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
         btnGoToLobby.setBounds(screenFactory.getxOrigin() + 148, screenFactory.getyOrigin() + 174, 165, 34);
         btnStatistics.setBounds(screenFactory.getxOrigin() + 148, screenFactory.getyOrigin() + 271, 165, 34);

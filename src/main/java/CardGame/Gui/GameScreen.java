@@ -24,28 +24,30 @@ public class GameScreen extends JPanel implements Observer {
     private GameClient client;
     private ScreenFactory screenFactory;
 
-    private JTextArea textArea;
-    private JLabel lblChat = new JLabel("Chat");
-    private JButton btnSendMessage = new JButton();
-    private JButton btnDoubleDown = new JButton();
-    private JButton btnStand = new JButton();
-    private JButton btnHit = new JButton();
-    private JButton btnFold = new JButton();
-    private JLabel lblCredits = new JLabel("Credits: \u00A31000");
-    private JLabel lblSubmitBet = new JLabel("Bet to be placed");
-    private JButton btnSubmitBet = new JButton();
-    private JButton btnBet1 = new JButton();
-    private JButton btnBet2 = new JButton();
-    private JButton btnBet3 = new JButton();
-    private JButton btnBet4 = new JButton();
-    private JButton btnLeaveGame = new JButton("Leave Game");
-    private JLabel lblCreditsBox = new JLabel();
-    private JLabel lblBetBox = new JLabel();
-    private JLabel lblBackHud = new JLabel();
-    private JList<String> listChat;
-    private JScrollPane scrollPane;
+	private JTextArea textArea;
+	private JList<String> listChat
+ 	private JScrollPane scrollPane;
+	private JLabel lblChat;
+	private JButton btnSendMessage;
+	private JButton btnDoubleDown;
+	private JButton btnStand;
+	private JButton btnHit;
+	private JButton btnFold;
+	private JLabel lblCredits;
+	private JLabel lblSubmitBet;
+	private JButton btnSubmitBet;
+	private JButton btnBet1;
+	private JButton btnBet2;
+	private JButton btnBet3;
+	private JButton btnBet4;
+	private JButton btnLeaveGame;
+	private JLabel lblCreditsBox;
+	private JLabel lblSubmitBetBox;
+	private JLabel lblBackHud;
     private JLabel lblSideHud;
     private JLabel lblSideFillHud;
+
+    private JLabel lblDeck;
 
     private int amountToBet;
     private int credits;
@@ -70,24 +72,28 @@ public class GameScreen extends JPanel implements Observer {
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
-        btnDoubleDown = new JButton();
-        btnStand = new JButton();
-        btnHit = new JButton();
-        btnFold = new JButton();
-        lblCredits = new JLabel("Credits: £ " + Integer.toString(credits));
-        lblSubmitBet = new JLabel(Integer.toString(amountToBet));
-        btnSubmitBet = new JButton();
+        btnLeaveGame = new JButton("Leave");
+
         btnBet1 = new JButton();
         btnBet2 = new JButton();
         btnBet3 = new JButton();
         btnBet4 = new JButton();
-        btnLeaveGame = new JButton("Leave Game");
+        btnDoubleDown = new JButton();
+        btnStand = new JButton();
+        btnHit = new JButton();
+        btnFold = new JButton();
+
+        lblCredits = new JLabel("Credits: £ " + Integer.toString(credits));
         lblCreditsBox = new JLabel();
-        lblBetBox = new JLabel();
+        lblSubmitBet = new JLabel(Integer.toString(amountToBet));
+        lblSubmitBetBox = new JLabel();
+        btnSubmitBet = new JButton();
+
         lblBackHud = new JLabel();
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
+        lblDeck = new JLabel();
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -388,17 +394,16 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(lblCreditsBox);
 
-        /**
-         * Bet Box
-         */
-
-        try {
-            Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
-            lblBetBox.setIcon(new ImageIcon(imgSubmitBox));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblBetBox);
+		/**
+		 * Bet Box
+		 */
+		try {
+			Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
+			lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(lblSubmitBetBox);
 
         /**
          * Back hud
@@ -423,7 +428,17 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(lblSideHud);
-    }
+
+	/**
+		 * Player positions and cards
+		 */
+		try {
+			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
+			lblDeck.setIcon(new ImageIcon(imgDeck));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(lblDeck);}
 
     public GameClient getClientModel() {
         return client;
@@ -433,30 +448,29 @@ public class GameScreen extends JPanel implements Observer {
         return chatMessageModel;
     }
 
-    public void updateBounds() {
-        scrollPane.setBounds(screenFactory.getxOrigin() + 850, 50, screenFactory.getxOrigin() + 150, screenFactory.getyOrigin() + 360);
-        textArea.setBounds(screenFactory.getxOrigin() + 850, screenFactory.getyOrigin() + 420, screenFactory.getxOrigin() + 150, screenFactory.getyOrigin() + 50);
-        lblChat.setBounds(screenFactory.getxOrigin() + 850, 10, 205, 35);
-        lblSideHud.setBounds(screenFactory.getxOrigin() + 800, screenFactory.getScreenHeightCurrent() - 1390, 66, 1324);
-        lblSideFillHud.setBounds(screenFactory.getxOrigin() + 850, 0, screenFactory.getScreenWidthCurrent(), screenFactory.getyOrigin() + 600);
-        btnSendMessage.setBounds(845 + (int) (screenFactory.getxOrigin() * 1.5), screenFactory.getScreenHeightCurrent() - 105, 159, 60);
-        btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent() - 120, 12, 100, 23);
-        btnDoubleDown.setBounds(740, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
-        btnStand.setBounds(640, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
-        btnHit.setBounds(540, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
-        btnFold.setBounds(440, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
-        lblCredits.setBounds(30, screenFactory.getScreenHeightCurrent() - 81, 200, 35);
-        lblSubmitBet.setBounds(30, screenFactory.getScreenHeightCurrent() - 121, 92, 35);
-        btnSubmitBet.setBounds(5, screenFactory.getScreenHeightCurrent() - 226, 98, 91);
-        btnBet1.setBounds(105, screenFactory.getScreenHeightCurrent() - 206, 81, 81);
-        btnBet2.setBounds(186, screenFactory.getScreenHeightCurrent() - 166, 81, 81);
-        btnBet3.setBounds(267, screenFactory.getScreenHeightCurrent() - 136, 81, 81);
-        btnBet4.setBounds(353, screenFactory.getScreenHeightCurrent() - 126, 81, 81);
-
-        lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent() - 86, 241, 42);
-        lblBetBox.setBounds(10, screenFactory.getScreenHeightCurrent() - 126, 144, 45);
-        lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent() - 176, 2590, 204);
-    }
+	public void updateBounds(){
+		scrollPane.setBounds(screenFactory.getxOrigin()+850, 50,screenFactory.getxOrigin()+150, screenFactory.getScreenHeightCurrent()-230);
+		textArea.setBounds(screenFactory.getxOrigin()+850, screenFactory.getScreenHeightCurrent()-170, screenFactory.getxOrigin()+150, 60);
+        lblChat.setBounds(screenFactory.getxOrigin()+850, 10, 205, 35);
+        lblSideHud.setBounds(screenFactory.getxOrigin()+800, screenFactory.getScreenHeightCurrent()-1500, 66, 1434);
+        lblSideFillHud.setBounds(screenFactory.getxOrigin()+850, 0,screenFactory.getScreenWidthCurrent(), screenFactory.getyOrigin()+800);
+        btnSendMessage.setBounds(845+(int)(screenFactory.getxOrigin()*1.5), screenFactory.getScreenHeightCurrent()-105, 159, 60);
+		btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent()-120, 10, 100, 30);
+		btnDoubleDown.setBounds(740, screenFactory.getScreenHeightCurrent()-100, 98, 55);
+		btnStand.setBounds(640, screenFactory.getScreenHeightCurrent()-100, 98, 55);
+		btnHit.setBounds(540, screenFactory.getScreenHeightCurrent()-100, 98, 55);
+		btnFold.setBounds(440, screenFactory.getScreenHeightCurrent()-100, 98, 55);
+		lblCredits.setBounds(30, screenFactory.getScreenHeightCurrent()-81, 200, 35);
+		lblSubmitBet.setBounds(30, screenFactory.getScreenHeightCurrent()-121, 92, 35);
+        btnSubmitBet.setBounds(5, screenFactory.getScreenHeightCurrent()-226, 98, 91);
+		btnBet1.setBounds(105, screenFactory.getScreenHeightCurrent()-206, 81, 81);
+		btnBet2.setBounds(186, screenFactory.getScreenHeightCurrent()-166, 81, 81);
+		btnBet3.setBounds(267, screenFactory.getScreenHeightCurrent()-136, 81, 81);
+		btnBet4.setBounds(353, screenFactory.getScreenHeightCurrent()-126, 81, 81);
+		lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent()-86, 241, 42);
+		lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent()-126, 144, 45);
+		lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent()-176, 2590, 204);
+	lblDeck.setBounds(screenFactory.getxOrigin()+720, 50, 64, 93);}
 
     public int getAmountToBet() {
         return amountToBet;

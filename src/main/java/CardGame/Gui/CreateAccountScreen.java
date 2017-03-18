@@ -138,21 +138,21 @@ public class CreateAccountScreen extends JPanel {
         add(btnSignUp);
     }
 
-    public void updateBounds() {
-        btnSignUp.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 392, 146, 23);
-        btnBack.setBounds(10, screenFactory.getScreenHeightCurrent() - 70, 89, 23);
-        emailField.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 338, 146, 20);
-        passwordField.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 308, 146, 20);
-        usernameField.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 278, 146, 20);
-        lastnameField.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 248, 146, 20);
-        firstnameField.setBounds(screenFactory.getxOrigin() + 501, screenFactory.getyOrigin() + 218, 146, 20);
-        lblEmail.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 338, 83, 14);
-        lblPassword.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 308, 83, 14);
-        lblUsername.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 278, 83, 14);
-        lblLastName.setBounds(screenFactory.getxOrigin() + 391, screenFactory.getyOrigin() + 248, 83, 14);
-        lblFirstName.setBounds(screenFactory.getxOrigin() + 374, screenFactory.getyOrigin() + 218, 100, 14);
-        lblCreateNewAccount.setBounds(screenFactory.getxOrigin() + 408, screenFactory.getyOrigin() + 121, 207, 23);
-    }
+	public void updateBounds(){
+		btnSignUp.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+392, 146, 23);
+		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
+		emailField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+338, 146, 20);
+		passwordField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+308, 146, 20);
+		usernameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+278, 146, 20);
+		lastnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+248, 146, 20);
+		firstnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+218, 146, 20);
+		lblEmail.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+338, 83, 14);
+		lblPassword.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+308, 83, 14);
+		lblUsername.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+278, 83, 14);
+		lblLastName.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+248, 83, 14);
+		lblFirstName.setBounds(screenFactory.getxOrigin()+374, screenFactory.getyOrigin()+218, 100, 14);
+		lblCreateNewAccount.setBounds(screenFactory.getxOrigin()+408, screenFactory.getyOrigin()+121, 207, 23);
+	}
 
     public GameClient getClientModel() {
         return client;
