@@ -78,37 +78,37 @@ public class GameServerThread implements Runnable {
      */
     @Override
     public void run() {
-            try {
-                while (clientAlive) {
-                    // We read in the request from the client and handle it
-                    ResponseProtocol response = handleInput(inputStream.readUTF());
+        try {
+            while (clientAlive) {
+                // We read in the request from the client and handle it
+                ResponseProtocol response = handleInput(inputStream.readUTF());
 
-                    // We write the response to the client
-                    outputStream.writeUTF(encodeResponse(response));
-                    outputStream.flush();
-                    System.out.println(response);
+                // We write the response to the client
+                outputStream.writeUTF(encodeResponse(response));
+                outputStream.flush();
+                System.out.println(response);
 
-                    // sleep thread
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                // sleep thread
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (EOFException e) {
-                System.out.println("GameClient disconnected.: " + e.toString());
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-            } finally {
-                // log user out of client and game on disconnect
-                if (gameJoined != null){
-                    quitGame(gameJoined,getLoggedInUser().getUserName());
-                }
-                logUserOut();
-                System.out.println("Logged in user set to: " + getLoggedInUser());
-                closeConnections();
             }
+        } catch (EOFException e) {
+            System.out.println("GameClient disconnected.: " + e.toString());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // log user out of client and game on disconnect
+            if (gameJoined != null) {
+                quitGame(gameJoined, getLoggedInUser().getUserName());
+            }
+            logUserOut();
+            System.out.println("Logged in user set to: " + getLoggedInUser());
+            closeConnections();
+        }
     }
 
     private void connectStreams() {
@@ -132,7 +132,7 @@ public class GameServerThread implements Runnable {
             this.outputStream.close();
             this.toClientSocket.close();
             this.pushOutputStream.close();
-        } catch (NullPointerException e ) {
+        } catch (NullPointerException e) {
             System.out.println("Problem closing connection due to null pointer");
         } catch (IOException e) {
             System.out.println("Problem closing connections.");
@@ -544,7 +544,7 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private void quitGame(String gameToQuit, String requestUsername) {
-        if (getGame(gameToQuit) != null && getGame(gameToQuit).getPlayer(requestUsername) != null){
+        if (getGame(gameToQuit) != null && getGame(gameToQuit).getPlayer(requestUsername) != null) {
             getGame(gameToQuit).removePlayer(requestUsername);
             this.gameJoined = null;
 
@@ -915,7 +915,7 @@ public class GameServerThread implements Runnable {
 
         if (this.games.size() != 0) {
             for (GameLobby game : games) {
-                if (!gameNames.contains(game.getLobbyName())){
+                if (!gameNames.contains(game.getLobbyName())) {
                     this.gameNames.add(game.getLobbyName());
                 }
             }
