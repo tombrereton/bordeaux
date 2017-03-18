@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+
 /**
  * gameScreen
  *
@@ -48,7 +49,13 @@ public class GameScreen extends JPanel implements Observer {
     private JLabel lblSideFillHud;
 
     private JLabel lblDeck;
+	private PlayerGui dealerGui;
+    private PlayerGui playerGui1;
+	private PlayerGui playerGui2;
+	private PlayerGui playerGui3;
+	private PlayerGui playerGui4;
 
+    //current credits and bets
     private int amountToBet;
     private int credits;
 
@@ -93,7 +100,13 @@ public class GameScreen extends JPanel implements Observer {
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
-        lblDeck = new JLabel();
+		//board images and players
+		lblDeck = new JLabel();
+		playerGui1 = new PlayerGui("14");
+		playerGui2 = new PlayerGui("31");
+		playerGui3 = new PlayerGui("5");
+		playerGui4 = new PlayerGui("3");
+		dealerGui = new PlayerGui("1");
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -270,9 +283,9 @@ public class GameScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
                 credits = credits - amountToBet;
                 ResponseProtocol response = client.requestBet(amountToBet);
-                if (response.getRequestSuccess() == 1){
+                if (response.getRequestSuccess() == 1) {
                     PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
-                    if(responseBudgets.getRequestSuccess() == 1){
+                    if (responseBudgets.getRequestSuccess() == 1) {
                         lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
                     }
                 }
@@ -362,19 +375,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-        /**
-         * Player positions and cards
-         */
-//		JLabel lblDeck = new JLabel();
-//		lblDeck.setBounds(700, 100, 241, 42);
-//		try {
-//			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
-//			lblDeck.setIcon(new ImageIcon(imgDeck));
-//		} catch (Exception ex) {
-//			System.out.println(ex);
-//		}
-//		add(lblDeck);
-
 
         /**
          * leave game button
@@ -406,21 +406,19 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(lblCreditsBox);
 
-		/**
-		 * Bet Box
-		 */
-		try {
-			Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
-			lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblSubmitBetBox);
-
         /**
-         * Back hud
+         * Bet Box
          */
+        try {
+            Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
+            lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblSubmitBetBox);
 
+
+        //Hud background, lblBackHud, lblSideHud, lblSideFillHud
         try {
             Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
             lblBackHud.setIcon(new ImageIcon(imgHud));
@@ -441,16 +439,22 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(lblSideHud);
 
-	/**
-		 * Player positions and cards
-		 */
-		try {
-			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
-			lblDeck.setIcon(new ImageIcon(imgDeck));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblDeck);}
+
+        //Player positions and board images: lblDeck, playerGui1, playerGui2, playerGui3, playerGui4
+        try {
+            Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
+            lblDeck.setIcon(new ImageIcon(imgDeck));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblDeck);
+
+        add(dealerGui);
+        add(playerGui1);
+        add(playerGui2);
+        add(playerGui3);
+        add(playerGui4);
+    }
 
     public GameClient getClientModel() {
         return client;
@@ -482,7 +486,14 @@ public class GameScreen extends JPanel implements Observer {
 		lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent()-86, 241, 42);
 		lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent()-126, 144, 45);
 		lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent()-176, 2590, 204);
-	lblDeck.setBounds(screenFactory.getxOrigin()+720, 50, 64, 93);}
+        lblDeck.setBounds(screenFactory.getxOrigin()+650, 20, 64, 93);
+
+		dealerGui.setBounds((int)(screenFactory.getxOrigin()*0.5)+320, 20, 200, 200);
+		playerGui1.setBounds(20, screenFactory.getScreenHeightCurrent()-425, 200, 200);
+		playerGui2.setBounds((int)(screenFactory.getxOrigin()*0.3)+220, screenFactory.getScreenHeightCurrent()-350, 200, 200);
+		playerGui3.setBounds((int)(screenFactory.getxOrigin()*0.7)+420, screenFactory.getScreenHeightCurrent()-350, 200, 200);
+		playerGui4.setBounds(screenFactory.getxOrigin()+620, screenFactory.getScreenHeightCurrent()-425, 200, 200);
+	}
 
     public int getAmountToBet() {
         return amountToBet;
