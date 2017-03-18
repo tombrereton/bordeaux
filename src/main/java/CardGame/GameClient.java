@@ -237,7 +237,7 @@ public class GameClient extends Observable {
      * @param username
      * @param password
      */
-    public ResponseLoginUser requestLogin(String username, String password) {
+    public synchronized ResponseLoginUser requestLogin(String username, String password) {
         // hash password and create user
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword);
@@ -276,7 +276,7 @@ public class GameClient extends Observable {
      * @param lastName
      * @return
      */
-    public ResponseRegisterUser requestRegisterUser(String username, String password, String firstName, String lastName) {
+    public synchronized ResponseRegisterUser requestRegisterUser(String username, String password, String firstName, String lastName) {
         // hash password and create user
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword, firstName, lastName);
@@ -302,7 +302,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseLogOut requestLogOut() {
+    public synchronized ResponseLogOut requestLogOut() {
         // create request and send request
         RequestLogOut requestLogOut = new RequestLogOut(getLoggedInUser().getUserName());
         sendRequest(requestLogOut);
@@ -357,7 +357,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseCreateGame requestCreateGame() {
+    public synchronized ResponseCreateGame requestCreateGame() {
         // create request and send request
         RequestCreateGame requestCreateGame = new RequestCreateGame(getLoggedInUser().getUserName());
         sendRequest(requestCreateGame);
@@ -372,7 +372,7 @@ public class GameClient extends Observable {
      * @param gameToJoin
      * @return
      */
-    public ResponseJoinGame requestJoinGame(String gameToJoin) {
+    public synchronized ResponseJoinGame requestJoinGame(String gameToJoin) {
         // create request and send request
         RequestJoinGame requestJoinGame = new RequestJoinGame(gameToJoin, getLoggedInUser().getUserName());
         sendRequest(requestJoinGame);
@@ -399,7 +399,7 @@ public class GameClient extends Observable {
      * @param gameToQuit
      * @return
      */
-    public ResponseQuitGame requestQuitGame(String gameToQuit) {
+    public synchronized ResponseQuitGame requestQuitGame(String gameToQuit) {
         // create request and send request
         RequestQuitGame requestQuitGame = new RequestQuitGame(gameToQuit, getLoggedInUser().getUserName());
         sendRequest(requestQuitGame);
