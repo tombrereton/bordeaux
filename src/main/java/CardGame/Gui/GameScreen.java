@@ -145,6 +145,8 @@ public class GameScreen extends JPanel implements Observer {
 
         /**
          * Send message button
+         *
+         * And display the error if not successful
          */
         btnSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -194,12 +196,25 @@ public class GameScreen extends JPanel implements Observer {
         textArea.setColumns(10);
 
         /**
-         * Game buttons
+         * Double Bet button
+         *
+         * And display the error if not successful
          */
         //DoubleDown Button
         btnDoubleDown.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                client.requestDoubleBet();
+
+                // send a double down request to server
+                ResponseProtocol responseProtocol =  client.requestDoubleBet();
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
             }
         });
         btnDoubleDown.setContentAreaFilled(false);
@@ -212,10 +227,25 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnDoubleDown);
 
-        //Stand Button
+
+        /**
+         * Stand button
+         *
+         * And display the error if not successful
+         */
         btnStand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                client.requestStand();
+                // send a stand request to server
+                ResponseProtocol responseProtocol = client.requestStand();
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
             }
         });
         btnStand.setContentAreaFilled(false);
@@ -228,10 +258,24 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnStand);
 
-        //Hit Button
+        /**
+         * Hit Button
+         *
+         * And display the error if not successful
+         */
         btnHit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                client.requestHit();
+                // send a hit request to server
+                ResponseProtocol responseProtocol = client.requestHit();
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
             }
         });
 
@@ -245,10 +289,23 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnHit);
 
-        //Hold Button
+        /**
+         * Hold Button
+         *
+         * And display the error if not successful
+         */
         btnFold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                client.requestFold();
+                // send a hold request to server
+                ResponseProtocol responseProtocol = client.requestFold();
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
@@ -278,7 +335,11 @@ public class GameScreen extends JPanel implements Observer {
         lblSubmitBet.setForeground(Color.BLACK);
         add(lblSubmitBet);
 
-        //Submit Bet
+        /**
+         * Submit Bet Button
+         *
+         * And display the error if not successful
+         */
         btnSubmitBet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 credits = credits - amountToBet;
@@ -287,6 +348,12 @@ public class GameScreen extends JPanel implements Observer {
                     PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
                     if (responseBudgets.getRequestSuccess() == 1) {
                         lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
+                    }else if(response.getRequestSuccess()==0){
+                        String errorMsg = response.getErrorMsg();
+                        if (response.getRequestSuccess() == 0){
+                            JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                                    JOptionPane.WARNING_MESSAGE);
+                        }
                     }
                 }
                 amountToBet = 0;
