@@ -523,7 +523,9 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayerBets);
 
         // get response from server and returnit
-        return getResponse(PushPlayerBets.class);
+        PushPlayerBets pushPlayerBets = getResponse(PushPlayerBets.class);
+        this.playerBets = pushPlayerBets.getPlayerBets();
+        return pushPlayerBets;
     }
 
     public synchronized PushPlayerBudgets requestGetPlayerBudgets() {
@@ -532,7 +534,9 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayerBudgets);
 
         // get response from server and returnit
-        return getResponse(PushPlayerBudgets.class);
+        PushPlayerBudgets pushPlayerBudgets = getResponse(PushPlayerBudgets.class);
+        this.playerBudgets = pushPlayerBudgets.getPlayerBudgets();
+        return pushPlayerBudgets;
     }
 
     public synchronized PushPlayersBust requestGetPlayersBust() {
@@ -553,7 +557,9 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayerHands);
 
         // get response from server and returnit
-        return getResponse(PushPlayerHands.class);
+        PushPlayerHands pushPlayerHands = getResponse(PushPlayerHands.class);
+        this.playerHands = pushPlayerHands.getPlayerHands();
+        return pushPlayerHands;
     }
 
     public synchronized PushPlayerNames requestGetPlayerNames() {
@@ -740,16 +746,13 @@ public class GameClient extends Observable {
         requestGetDealerHand();
 
         // player bets
-        PushPlayerBets pushPlayerBets = requestGetPlayerBets();
-        playerBets = pushPlayerBets.getPlayerBets();
+        requestGetPlayerBets();
 
         // player budgets
-        PushPlayerBudgets pushPlayerBudgets = requestGetPlayerBudgets();
-        playerBudgets = pushPlayerBudgets.getPlayerBudgets();
+        requestGetPlayerBudgets();
 
         // player hands
-        PushPlayerHands pushPlayerHands = requestGetPlayerHands();
-        playerHands = pushPlayerHands.getPlayerHands();
+        requestGetPlayerHands();
 
         // player names
         requestGetPlayerNames();
