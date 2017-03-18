@@ -182,8 +182,6 @@ public class GameLobby {
         for (Player player : players) {
             if (player.getUsername().equals(username)) {
                 return player;
-            } else {
-                return null;
             }
         }
         return null;

@@ -1,6 +1,7 @@
 package CardGame.Gui;
 
 import CardGame.GameClient;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -10,7 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -22,7 +22,6 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
-    private HashSet<String> listOfGames;
     private String gameName;
 
     private GameClient client;
@@ -49,7 +48,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
 
         // gameJList variables
-        this.listOfGames = new HashSet<>();
         this.gameNameListModel = new DefaultListModel();
         this.gameJList = new JList(this.gameNameListModel);
         this.lobbyGamesOffset = 0;
@@ -107,7 +105,7 @@ public class LobbyScreen extends JPanel implements Observer {
 
                 // we get the game name with the index
                 ArrayList<String> games = new ArrayList<>(getClientModel().getListOfGames());
-                if (games.size() != 0 && games.size() >= selectionIndex) {
+                if (games.size() != 0 && games.size() > selectionIndex) {
                     String gameNameSelected = games.get(selectionIndex);
 
                     // we set the game name to the game selected
@@ -124,7 +122,15 @@ public class LobbyScreen extends JPanel implements Observer {
         btnJoinGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                getClientModel().requestJoinGame(getGameName());
+                ResponseProtocol responseProtocol = getClientModel().requestJoinGame(getGameName());
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
         btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -138,8 +144,24 @@ public class LobbyScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
 
                 // send request to create a game
-                getClientModel().requestCreateGame();
-                getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
+                ResponseProtocol responseProtocol = getClientModel().requestCreateGame();
+                ResponseProtocol responseProtocol1 = getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                int success2 = responseProtocol1.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                String errorMsg1 = responseProtocol1.getErrorMsg();
+
+                if (success == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                } else if (success2 == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg1, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
+
             }
         });
         btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -153,10 +175,6 @@ public class LobbyScreen extends JPanel implements Observer {
         gameJList.setBounds(50, 50, screenFactory.getScreenWidthCurrent() - 120, screenFactory.getScreenHeightCurrent() - 160);
         btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent() - 370, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
         btnCreateGame.setBounds(screenFactory.getxOrigin() + 352, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
-    }
-
-    public HashSet<String> getListOfGames() {
-        return listOfGames;
     }
 
     public GameClient getClientModel() {
@@ -173,10 +191,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
     public ScreenFactory getScreenFactory() {
         return screenFactory;
-    }
-
-    public void setListOfGames(HashSet<String> listOfGames) {
-        this.listOfGames = listOfGames;
     }
 
     public DefaultListModel getGameNameListModel() {
