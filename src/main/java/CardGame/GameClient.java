@@ -600,7 +600,10 @@ public class GameClient extends Observable {
 
             while (isGettingGames) {
                 PushGameNames pushGameNames = requestGetGameNames();
-                getListOfGames().addAll(pushGameNames.getGameNames());
+
+                ArrayList<String> responseGamesNames = pushGameNames.getGameNames();
+                getListOfGames().clear();
+                getListOfGames().addAll(responseGamesNames);
 
                 try {
                     Thread.sleep(1000);
@@ -680,7 +683,7 @@ public class GameClient extends Observable {
         return messages;
     }
 
-    public void addMessages(ArrayList<MessageObject> messages) {
+    public synchronized void addMessages(ArrayList<MessageObject> messages) {
         for (MessageObject mo : messages) {
             this.messages.add(mo);
         }

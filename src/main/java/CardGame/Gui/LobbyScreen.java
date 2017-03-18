@@ -11,7 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,7 +22,6 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
-    private HashSet<String> listOfGames;
     private String gameName;
 
     private GameClient client;
@@ -50,7 +48,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
 
         // gameJList variables
-        this.listOfGames = new HashSet<>();
         this.gameNameListModel = new DefaultListModel();
         this.gameJList = new JList(this.gameNameListModel);
         this.lobbyGamesOffset = 0;
@@ -180,10 +177,6 @@ public class LobbyScreen extends JPanel implements Observer {
         btnCreateGame.setBounds(screenFactory.getxOrigin() + 352, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
     }
 
-    public HashSet<String> getListOfGames() {
-        return listOfGames;
-    }
-
     public GameClient getClientModel() {
         return client;
     }
@@ -198,10 +191,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
     public ScreenFactory getScreenFactory() {
         return screenFactory;
-    }
-
-    public void setListOfGames(HashSet<String> listOfGames) {
-        this.listOfGames = listOfGames;
     }
 
     public DefaultListModel getGameNameListModel() {
