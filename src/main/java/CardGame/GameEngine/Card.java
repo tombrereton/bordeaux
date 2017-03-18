@@ -119,4 +119,26 @@ public class Card {
     public boolean isFaceUp() {
         return isFaceUp;
     }
+
+    /**
+     * This method creates a 3 digit string ID to reference the card image
+     * For example the Ace of Spaces would be "001"
+     * @return The imageID as a 3 digit String
+     */
+    public String getImageID(){
+        // default image
+        String imageID = "000";
+
+        if (isFaceUp()) {
+            // if face up, get image string
+            imageID = Integer.toString(suit);
+            if (value < 10) {
+                imageID = imageID + "0";
+            }
+
+            imageID = imageID + Integer.toString(value);
+        }
+
+        return imageID;
+    }
 } // end class Card

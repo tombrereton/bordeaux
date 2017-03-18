@@ -855,8 +855,8 @@ public class GameClient extends Observable {
         return playerHands;
     }
 
-    public Set<String> getPlayerNames() {
-        return playerNames;
+    public ArrayList<String> getPlayerNames() {
+        return new ArrayList<>(playerNames);
     }
 
     public Map<String, Boolean> getPlayersBust() {

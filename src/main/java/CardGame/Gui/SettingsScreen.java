@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
 public class SettingsScreen extends JPanel {
 
 	private GameClient client;
-	private BlackjackOnline screenFactory;
+	private BlackjackOnline blackjackOnline;
 
 	private JLabel lblTitle;
 	private JButton btnBack;
@@ -23,9 +23,9 @@ public class SettingsScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen(GameClient client, BlackjackOnline screenFactory) {
+	public SettingsScreen(GameClient client, BlackjackOnline blackjackOnline) {
 		this.client = client;
-		this.screenFactory = screenFactory;
+		this.blackjackOnline = blackjackOnline;
 		lblTitle = new JLabel("Settings");
 		btnBack = new JButton("Back");
 		setBackground(new Color(46, 139, 87));
@@ -59,8 +59,8 @@ public class SettingsScreen extends JPanel {
 	}
 
 	public void updateBounds(){
-		lblTitle.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
-		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
+		lblTitle.setBounds(blackjackOnline.getxOrigin()+391, 10, 242, 34);
+		btnBack.setBounds(10, blackjackOnline.getScreenHeightCurrent()-80, 100, 30);
 	}
 
 	public GameClient getClientModel() {
