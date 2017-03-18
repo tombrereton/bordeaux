@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -10,149 +10,153 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import static CardGame.Gui.Screens.HOMESCREEN;
 
 /**
  * Lobby Screen
- * @author Alex
  *
+ * @author Alex
  */
-public class LobbyScreen extends JPanel {
-//    public String[] listOfGames;
+public class LobbyScreen extends JPanel implements Observer {
     public ArrayList<String> listOfGames;
-    public DefaultListModel model;
     private String gameName;
 
-	private ClientModel clientModel;
-	private ScreenFactory screenFactory;
+    private GameClient client;
+    private ScreenFactory screenFactory;
 
-	private JLabel lblLobby = new JLabel("Lobby");
-	private JButton btnBack = new JButton("Back");
-	private JList list = new JList();
-	private JButton btnJoinGame = new JButton("Join game");
-	private JButton btnCreateGame = new JButton("Create game");
+    private JLabel lblLobby;
+    private JButton btnBack;
+    private JButton btnJoinGame;
+    private JButton btnCreateGame;
 
-	/**
-	 * Create the application.
-	 */
-	public LobbyScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
-		this.screenFactory = screenFactory;
-		this.listOfGames = new ArrayList<>();
-		initialize();
-	}
+    // gameList variables
+    private DefaultListModel gameNameListModel;
+    private JList gameList;
+    private int lobbyGamesOffset;
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
+    /**
+     * Create the application.
+     */
+    public LobbyScreen(GameClient client, ScreenFactory screenFactory) {
+        // we become an observer
+        this.client = client;
+        this.screenFactory = screenFactory;
+        client.addObserver(this);
 
-		lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
-		lblLobby.setForeground(new Color(255, 255, 255));
-		lblLobby.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		add(lblLobby);
-		
-		/**
-		 * back button events
-		 */
-		btnBack.setBackground(new Color(255, 255, 255));
-		btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    getClientModel().setCurrentScreen(HOMESCREEN);
-			}
-		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
-		add(btnBack);
+
+        // gameList variables
+        this.gameNameListModel = new DefaultListModel();
+        this.gameList = new JList(this.gameNameListModel);
+        this.lobbyGamesOffset = 0;
+
+        lblLobby = new JLabel("Lobby");
+        btnBack = new JButton("Back");
+        btnJoinGame = new JButton("Join game");
+        btnCreateGame = new JButton("Create game");
+        setBackground(new Color(46, 139, 87));
+        initialize();
+        updateBounds();
+    }
+
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+
+        lblLobby.setHorizontalAlignment(SwingConstants.CENTER);
+        lblLobby.setFont(new Font("Soho Std", Font.PLAIN, 24));
+        lblLobby.setForeground(new Color(255, 255, 255));
+        add(lblLobby);
+
+        /**
+         * back button events
+         */
+        btnBack.setBackground(new Color(255, 255, 255));
+        btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getClientModel().setCurrentScreen(HOMESCREEN);
+            }
+        });
+
+        add(btnBack);
 
         /**
          * List of games
          */
-		list.setVisibleRowCount(20);
-		list.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		list.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setModel(model = new DefaultListModel() {
-            public int getSize() {
-				return listOfGames.size();
-			}
-			public Object getElementAt(int index) {
-				return listOfGames.get(index);
-			}
-		});
-		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
+        gameList.setVisibleRowCount(20);
+        gameList.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        gameList.setFont(new Font("Soho Std", Font.PLAIN, 18));
+        gameList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		// add listener to list
-        ListSelectionModel listSelectionModel = list.getSelectionModel();
+        // add listener to gameList
+        ListSelectionModel listSelectionModel = gameList.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
 
-                // we get the index of the selected text in the list
+                // we get the index of the selected text in the gameList
                 int selectionIndex = listSelectionEvent.getFirstIndex();
 
                 // we get the game name with the index
-                String gameNameSelected = getListOfGames().get(selectionIndex);
+                ArrayList<String> games = new ArrayList<>(getClientModel().getListOfGames());
+                String gameNameSelected = games.get(selectionIndex);
 
                 // we set the game name to the game selected
                 setGameName(gameNameSelected);
             }
         });
-		add(list);
+        add(gameList);
 
-		/**
-		 * Join button
-		 */
-		btnJoinGame.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    // todo: create this method and somehow get gameName from list
-			    getClientModel().requestJoinGame(getGameName());
-			}
-		});
-		btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnJoinGame.setBackground(Color.WHITE);
-		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
-		add(btnJoinGame);
+        /**
+         * Join button
+         */
+        btnJoinGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                getClientModel().requestJoinGame(getGameName());
+            }
+        });
+        btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnJoinGame.setBackground(Color.WHITE);
+        add(btnJoinGame);
 
         /**
          * Create game button
          */
-		btnCreateGame.addActionListener(new ActionListener() {
+        btnCreateGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: make this show in the list
-                // todo: double check this
+
+                // send request to create a game
                 getClientModel().requestCreateGame();
-                setListOfGames(getClientModel().getListOfGames());
-                model.addElement(getListOfGames());
-                //ScreenFactory.setPane(ScreenFactory.frame.lobbyScreen);
+                getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
             }
         });
-		btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
-		btnCreateGame.setBackground(Color.WHITE);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
+        btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
+        btnCreateGame.setBackground(Color.WHITE);
         add(btnCreateGame);
-
-
-	}
+    }
 
 	public void updateBounds(){
-		lblLobby.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+515, 150, 23);
-		list.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+56, 946, 444);
-		btnJoinGame.setBounds(screenFactory.getxOrigin()+836, screenFactory.getyOrigin()+515, 150, 23);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+428, screenFactory.getyOrigin()+515, 150, 23);
+		lblLobby.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
+		btnBack.setBounds(50, screenFactory.getScreenHeightCurrent()-100, 300, 50);
+		gameList.setBounds(50, 50, screenFactory.getScreenWidthCurrent()-120, screenFactory.getScreenHeightCurrent()-160);
+		btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent()-370, screenFactory.getScreenHeightCurrent()-100, 300, 50);
+		btnCreateGame.setBounds(screenFactory.getxOrigin()+352, screenFactory.getScreenHeightCurrent()-100, 300, 50);
 	}
 
-	public ArrayList<String> getListOfGames() {
-		return listOfGames;
-	}
+    public ArrayList<String> getListOfGames() {
+        return listOfGames;
+    }
 
-	public ClientModel getClientModel() {
-		return clientModel;
-	}
+    public GameClient getClientModel() {
+        return client;
+    }
 
     public void setGameName(String gameName) {
         this.gameName = gameName;
@@ -168,5 +172,38 @@ public class LobbyScreen extends JPanel {
 
     public void setListOfGames(ArrayList<String> listOfGames) {
         this.listOfGames = listOfGames;
+    }
+
+    public DefaultListModel getGameNameListModel() {
+        return gameNameListModel;
+    }
+
+    private void addToList(ArrayList<String> gamesNames) {
+
+        int clientGameOffset = getClientModel().getListOfGames().size();
+
+        while (lobbyGamesOffset < clientGameOffset){
+            ArrayList<String> gameNames = new ArrayList<>(getClientModel().getListOfGames());
+            this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
+
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if (observable instanceof GameClient) {
+            GameClient model = (GameClient) observable;
+
+            // get clientGameOf
+            int clientGameOffset = model.getListOfGames().size();
+
+            // add to list
+            while (lobbyGamesOffset < clientGameOffset){
+                ArrayList<String> gameNames = new ArrayList<>(model.getListOfGames());
+                this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
+                lobbyGamesOffset++;
+            }
+
+        }
     }
 }

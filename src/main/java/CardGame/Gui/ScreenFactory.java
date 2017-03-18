@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +26,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * sets up the screen guis
      * screen ratio 16:9
      */
-    public static JPanel masterPane;
     public static JPanel centerPane;
     public static ScreenFactory frame = null;
     public LoginScreen loginScreen;
@@ -36,38 +35,36 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     public StatisticsScreen statisticsScreen;
     public LobbyScreen lobbyScreen;
     public GameScreen gameScreen;
-    private ClientModel clientModel;
+    private GameClient client;
 
 
     /**
      * screen size variables
      * smallest screen resolution
      */
-    private int screenWidthMin;
-    private int screenHeightMin;
+    public static final int screenWidthMin = 1024;
+    public static final int screenHeightMin = 576;
     private int screenWidthCurrent;
     private int screenHeightCurrent;
     private int xOrigin;
     private int yOrigin;
+
     /**
      * Constructor for the frame
      */
-    public ScreenFactory(ClientModel clientModel) {
+    public ScreenFactory(GameClient client) {
         // add to observer list for notify all
-        this.clientModel = clientModel;
-        clientModel.addObserver(this);
-
+        this.client = client;
+        client.addObserver(this);
 
         // instantiate create account and login screen in constructor
-        this.createAccountScreen = new CreateAccountScreen(clientModel, this);
-        this.loginScreen = new LoginScreen(clientModel, this);
+        this.createAccountScreen = new CreateAccountScreen(client, this);
+        this.loginScreen = new LoginScreen(client, this);
 
-        screenWidthMin = 1024;
-        screenHeightMin = 576;
         screenWidthCurrent = screenWidthMin;
         screenHeightCurrent = screenHeightMin;
-        xOrigin = ((screenWidthCurrent -screenWidthMin)/2);
-        yOrigin = ((screenHeightCurrent-screenHeightMin)/2);
+        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
+        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
 
         // this screen should be created at run time so it can access the
         // logged in user after the user has logged in
@@ -86,18 +83,16 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         addComponentListener(this);
+
     }
+
 
     private void initialiseLoginScreen() {
         centerPane = loginScreen;
-        centerPane.setOpaque(false);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
-        masterPane = new JPanel(new GridBagLayout());
-        masterPane.setBackground(new Color(46, 139, 87));
-        masterPane.add(centerPane);
-        add(masterPane);
+        add(centerPane);
     }
 
     public int getxOrigin() {
@@ -108,7 +103,13 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         return yOrigin;
     }
 
+    public int getScreenWidthCurrent() {
+        return screenWidthCurrent;
+    }
 
+    public int getScreenHeightCurrent() {
+        return screenHeightCurrent;
+    }
 
     /**
      * method for changing between panels
@@ -116,35 +117,33 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * @param panelAdd Panel to add
      */
     public void setPane(JPanel panelAdd) {
-        masterPane.remove(centerPane);
-        centerPane = panelAdd;
-        centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setOpaque(false);
-        centerPane.setLayout(null);
-        masterPane.add(centerPane);
-        frame.repaint();
-        frame.revalidate();
-    }
+        if (centerPane != panelAdd) {
+            frame.remove(centerPane);
+            centerPane = panelAdd;
+            centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+            centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
+            centerPane.setLayout(null);
+            updatePanelBounds();
+            frame.add(centerPane);
+            frame.repaint();
+            frame.revalidate();
 
-    /**
-     *
-     */
-    public void factory() {
-
+//            if (panelAdd == this.lobbyScreen) {
+//                this.lobbyScreen.getGameNameListModel().clear();
+//            }
+        }
     }
 
     @Override
     public void componentResized(ComponentEvent e) {
         screenWidthCurrent = frame.getWidth();
         screenHeightCurrent = frame.getHeight();
-        xOrigin = ((screenWidthCurrent - screenWidthMin)/2);
-        yOrigin = ((screenHeightCurrent- screenHeightMin)/2);
+        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
+        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
-        centerPane.setOpaque(false);
         centerPane.setLayout(null);
-        //TODO: call update bounds method in frame
+        updatePanelBounds();
         frame.repaint();
         frame.revalidate();
     }
@@ -161,25 +160,32 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     public void componentHidden(ComponentEvent e) {
     }
 
-    /**
-     * main method with which to run the gui
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    ClientModel clientModel = new ClientModel();
-                    frame = new ScreenFactory(clientModel);
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    public void updatePanelBounds() {
+        int currentScreen = client.getCurrentScreen();
+        switch (currentScreen) {
+            case 0:
+                loginScreen.updateBounds();
+                break;
+            case 1:
+                createAccountScreen.updateBounds();
+                break;
+            case 2:
+                homeScreen.updateBounds();
+                break;
+            case 3:
+                lobbyScreen.updateBounds();
+                break;
+            case 4:
+                gameScreen.updateBounds();
+                break;
+            case 5:
+                statisticsScreen.updateBounds();
+                break;
+            case 6:
+                settingsScreen.updateBounds();
+                break;
+        }
     }
-
 
 
     /**
@@ -191,8 +197,8 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      */
     @Override
     public void update(Observable observable, Object o) {
-        if (observable instanceof ClientModel) {
-            ClientModel model = (ClientModel) observable;
+        if (observable instanceof GameClient) {
+            GameClient model = (GameClient) observable;
             int currentScreen = model.getCurrentScreen();
 
             switch (currentScreen) {
@@ -203,27 +209,57 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     setPane(this.createAccountScreen);
                     break;
                 case HOMESCREEN:
-                    this.homeScreen = new HomeScreen(model, this);
+                    if (this.homeScreen == null) {
+                        this.homeScreen = new HomeScreen(model, this);
+                    }
                     setPane(this.homeScreen);
                     break;
                 case LOBBYSCREEN:
-                    this.lobbyScreen = new LobbyScreen(model, this);
+                    if (this.lobbyScreen == null) {
+                        this.lobbyScreen = new LobbyScreen(model, this);
+                    }
                     setPane(this.lobbyScreen);
                     break;
                 case GAMESCREEN:
-                    this.gameScreen = new GameScreen(model, this);
+                    if (this.gameScreen == null) {
+                        this.gameScreen = new GameScreen(model, this);
+                    }
                     setPane(this.gameScreen);
                     break;
                 case STATISTICSSCREEN:
-                    this.statisticsScreen = new StatisticsScreen(model, this);
+                    if (this.statisticsScreen == null) {
+                        this.statisticsScreen = new StatisticsScreen(model, this);
+                    }
                     setPane(this.statisticsScreen);
                     break;
                 case SETTINGSSCREEN:
-                    this.settingsScreen = new SettingsScreen(model, this);
+                    if (this.settingsScreen == null) {
+                        this.settingsScreen = new SettingsScreen(model, this);
+                    }
                     setPane(this.settingsScreen);
                     break;
             }
         }
+    }
 
+    /**
+     * main method with which to run the gui
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GameClient gameClient = null;
+                try {
+                    gameClient = new GameClient("localhost", 7654);
+                    frame = new ScreenFactory(gameClient);
+                    frame.setVisible(true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

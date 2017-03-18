@@ -18,10 +18,10 @@ import java.util.concurrent.Executors;
  *
  * @Author Tom Brereton
  */
-public class CardGameServer {
-    private final int port = 7654;
+public class GameServer {
+    private final int PORT = 7654;
+    private final int NUMBER_OF_THREADS = 20;
     private ServerSocket serverSocket;
-    private final int numberOfThreads = 20;
     protected FunctionDB functionDB;
     private Gson gson;
 
@@ -30,10 +30,10 @@ public class CardGameServer {
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
-    private volatile CopyOnWriteArrayList<String> gameNames;
+    private volatile ConcurrentLinkedDeque<String> gameNames;
 
-    public CardGameServer() {
-        this.gameNames = new CopyOnWriteArrayList<>();
+    public GameServer() {
+        this.gameNames = new ConcurrentLinkedDeque<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
         this.socketList = new ConcurrentLinkedDeque<>();
@@ -46,14 +46,14 @@ public class CardGameServer {
     }
 
     public void connectToClients() {
-        ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
+        ExecutorService threadPool = Executors.newFixedThreadPool(this.NUMBER_OF_THREADS);
 
         try {
-            this.serverSocket = new ServerSocket(this.port);
+            this.serverSocket = new ServerSocket(this.PORT);
 
             while (true) {
                 // Wait for a client to connect
-                System.out.println("Waiting for connection from Client");
+                System.out.println("Waiting for connection from GameClient");
                 Socket socket = this.serverSocket.accept();
 
 
@@ -63,7 +63,7 @@ public class CardGameServer {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new ClientThread(this,socket, this.messageQueue,
+                threadPool.execute(new GameServerThread(this,socket, this.messageQueue,
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class CardGameServer {
 
     public static void main(String[] args) throws IOException {
 
-        CardGameServer server = new CardGameServer();
+        GameServer server = new GameServer();
         server.connectToDatabase();
         server.connectToClients();
     }

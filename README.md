@@ -26,7 +26,7 @@ git remote add upstream https://name:password@github.org/repo.git
 - **Dev** Trial program and where we submit our pull requests to.
 - **Feature branches**: whatever feature you are currently working on.
 - Ignore release and dev branches
-![Alt description](http://nvie.com/img/git-model@2x.png)
+![Alt description](http://nvie.com/img/git-clientModel@2x.png)
 
 ---
 ### Creating your own branch and committing

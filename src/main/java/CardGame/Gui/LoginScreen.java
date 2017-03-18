@@ -1,14 +1,13 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
 import CardGame.Responses.ResponseProtocol;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 
@@ -20,28 +19,34 @@ import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
  */
 public class LoginScreen extends JPanel {
 
-	private ClientModel clientModel;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblLogin = new JLabel("BlackJack Online");
-	private JButton btnCreateAccount = new JButton("Create Account");
-	private JButton btnLogin = new JButton("Login");
-	private JLabel lblUsername = new JLabel("Username");
-	private JLabel lblPassword = new JLabel("Password");
-	private JTextField usernameField = new JTextField();
-	private JPasswordField passwordField = new JPasswordField();
-
-	private int xOrigin = 0;
-	private int yOrigin = 0;
+	private JButton btnCreateAccount;
+	private JButton btnLogin;
+	private JLabel lblUsername;
+	private JLabel lblPassword;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
+	private JLabel lblLogo;
 
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
+	public LoginScreen(GameClient client, ScreenFactory screenFactory) {
+		this.client = client;
 		this.screenFactory = screenFactory;
-		initialize();
-	}
+		btnCreateAccount = new JButton("Create Account");
+		btnLogin = new JButton("Login");
+        lblUsername = new JLabel("Username");
+        lblPassword = new JLabel("Password");
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        lblLogo = new JLabel();
+        setBackground(new Color(46, 139, 87));
+        initialize();
+		updateBounds();
+    }
 
 	/**
 	 * Initialize the contents of the panel.
@@ -50,19 +55,23 @@ public class LoginScreen extends JPanel {
 
 		lblUsername.setForeground(new Color(255, 255, 255));
 		lblUsername.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+226, 127, 31);
 		add(lblUsername);
 
 		lblPassword.setForeground(new Color(255, 255, 255));
 		lblPassword.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+283, 101, 17);
 		add(lblPassword);
 
-		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+233, 140, 20);
 		add(usernameField);
 
-		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+283, 140, 20);
 		add(passwordField);
+
+		try {
+			Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageLogo.png"));
+			lblLogo.setIcon(new ImageIcon(imgHud));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(lblLogo);
 		
 		
 		/**
@@ -72,18 +81,25 @@ public class LoginScreen extends JPanel {
 		btnLogin.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO change to handle password fields later
-                getClientModel().requestLogin(usernameField.getText(), String.valueOf(passwordField.getPassword()));
 
+			    // We send a request and get the response
+				String username = usernameField.getText();
+                char[] password = passwordField.getPassword();
+                ResponseProtocol responseProtocol = getClientModel().requestLogin(username, String.valueOf(password));
 
-//			    // If response say success, change screen
-//			    if (clientModel.getCurrentScreen() == HOMESCREEN){
-//			    	screenFactory.screenFactory(HOMESCREEN);
-//					ScreenFactory.setPane(ScreenFactory.frame.homeScreen);
-//				}
+                usernameField.setText("");
+                passwordField.setText("");
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
 			}
 		});
-		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
 		add(btnLogin);
 		
 		/**
@@ -96,32 +112,22 @@ public class LoginScreen extends JPanel {
 			    getClientModel().setCurrentScreen(CREATE_ACCOUNTSCREEN);
 			}
 		});
-		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+418, 160, 30);
 		add(btnCreateAccount);
-		
-		
-		/**
-		 * Main Heading
-		 */
-		lblLogin.setForeground(new Color(255, 255, 255));
-		lblLogin.setFont(new Font("Script MT Bold", Font.BOLD, 36));
-		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogin.setBounds(screenFactory.getxOrigin()+314, screenFactory.getyOrigin()+115, 396, 57);
-		add(lblLogin);
+
 	}
 
 	public void updateBounds(){
-		lblLogin.setBounds(screenFactory.getxOrigin()+314, screenFactory.getyOrigin()+115, 396, 57);
-		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+418, 160, 30);
-		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+332, 140, 30);
-		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+283, 140, 20);
-		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+233, 140, 20);
-		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+283, 101, 17);
-		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+226, 127, 31);
+		lblLogo.setBounds(screenFactory.getxOrigin()+312, screenFactory.getyOrigin()+40, 400, 221);
+		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+480, 160, 30);
+		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+400, 140, 30);
+		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+350, 140, 20);
+		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+300, 140, 20);
+		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+350, 101, 17);
+		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+300, 127, 31);
 	}
 
-	public ClientModel getClientModel() {
-		return clientModel;
+	public GameClient getClientModel() {
+		return client;
 	}
 
 }

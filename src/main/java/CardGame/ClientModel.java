@@ -3,7 +3,6 @@ package CardGame;
 import CardGame.GameEngine.BlackjackHand;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
-import CardGame.Pushes.PushProtocol;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -13,9 +12,10 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static CardGame.Gui.Screens.*;
@@ -41,27 +41,28 @@ public class ClientModel extends Observable {
     private boolean connected, loggedIn;
 
     // Screen state variable
-    // this variable can only be set the predefined screens
-    // in CardGame.Gui.Screens
     private int currentScreen;
 
     // fields
     Gson gson = new Gson();
     User user;
     ArrayList<User> users;
-    LinkedBlockingQueue<PushProtocol> pushRequestQueue;
 
     // Game variables
-    private ArrayList<String> playerNames;
-    private Hand dealerHand;
-    private Map<String, Hand> playerHands;
-    private Map<String, Integer> playerBets;
-    private Map<String, Integer> playerBudgets;
-    private Map<String, Boolean> playersFinished;
-    private Map<String, Boolean> playersWon;
-    private Map<String, Boolean> playersBust;
-    private Map<String, Boolean> playersStand;
-    private ArrayList<String> listOfGames;
+    private volatile LinkedBlockingQueue<ResponseProtocol> pushProtocolQueue;
+    private volatile CopyOnWriteArrayList<String> playerNames;
+    private volatile Hand dealerHand;
+    private volatile ConcurrentHashMap<String, Hand> playerHands;
+    private volatile ConcurrentHashMap<String, Integer> playerBets;
+    private volatile ConcurrentHashMap<String, Integer> playerBudgets;
+    private volatile ConcurrentHashMap<String, Boolean> playersFinished;
+    private volatile ConcurrentHashMap<String, Boolean> playersWon;
+    private volatile ConcurrentHashMap<String, Boolean> playersBust;
+    private volatile ConcurrentHashMap<String, Boolean> playersStand;
+    private volatile CopyOnWriteArrayList<String> listOfGames;
+
+    // chat variables
+    private int chatOffset;
 
     /**
      * Constructor.
@@ -83,18 +84,23 @@ public class ClientModel extends Observable {
 
         this.connected = false;
         this.loggedIn = false;
-        this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
+        this.pushProtocolQueue = new LinkedBlockingQueue<ResponseProtocol>();
         this.currentScreen = Screens.LOGINSCREEN;
 
         // instantiate game variables
-        this.playerNames = new ArrayList<>();
-        this.playerHands = new HashMap<>();
-        this.playerBudgets = new HashMap<>();
-        this.playersBust = new HashMap<>();
-        this.playersWon = new HashMap<>();
-        this.playersStand = new HashMap<>();
+        this.playerNames = new CopyOnWriteArrayList<>();
+        this.playerHands = new ConcurrentHashMap<>();
+        this.playerBudgets = new ConcurrentHashMap<>();
+        this.playersBust = new ConcurrentHashMap<>();
+        this.playersWon = new ConcurrentHashMap<>();
+        this.playersStand = new ConcurrentHashMap<>();
         this.dealerHand = new BlackjackHand();
-        this.listOfGames = new ArrayList<>();
+        this.listOfGames = new CopyOnWriteArrayList<>();
+
+        this.chatOffset = -1;
+
+        // method which starts a thread to listen for pushes
+//        getPushFromQueue();
     }
 
     /**
@@ -104,38 +110,42 @@ public class ClientModel extends Observable {
      * @param username
      * @param password
      */
-    public void requestLogin(String username, String password) {
+    public ResponseProtocol requestLogin(String username, String password) {
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword);
+        ResponseLoginUser responseLoginUser = null;
         try {
             RequestLoginUser request = new RequestLoginUser(user);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseLoginUser responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
+            responseLoginUser = gson.fromJson(responseString, ResponseLoginUser.class);
+
+            // set logged in user on successful response
             if (responseLoginUser.getRequestSuccess() == SUCCESS) {
                 setLoggedIn(true, responseLoginUser.getUser());
             }
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseLoginUser;
     }
 
-    public void requestLogOut() {
+    public ResponseProtocol requestLogOut() {
+        ResponseLogOut responseLogOut = null;
         try {
             RequestLogOut request = new RequestLogOut(this.user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseLogOut responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
+            responseLogOut = gson.fromJson(responseString, ResponseLogOut.class);
             if (responseLogOut.getRequestSuccess() == SUCCESS) {
                 setLoggedIn(false, null);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        return responseLogOut;
     }
 
 
@@ -163,21 +173,22 @@ public class ClientModel extends Observable {
      * @param first
      * @param last
      */
-    public void requestRegisterUser(String username, String password, String first, String last) {
+    public ResponseProtocol requestRegisterUser(String username, String password, String first, String last) {
         String hashedPassword = hashPassword(password);
         User user = new User(username, hashedPassword, first, last);
+        ResponseRegisterUser responseRegisterUser = null;
         try {
             RequestRegisterUser request = new RequestRegisterUser(user);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseRegisterUser responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
+            responseRegisterUser = gson.fromJson(responseString, ResponseRegisterUser.class);
             if (responseRegisterUser.getRequestSuccess() == 1) {
                 System.out.println("registration succesful");
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseRegisterUser;
 
     }
 
@@ -186,149 +197,170 @@ public class ClientModel extends Observable {
         return sha256hex;
     }
 
-    public void requestCreateGame() {
+    public ResponseProtocol requestCreateGame() {
+        ResponseCreateGame responseCreateGame = null;
         try {
             RequestCreateGame request = new RequestCreateGame(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseCreateGame responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
+            responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
             if (responseCreateGame.getRequestSuccess() == 1) {
                 System.out.println("Created Game");
-                String gameName = responseCreateGame.getGameName();
-                listOfGames.add(gameName);
+//                String gameName = responseCreateGame.getGameName();
+//                listOfGames.add(gameName);
             }
-
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return responseCreateGame;
     }
 
-    public void requestJoinGame(String gamename) {
+    public ResponseProtocol requestJoinGame(String gamename) {
+        ResponseJoinGame responseJoinGame = null;
         try {
             RequestJoinGame request = new RequestJoinGame(gamename, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseJoinGame responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
+            responseJoinGame = gson.fromJson(responseString, ResponseJoinGame.class);
             if (responseJoinGame.getRequestSuccess() == 1) {
                 setCurrentScreen(GAMESCREEN);
                 System.out.println("Joined the Game");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseJoinGame;
     }
 
-    public void requestBet(int betAmount) {
+    public ResponseProtocol requestBet(int betAmount) {
+        ResponseBet responseBet = null;
         try {
             RequestBet request = new RequestBet(betAmount, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseBet responseBet = gson.fromJson(responseString, ResponseBet.class);
+            responseBet = gson.fromJson(responseString, ResponseBet.class);
             if (responseBet.getRequestSuccess() == 1) {
                 System.out.println("Bet!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseBet;
     }
 
 
-    public void requestDoubleBet() {
+    public ResponseProtocol requestDoubleBet() {
+        ResponseDoubleBet responseDoubleBet = null;
         try {
             RequestDoubleBet request = new RequestDoubleBet(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseDoubleBet responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
+            responseDoubleBet = gson.fromJson(responseString, ResponseDoubleBet.class);
             if (responseDoubleBet.getRequestSuccess() == 1) {
                 System.out.println("Double bet!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseDoubleBet;
     }
 
 
-    public void requestHit() {
+    public ResponseProtocol requestHit() {
+        ResponseHit responseHit = null;
         try {
             RequestHit request = new RequestHit(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseHit responseHit = gson.fromJson(responseString, ResponseHit.class);
+            responseHit = gson.fromJson(responseString, ResponseHit.class);
             if (responseHit.getRequestSuccess() == 1) {
                 System.out.println("Hit!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseHit;
     }
 
-    public void requestStand() {
+    public ResponseProtocol requestStand() {
+        ResponseStand responseStand = null;
         try {
             RequestStand request = new RequestStand(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseStand responseStand = gson.fromJson(responseString, ResponseStand.class);
+            responseStand = gson.fromJson(responseString, ResponseStand.class);
             if (responseStand.getRequestSuccess() == 1) {
                 System.out.println("Stand!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseStand;
     }
 
-    public void requestFold() {
+    public ResponseProtocol requestFold() {
+        ResponseFold responseFold = null;
         try {
             RequestFold request = new RequestFold(user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseFold responseFold = gson.fromJson(responseString, ResponseFold.class);
+            responseFold = gson.fromJson(responseString, ResponseFold.class);
             if (responseFold.getRequestSuccess() == 1) {
                 System.out.println("Fold!");
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseFold;
     }
 
-    public ResponseGetMessages requestGetMessages(int offset){
+    public ResponseProtocol requestGetMessages(int offset) {
+        ResponseGetMessages responseGetMessages = null;
         try {
             RequestGetMessages request = new RequestGetMessages(offset);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseGetMessages responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
+            responseGetMessages = gson.fromJson(responseString, ResponseGetMessages.class);
             if (responseGetMessages.getRequestSuccess() == 1) {
                 System.out.println("Got messages from the server");
                 System.out.println(responseGetMessages.getMessages());
             }
-            return responseGetMessages;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return responseGetMessages;
     }
 
-    public void requestSendMessages(String message) {
+    public ResponseProtocol requestSendMessages(String message) {
+        ResponseSendMessage responseSendMessage = null;
         try {
             RequestSendMessage request = new RequestSendMessage(user.getUserName(), message);
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseSendMessage responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
+            responseSendMessage = gson.fromJson(responseString, ResponseSendMessage.class);
             if (responseSendMessage.getRequestSuccess() == 1) {
                 System.out.println("sent a messages to the server");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseSendMessage;
     }
 
 
-    public void requestQuitGame(String gameToQuit) {
+    public ResponseProtocol requestQuitGame(String gameToQuit) {
+        ResponseQuitGame responseQuitGame = null;
         try {
             RequestQuitGame request = new RequestQuitGame(gameToQuit, user.getUserName());
             cardGameClient.sendRequest(request);
             String responseString = threadDataIn.readUTF();
-            ResponseQuitGame responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
+            responseQuitGame = gson.fromJson(responseString, ResponseQuitGame.class);
             if (responseQuitGame.getRequestSuccess() == 1) {
                 System.out.println("quit the game");
                 setCurrentScreen(LOBBYSCREEN);
@@ -336,7 +368,9 @@ public class ClientModel extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return responseQuitGame;
     }
+
 
 
     /**
@@ -398,7 +432,7 @@ public class ClientModel extends Observable {
      *
      * @return
      */
-    public ArrayList<String> getListOfGames() {
+    public CopyOnWriteArrayList<String> getListOfGames() {
         return listOfGames;
     }
 
@@ -414,11 +448,27 @@ public class ClientModel extends Observable {
     }
 
     /**
+     * Getter for chatoffset
+     * @return
+     */
+    public int getChatOffset() {
+        return chatOffset;
+    }
+
+    /**
+     * setter for chat offset
+     * @param chatOffset
+     */
+    public void setChatOffset(int chatOffset) {
+        this.chatOffset = chatOffset;
+    }
+
+    /**
      * Setter for list of games.
      *
      * @param listOfGames
      */
-    public void setListOfGames(ArrayList<String> listOfGames) {
+    public void setListOfGames(CopyOnWriteArrayList<String> listOfGames) {
         this.listOfGames = listOfGames;
     }
 
@@ -427,7 +477,7 @@ public class ClientModel extends Observable {
      *
      * @return
      */
-    public ArrayList<String> getPlayerNames() {
+    public CopyOnWriteArrayList<String> getPlayerNames() {
         return playerNames;
     }
 
@@ -496,6 +546,7 @@ public class ClientModel extends Observable {
 
     /**
      * getter for players standing
+     *
      * @return
      */
     public Map<String, Boolean> getPlayersStand() {
@@ -507,7 +558,7 @@ public class ClientModel extends Observable {
      *
      * @param playerNames
      */
-    public void setPlayerNames(ArrayList<String> playerNames) {
+    public void setPlayerNames(CopyOnWriteArrayList<String> playerNames) {
         this.playerNames = playerNames;
     }
 
@@ -525,7 +576,7 @@ public class ClientModel extends Observable {
      *
      * @param playerHands
      */
-    public void setPlayerHands(Map<String, Hand> playerHands) {
+    public void setPlayerHands(ConcurrentHashMap<String, Hand> playerHands) {
         this.playerHands = playerHands;
     }
 
@@ -534,7 +585,7 @@ public class ClientModel extends Observable {
      *
      * @param playerBets
      */
-    public void setPlayerBets(Map<String, Integer> playerBets) {
+    public void setPlayerBets(ConcurrentHashMap<String, Integer> playerBets) {
         this.playerBets = playerBets;
     }
 
@@ -543,7 +594,7 @@ public class ClientModel extends Observable {
      *
      * @param playerBudgets
      */
-    public void setPlayerBudgets(Map<String, Integer> playerBudgets) {
+    public void setPlayerBudgets(ConcurrentHashMap<String, Integer> playerBudgets) {
         this.playerBudgets = playerBudgets;
     }
 
@@ -552,7 +603,7 @@ public class ClientModel extends Observable {
      *
      * @param playersFinished
      */
-    public void setPlayersFinished(Map<String, Boolean> playersFinished) {
+    public void setPlayersFinished(ConcurrentHashMap<String, Boolean> playersFinished) {
         this.playersFinished = playersFinished;
     }
 
@@ -561,7 +612,7 @@ public class ClientModel extends Observable {
      *
      * @param playersWon
      */
-    public void setPlayersWon(Map<String, Boolean> playersWon) {
+    public void setPlayersWon(ConcurrentHashMap<String, Boolean> playersWon) {
         this.playersWon = playersWon;
     }
 
@@ -570,24 +621,30 @@ public class ClientModel extends Observable {
      *
      * @param playersBust
      */
-    public void setPlayersBust(Map<String, Boolean> playersBust) {
+    public void setPlayersBust(ConcurrentHashMap<String, Boolean> playersBust) {
         this.playersBust = playersBust;
     }
 
 
     /**
      * setter for players standing
+     *
      * @param playersStand
      */
-    public void setPlayersStand(Map<String, Boolean> playersStand) {
+    public void setPlayersStand(ConcurrentHashMap<String, Boolean> playersStand) {
         this.playersStand = playersStand;
     }
+
 
     public PipedOutputStream getPout() {
         return pout;
     }
 
-    public LinkedBlockingQueue<PushProtocol> getPushRequestQueue() {
-        return pushRequestQueue;
+    /**
+     * getter for the push protocol queue
+     * @return
+     */
+    public LinkedBlockingQueue<ResponseProtocol> getPushProtocolQueue() {
+        return pushProtocolQueue;
     }
 }

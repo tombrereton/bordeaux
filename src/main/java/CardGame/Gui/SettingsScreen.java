@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,19 +14,23 @@ import java.awt.event.ActionListener;
  */
 public class SettingsScreen extends JPanel {
 
-	private ClientModel clientModel;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
-	private JLabel lblWelcome = new JLabel("Settings");
-	private JButton btnBack = new JButton("Back");
+	private JLabel lblTitle;
+	private JButton btnBack;
 
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
+	public SettingsScreen(GameClient client, ScreenFactory screenFactory) {
+		this.client = client;
 		this.screenFactory = screenFactory;
+		lblTitle = new JLabel("Settings");
+		btnBack = new JButton("Back");
+		setBackground(new Color(46, 139, 87));
 		initialize();
+		updateBounds();
 	}
 
 	/**
@@ -36,11 +40,10 @@ public class SettingsScreen extends JPanel {
 		setSize(1024,576);
 		setLayout(null);
 
-		lblWelcome.setHorizontalAlignment(SwingConstants.CENTER);
-		lblWelcome.setFont(new Font("Soho Std", Font.PLAIN, 24));
-		lblWelcome.setForeground(new Color(255, 255, 255));
-		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		add(lblWelcome);
+		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTitle.setFont(new Font("Soho Std", Font.PLAIN, 24));
+		lblTitle.setForeground(new Color(255, 255, 255));
+		add(lblTitle);
 		
 		/**
 		 * back button events
@@ -52,16 +55,15 @@ public class SettingsScreen extends JPanel {
 				getClientModel().setCurrentScreen(Screens.HOMESCREEN);
 			}
 		});
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
 		add(btnBack);
 	}
 
-	public void update(){
-		lblWelcome.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+11, 242, 34);
-		btnBack.setBounds(screenFactory.getxOrigin()+40, screenFactory.getyOrigin()+526, 89, 23);
+	public void updateBounds(){
+		lblTitle.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
+		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
 	}
 
-	public ClientModel getClientModel() {
-		return clientModel;
+	public GameClient getClientModel() {
+		return client;
 	}
 }

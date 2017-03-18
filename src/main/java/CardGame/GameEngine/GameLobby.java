@@ -1,11 +1,13 @@
 package CardGame.GameEngine;
 
+import CardGame.MessageObject;
 import CardGame.User;
 
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Created by tom on 09/03/17.
@@ -23,6 +25,9 @@ public class GameLobby {
     private Map<String, Boolean> playersWon;
     private Map<String, Boolean> playersStand;
     private BlackjackHand dealerHand;
+
+    // chat variables
+    private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
 
 
     /**
@@ -44,6 +49,9 @@ public class GameLobby {
         this.playersWon = new HashMap<>();
         this.playersStand = new HashMap<>();
         this.dealerHand = new BlackjackHand();
+
+        // chat variables
+        this.messageQueue = new ConcurrentLinkedDeque<>();
 
     }
 
@@ -205,6 +213,7 @@ public class GameLobby {
         for (Player player : players) {
             if (player.getUsername().equals(username)) {
                 removeID = index;
+                break;
             }
             index++;
         }
@@ -470,6 +479,14 @@ public class GameLobby {
         }
 
         allPlayersStand = true;
+    }
+
+    public ConcurrentLinkedDeque<MessageObject> getMessageQueue() {
+        return messageQueue;
+    }
+
+    public void setMessageQueue(ConcurrentLinkedDeque<MessageObject> messageQueue) {
+        this.messageQueue = messageQueue;
     }
 
     public Map<String, Boolean> getPlayersWon() {
