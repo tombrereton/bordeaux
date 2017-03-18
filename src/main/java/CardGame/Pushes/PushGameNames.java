@@ -2,7 +2,7 @@ package CardGame.Pushes;
 
 import CardGame.Responses.ResponseProtocol;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 import static CardGame.ProtocolTypes.PUSH_GAME_NAMES;
 
@@ -10,14 +10,14 @@ import static CardGame.ProtocolTypes.PUSH_GAME_NAMES;
  * Created by tom on 11/03/17.
  */
 public class PushGameNames extends ResponseProtocol {
-    private ArrayList<String> gameNames;
+    private Set<String> gameNames;
 
-    public PushGameNames(int protocolID, int success, ArrayList<String> gameNames) {
+    public PushGameNames(int protocolID, int success, Set<String> gameNames) {
         super(protocolID, PUSH_GAME_NAMES, success);
         this.gameNames = gameNames;
     }
 
-    public ArrayList<String> getGameNames() {
+    public Set<String> getGameNames() {
         return gameNames;
     }
 

@@ -2,7 +2,6 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.MessageObject;
-import CardGame.Pushes.PushPlayerBudgets;
 import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
@@ -25,35 +24,35 @@ public class GameScreen extends JPanel implements Observer {
     private GameClient client;
     private ScreenFactory screenFactory;
 
-	private JTextArea textArea;
-	private JList<String> listChat;
- 	private JScrollPane scrollPane;
-	private JLabel lblChat;
-	private JButton btnSendMessage;
-	private JButton btnDoubleDown;
-	private JButton btnStand;
-	private JButton btnHit;
-	private JButton btnFold;
-	private JLabel lblCredits;
-	private JLabel lblSubmitBet;
-	private JButton btnSubmitBet;
-	private JButton btnBet1;
-	private JButton btnBet2;
-	private JButton btnBet3;
-	private JButton btnBet4;
-	private JButton btnLeaveGame;
-	private JLabel lblCreditsBox;
-	private JLabel lblSubmitBetBox;
-	private JLabel lblBackHud;
+    private JTextArea textArea;
+    private JList<String> listChat;
+    private JScrollPane scrollPane;
+    private JLabel lblChat;
+    private JButton btnSendMessage;
+    private JButton btnDoubleDown;
+    private JButton btnStand;
+    private JButton btnHit;
+    private JButton btnFold;
+    private JLabel lblBudget;
+    private JLabel lblSubmitBet;
+    private JButton btnSubmitBet;
+    private JButton btnBet1;
+    private JButton btnBet2;
+    private JButton btnBet3;
+    private JButton btnBet4;
+    private JButton btnLeaveGame;
+    private JLabel lblCreditsBox;
+    private JLabel lblSubmitBetBox;
+    private JLabel lblBackHud;
     private JLabel lblSideHud;
     private JLabel lblSideFillHud;
 
     private JLabel lblDeck;
-	private PlayerGui dealerGui;
+    private PlayerGui dealerGui;
     private PlayerGui playerGui1;
-	private PlayerGui playerGui2;
-	private PlayerGui playerGui3;
-	private PlayerGui playerGui4;
+    private PlayerGui playerGui2;
+    private PlayerGui playerGui3;
+    private PlayerGui playerGui4;
 
     //current credits and bets
     private int amountToBet;
@@ -90,7 +89,7 @@ public class GameScreen extends JPanel implements Observer {
         btnHit = new JButton();
         btnFold = new JButton();
 
-        lblCredits = new JLabel("Credits: £ " + Integer.toString(credits));
+        lblBudget = new JLabel("Credits: £ " + Integer.toString(credits));
         lblCreditsBox = new JLabel();
         lblSubmitBet = new JLabel(Integer.toString(amountToBet));
         lblSubmitBetBox = new JLabel();
@@ -100,13 +99,13 @@ public class GameScreen extends JPanel implements Observer {
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
-		//board images and players
-		lblDeck = new JLabel();
-		playerGui1 = new PlayerGui("14");
-		playerGui2 = new PlayerGui("31");
-		playerGui3 = new PlayerGui("5");
-		playerGui4 = new PlayerGui("3");
-		dealerGui = new PlayerGui("1");
+        //board images and players
+        lblDeck = new JLabel();
+        playerGui1 = new PlayerGui("14");
+        playerGui2 = new PlayerGui("31");
+        playerGui3 = new PlayerGui("5");
+        playerGui4 = new PlayerGui("3");
+        dealerGui = new PlayerGui("1");
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -143,6 +142,8 @@ public class GameScreen extends JPanel implements Observer {
         lblChat.setForeground(Color.WHITE);
         add(lblChat);
 
+
+        // SEND BUTTON
         /**
          * Send message button
          *
@@ -169,7 +170,7 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0){
+                if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -179,6 +180,8 @@ public class GameScreen extends JPanel implements Observer {
 
         btnSendMessage.setContentAreaFilled(false);
         btnSendMessage.setBorderPainted(false);
+
+        // add send button image
         try {
             Image imgSendMessage = ImageIO.read(getClass().getResource("/gameHud/imageBtnMessage.png"));
             btnSendMessage.setIcon(new ImageIcon(imgSendMessage));
@@ -187,6 +190,9 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnSendMessage);
 
+        // END SEND BUTTON
+
+        // CHAT MESSAGE BOX
         /**
          * Editable text area for sending messages
          */
@@ -194,7 +200,9 @@ public class GameScreen extends JPanel implements Observer {
         textArea.setLineWrap(true);
         add(textArea);
         textArea.setColumns(10);
+        // END CHAT MESSAGE BOX
 
+        // DOUBLE BET BUTTON
         /**
          * Double Bet button
          *
@@ -205,12 +213,12 @@ public class GameScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
 
                 // send a double down request to server
-                ResponseProtocol responseProtocol =  client.requestDoubleBet();
+                ResponseProtocol responseProtocol = client.requestDoubleBet();
 
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0){
+                if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -226,8 +234,9 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnDoubleDown);
+        // END DOUBLE BUTTON
 
-
+        // STAND BUTTON
         /**
          * Stand button
          *
@@ -241,7 +250,7 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0){
+                if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -257,7 +266,9 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnStand);
+        // END STAND BUTTON
 
+        // HIT BUTTON
         /**
          * Hit Button
          *
@@ -271,7 +282,7 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0){
+                if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -288,9 +299,11 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnHit);
+        // END HIT BUTTON
 
+        // FOLD BUTTON
         /**
-         * Hold Button
+         * Fold Button
          *
          * And display the error if not successful
          */
@@ -302,7 +315,7 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0){
+                if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -318,15 +331,15 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnFold);
+        // END FOLD BUTTON
 
         /**
-
          * Player credits label
          */
-        lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        lblCredits.setForeground(Color.BLACK);
+        lblBudget.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblBudget.setForeground(Color.BLACK);
 
-        add(lblCredits);
+        add(lblBudget);
 
         /**
          * Player credits to bet label
@@ -335,6 +348,7 @@ public class GameScreen extends JPanel implements Observer {
         lblSubmitBet.setForeground(Color.BLACK);
         add(lblSubmitBet);
 
+        // BET BUTTON
         /**
          * Submit Bet Button
          *
@@ -342,20 +356,18 @@ public class GameScreen extends JPanel implements Observer {
          */
         btnSubmitBet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                credits = credits - amountToBet;
+
+                // we send the request to bet
                 ResponseProtocol response = client.requestBet(amountToBet);
-                if (response.getRequestSuccess() == 1) {
-                    PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
-                    if (responseBudgets.getRequestSuccess() == 1) {
-                        lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
-                    }else if(response.getRequestSuccess()==0){
-                        String errorMsg = response.getErrorMsg();
-                        if (response.getRequestSuccess() == 0){
-                            JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                                    JOptionPane.WARNING_MESSAGE);
-                        }
-                    }
+
+                if (response.getRequestSuccess() == 0) {
+                    // display error msg if not successful
+                    String errorMsg = response.getErrorMsg();
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
                 }
+
+                // set bet amount to 0
                 amountToBet = 0;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
             }
@@ -450,7 +462,7 @@ public class GameScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
                 ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
 
-                if (leaveGame.getRequestSuccess() == 1){
+                if (leaveGame.getRequestSuccess() == 1) {
                     chatMessageModel.clear();
                     gameScreenChatOffset = 0;
                 }
@@ -531,36 +543,36 @@ public class GameScreen extends JPanel implements Observer {
         return chatMessageModel;
     }
 
-	public void updateBounds(){
-		scrollPane.setBounds(screenFactory.getxOrigin()+850, 50,screenFactory.getxOrigin()+150, screenFactory.getScreenHeightCurrent()-230);
-		textArea.setBounds(screenFactory.getxOrigin()+850, screenFactory.getScreenHeightCurrent()-170, screenFactory.getxOrigin()+150, 60);
-        lblChat.setBounds(screenFactory.getxOrigin()+850, 10, 205, 35);
-        lblSideHud.setBounds(screenFactory.getxOrigin()+800, screenFactory.getScreenHeightCurrent()-1500, 66, 1434);
-        lblSideFillHud.setBounds(screenFactory.getxOrigin()+850, 0,screenFactory.getScreenWidthCurrent(), screenFactory.getyOrigin()+800);
-        btnSendMessage.setBounds(845+(int)(screenFactory.getxOrigin()*1.5), screenFactory.getScreenHeightCurrent()-105, 159, 60);
-		btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent()-120, 10, 100, 30);
-		btnDoubleDown.setBounds(740, screenFactory.getScreenHeightCurrent()-100, 98, 55);
-		btnStand.setBounds(640, screenFactory.getScreenHeightCurrent()-100, 98, 55);
-		btnHit.setBounds(540, screenFactory.getScreenHeightCurrent()-100, 98, 55);
-		btnFold.setBounds(440, screenFactory.getScreenHeightCurrent()-100, 98, 55);
-		lblCredits.setBounds(30, screenFactory.getScreenHeightCurrent()-81, 200, 35);
-		lblSubmitBet.setBounds(30, screenFactory.getScreenHeightCurrent()-121, 92, 35);
-        btnSubmitBet.setBounds(5, screenFactory.getScreenHeightCurrent()-226, 98, 91);
-		btnBet1.setBounds(105, screenFactory.getScreenHeightCurrent()-206, 81, 81);
-		btnBet2.setBounds(186, screenFactory.getScreenHeightCurrent()-166, 81, 81);
-		btnBet3.setBounds(267, screenFactory.getScreenHeightCurrent()-136, 81, 81);
-		btnBet4.setBounds(353, screenFactory.getScreenHeightCurrent()-126, 81, 81);
-		lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent()-86, 241, 42);
-		lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent()-126, 144, 45);
-		lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent()-176, 2590, 204);
-        lblDeck.setBounds(screenFactory.getxOrigin()+650, 20, 64, 93);
+    public void updateBounds() {
+        scrollPane.setBounds(screenFactory.getxOrigin() + 850, 50, screenFactory.getxOrigin() + 150, screenFactory.getScreenHeightCurrent() - 230);
+        textArea.setBounds(screenFactory.getxOrigin() + 850, screenFactory.getScreenHeightCurrent() - 170, screenFactory.getxOrigin() + 150, 60);
+        lblChat.setBounds(screenFactory.getxOrigin() + 850, 10, 205, 35);
+        lblSideHud.setBounds(screenFactory.getxOrigin() + 800, screenFactory.getScreenHeightCurrent() - 1500, 66, 1434);
+        lblSideFillHud.setBounds(screenFactory.getxOrigin() + 850, 0, screenFactory.getScreenWidthCurrent(), screenFactory.getyOrigin() + 800);
+        btnSendMessage.setBounds(845 + (int) (screenFactory.getxOrigin() * 1.5), screenFactory.getScreenHeightCurrent() - 105, 159, 60);
+        btnLeaveGame.setBounds(screenFactory.getScreenWidthCurrent() - 120, 10, 100, 30);
+        btnDoubleDown.setBounds(740, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
+        btnStand.setBounds(640, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
+        btnHit.setBounds(540, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
+        btnFold.setBounds(440, screenFactory.getScreenHeightCurrent() - 100, 98, 55);
+        lblBudget.setBounds(30, screenFactory.getScreenHeightCurrent() - 81, 200, 35);
+        lblSubmitBet.setBounds(30, screenFactory.getScreenHeightCurrent() - 121, 92, 35);
+        btnSubmitBet.setBounds(5, screenFactory.getScreenHeightCurrent() - 226, 98, 91);
+        btnBet1.setBounds(105, screenFactory.getScreenHeightCurrent() - 206, 81, 81);
+        btnBet2.setBounds(186, screenFactory.getScreenHeightCurrent() - 166, 81, 81);
+        btnBet3.setBounds(267, screenFactory.getScreenHeightCurrent() - 136, 81, 81);
+        btnBet4.setBounds(353, screenFactory.getScreenHeightCurrent() - 126, 81, 81);
+        lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent() - 86, 241, 42);
+        lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent() - 126, 144, 45);
+        lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent() - 176, 2590, 204);
+        lblDeck.setBounds(screenFactory.getxOrigin() + 650, 20, 64, 93);
 
-		dealerGui.setBounds((int)(screenFactory.getxOrigin()*0.5)+320, 20, 200, 200);
-		playerGui1.setBounds(20, screenFactory.getScreenHeightCurrent()-425, 200, 200);
-		playerGui2.setBounds((int)(screenFactory.getxOrigin()*0.3)+220, screenFactory.getScreenHeightCurrent()-350, 200, 200);
-		playerGui3.setBounds((int)(screenFactory.getxOrigin()*0.7)+420, screenFactory.getScreenHeightCurrent()-350, 200, 200);
-		playerGui4.setBounds(screenFactory.getxOrigin()+620, screenFactory.getScreenHeightCurrent()-425, 200, 200);
-	}
+        dealerGui.setBounds((int) (screenFactory.getxOrigin() * 0.5) + 320, 20, 200, 200);
+        playerGui1.setBounds(20, screenFactory.getScreenHeightCurrent() - 425, 200, 200);
+        playerGui2.setBounds((int) (screenFactory.getxOrigin() * 0.3) + 220, screenFactory.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui3.setBounds((int) (screenFactory.getxOrigin() * 0.7) + 420, screenFactory.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui4.setBounds(screenFactory.getxOrigin() + 620, screenFactory.getScreenHeightCurrent() - 425, 200, 200);
+    }
 
     public int getAmountToBet() {
         return amountToBet;
@@ -579,6 +591,12 @@ public class GameScreen extends JPanel implements Observer {
     }
 
 
+    /**
+     * This method is called when the observable class calls notifyObservers.
+     *
+     * @param observable
+     * @param o
+     */
     @Override
     public void update(Observable observable, Object o) {
         if (observable instanceof GameClient) {
@@ -586,6 +604,11 @@ public class GameScreen extends JPanel implements Observer {
             updateMessageList(model);
 
 
+            // update your budget
+            if (model.getPlayerBudgets() != null && !model.getPlayerBudgets().isEmpty()) {
+                int yourBudget = model.getPlayerBudgets().get(model.getLoggedInUser().getUserName());
+                this.lblBudget.setText("Budget: £" + yourBudget);
+            }
         }
     }
 
@@ -594,7 +617,7 @@ public class GameScreen extends JPanel implements Observer {
         int clientMsgOffset = model.getMessages().size();
 
         // add to list
-        while (gameScreenChatOffset < clientMsgOffset){
+        while (gameScreenChatOffset < clientMsgOffset) {
             ArrayList<MessageObject> msg = new ArrayList<>(model.getMessages());
             this.chatMessageModel.addElement(msg.get(gameScreenChatOffset).toString());
             gameScreenChatOffset++;
