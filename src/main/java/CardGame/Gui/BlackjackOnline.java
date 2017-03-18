@@ -17,7 +17,7 @@ import static CardGame.Gui.Screens.*;
  *
  * @author Alex
  */
-public class ScreenFactory extends JFrame implements Observer, ComponentListener {
+public class BlackjackOnline extends JFrame implements Observer, ComponentListener {
 
 //	private ImageIcon icon;
 //	private JLabel label;
@@ -27,7 +27,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
      * screen ratio 16:9
      */
     public static JPanel centerPane;
-    public static ScreenFactory frame = null;
+    public static BlackjackOnline frame = null;
     public LoginScreen loginScreen;
     public HomeScreen homeScreen;
     public CreateAccountScreen createAccountScreen;
@@ -52,7 +52,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
     /**
      * Constructor for the frame
      */
-    public ScreenFactory(GameClient client) {
+    public BlackjackOnline(GameClient client) {
         // add to observer list for notify all
         this.client = client;
         client.addObserver(this);
@@ -253,7 +253,7 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                 GameClient gameClient = null;
                 try {
                     gameClient = new GameClient("localhost", 7654);
-                    frame = new ScreenFactory(gameClient);
+                    frame = new BlackjackOnline(gameClient);
                     frame.setVisible(true);
 
                 } catch (Exception e) {

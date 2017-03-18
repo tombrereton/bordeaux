@@ -13,7 +13,7 @@ import static CardGame.Gui.Screens.LOGINSCREEN;
 public class CreateAccountScreen extends JPanel {
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline blackjackOnline;
 
     private JTextField firstnameField;
     private JTextField lastnameField;
@@ -34,9 +34,9 @@ public class CreateAccountScreen extends JPanel {
     /**
      * Create the application.
      */
-    public CreateAccountScreen(GameClient client, ScreenFactory screenFactory) {
+    public CreateAccountScreen(GameClient client, BlackjackOnline blackjackOnline) {
         this.client = client;
-        this.screenFactory = screenFactory;
+        this.blackjackOnline = blackjackOnline;
         setBackground(new Color(46, 139, 87));
         initialize();
     }
@@ -139,19 +139,19 @@ public class CreateAccountScreen extends JPanel {
     }
 
 	public void updateBounds(){
-		btnSignUp.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+392, 146, 23);
-		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
-		emailField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+338, 146, 20);
-		passwordField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+308, 146, 20);
-		usernameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+278, 146, 20);
-		lastnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+248, 146, 20);
-		firstnameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+218, 146, 20);
-		lblEmail.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+338, 83, 14);
-		lblPassword.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+308, 83, 14);
-		lblUsername.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+278, 83, 14);
-		lblLastName.setBounds(screenFactory.getxOrigin()+391, screenFactory.getyOrigin()+248, 83, 14);
-		lblFirstName.setBounds(screenFactory.getxOrigin()+374, screenFactory.getyOrigin()+218, 100, 14);
-		lblCreateNewAccount.setBounds(screenFactory.getxOrigin()+408, screenFactory.getyOrigin()+121, 207, 23);
+		btnSignUp.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+392, 146, 23);
+		btnBack.setBounds(10, blackjackOnline.getScreenHeightCurrent()-80, 100, 30);
+		emailField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+338, 146, 20);
+		passwordField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+308, 146, 20);
+		usernameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+278, 146, 20);
+		lastnameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+248, 146, 20);
+		firstnameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+218, 146, 20);
+		lblEmail.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+338, 83, 14);
+		lblPassword.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+308, 83, 14);
+		lblUsername.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+278, 83, 14);
+		lblLastName.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+248, 83, 14);
+		lblFirstName.setBounds(blackjackOnline.getxOrigin()+374, blackjackOnline.getyOrigin()+218, 100, 14);
+		lblCreateNewAccount.setBounds(blackjackOnline.getxOrigin()+408, blackjackOnline.getyOrigin()+121, 207, 23);
 	}
 
     public GameClient getClientModel() {

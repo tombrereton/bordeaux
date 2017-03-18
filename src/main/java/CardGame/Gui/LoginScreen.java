@@ -20,7 +20,7 @@ import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 public class LoginScreen extends JPanel {
 
 	private GameClient client;
-	private ScreenFactory screenFactory;
+	private BlackjackOnline blackjackOnline;
 
 	private JButton btnCreateAccount;
 	private JButton btnLogin;
@@ -33,9 +33,9 @@ public class LoginScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(GameClient client, ScreenFactory screenFactory) {
+	public LoginScreen(GameClient client, BlackjackOnline blackjackOnline) {
 		this.client = client;
-		this.screenFactory = screenFactory;
+		this.blackjackOnline = blackjackOnline;
 		btnCreateAccount = new JButton("Create Account");
 		btnLogin = new JButton("Login");
         lblUsername = new JLabel("Username");
@@ -122,13 +122,13 @@ public class LoginScreen extends JPanel {
 	}
 
 	public void updateBounds(){
-		lblLogo.setBounds(screenFactory.getxOrigin()+312, screenFactory.getyOrigin()+40, 400, 221);
-		btnCreateAccount.setBounds(screenFactory.getxOrigin()+432, screenFactory.getyOrigin()+480, 160, 30);
-		btnLogin.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+400, 140, 30);
-		passwordField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+350, 140, 20);
-		usernameField.setBounds(screenFactory.getxOrigin()+526, screenFactory.getyOrigin()+300, 140, 20);
-		lblPassword.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+350, 101, 17);
-		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+300, 127, 31);
+		lblLogo.setBounds(blackjackOnline.getxOrigin()+312, blackjackOnline.getyOrigin()+40, 400, 221);
+		btnCreateAccount.setBounds(blackjackOnline.getxOrigin()+432, blackjackOnline.getyOrigin()+480, 160, 30);
+		btnLogin.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+400, 140, 30);
+		passwordField.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+350, 140, 20);
+		usernameField.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+300, 140, 20);
+		lblPassword.setBounds(blackjackOnline.getxOrigin()+345, blackjackOnline.getyOrigin()+350, 101, 17);
+		lblUsername.setBounds(blackjackOnline.getxOrigin()+345, blackjackOnline.getyOrigin()+300, 127, 31);
 	}
 
 	public GameClient getClientModel() {

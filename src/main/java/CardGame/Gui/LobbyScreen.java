@@ -25,7 +25,7 @@ public class LobbyScreen extends JPanel implements Observer {
     private String gameName;
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline blackjackOnline;
 
     private JLabel lblLobby;
     private JButton btnBack;
@@ -40,10 +40,10 @@ public class LobbyScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public LobbyScreen(GameClient client, ScreenFactory screenFactory) {
+    public LobbyScreen(GameClient client, BlackjackOnline blackjackOnline) {
         // we become an observer
         this.client = client;
-        this.screenFactory = screenFactory;
+        this.blackjackOnline = blackjackOnline;
         client.addObserver(this);
 
 
@@ -170,11 +170,11 @@ public class LobbyScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        lblLobby.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
-        btnBack.setBounds(50, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
-        gameJList.setBounds(50, 50, screenFactory.getScreenWidthCurrent() - 120, screenFactory.getScreenHeightCurrent() - 160);
-        btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent() - 370, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
-        btnCreateGame.setBounds(screenFactory.getxOrigin() + 352, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
+        lblLobby.setBounds(blackjackOnline.getxOrigin() + 391, 10, 242, 34);
+        btnBack.setBounds(50, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
+        gameJList.setBounds(50, 50, blackjackOnline.getScreenWidthCurrent() - 120, blackjackOnline.getScreenHeightCurrent() - 160);
+        btnJoinGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 370, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
+        btnCreateGame.setBounds(blackjackOnline.getxOrigin() + 352, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
     }
 
     public GameClient getClientModel() {
@@ -189,8 +189,8 @@ public class LobbyScreen extends JPanel implements Observer {
         return gameName;
     }
 
-    public ScreenFactory getScreenFactory() {
-        return screenFactory;
+    public BlackjackOnline getBlackjackOnline() {
+        return blackjackOnline;
     }
 
     public DefaultListModel getGameNameListModel() {
