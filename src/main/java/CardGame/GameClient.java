@@ -47,7 +47,7 @@ public class GameClient extends Observable {
 
     // chat variables
     private int chatOffset;
-    private ConcurrentLinkedDeque<MessageObject> messages;
+    private volatile ConcurrentLinkedDeque<MessageObject> messages;
 
     // Threads
     Thread gameNamesThread;
@@ -657,6 +657,8 @@ public class GameClient extends Observable {
 
                 try {
                     Thread.sleep(100);
+                } catch (NullPointerException e){
+                    System.out.println("Server down.");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

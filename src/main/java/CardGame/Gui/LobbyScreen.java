@@ -107,10 +107,13 @@ public class LobbyScreen extends JPanel implements Observer {
 
                 // we get the game name with the index
                 ArrayList<String> games = new ArrayList<>(getClientModel().getListOfGames());
-                String gameNameSelected = games.get(selectionIndex);
+                if (games.size() != 0 && games.size() >= selectionIndex) {
+                    String gameNameSelected = games.get(selectionIndex);
 
-                // we set the game name to the game selected
-                setGameName(gameNameSelected);
+                    // we set the game name to the game selected
+                    setGameName(gameNameSelected);
+                }
+
             }
         });
         add(gameJList);
@@ -180,7 +183,7 @@ public class LobbyScreen extends JPanel implements Observer {
         return gameNameListModel;
     }
 
-    public void resetGameList(){
+    public void resetGameList() {
         this.lobbyGamesOffset = 0;
         this.getGameNameListModel().clear();
     }
@@ -202,7 +205,7 @@ public class LobbyScreen extends JPanel implements Observer {
 
             // remove game from game list if not in client list of games
             for (int i = 0; i < gameNameListModel.size(); i++) {
-                if (!gameNames.contains(gameNameListModel.get(i))){
+                if (!gameNames.contains(gameNameListModel.get(i))) {
                     gameNameListModel.remove(i);
                     lobbyGamesOffset = 0;
                 }
