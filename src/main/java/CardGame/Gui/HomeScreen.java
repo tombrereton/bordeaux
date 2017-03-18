@@ -1,6 +1,7 @@
 package CardGame.Gui;
 
 import CardGame.GameClient;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.swing.*;
 import java.awt.*;
@@ -72,7 +73,20 @@ public class HomeScreen extends JPanel implements Observer {
         btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
         btnLogout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                getClientModel().requestLogOut();
+                ResponseProtocol responseProtocol = getClientModel().requestLogOut();
+
+
+                if (responseProtocol == null){
+                    return;
+                }
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
         add(btnLogout);

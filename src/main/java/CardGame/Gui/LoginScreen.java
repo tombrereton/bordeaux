@@ -90,6 +90,11 @@ public class LoginScreen extends JPanel {
                 usernameField.setText("");
                 passwordField.setText("");
 
+
+                if (responseProtocol == null){
+                    return;
+                }
+
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();

@@ -102,7 +102,9 @@ public class GameServerThread implements Runnable {
                 e.printStackTrace();
             } finally {
                 // log user out of client and game on disconnect
-                quitGame(gameJoined,getLoggedInUser().getUserName());
+                if (gameJoined != null){
+                    quitGame(gameJoined,getLoggedInUser().getUserName());
+                }
                 logUserOut();
                 System.out.println("Logged in user set to: " + getLoggedInUser());
                 closeConnections();
