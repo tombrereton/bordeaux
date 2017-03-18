@@ -388,6 +388,7 @@ public class GameClient extends Observable {
             stopGettingMessages();
             startGettingGameNames();
             messages.clear();
+            setChatOffset(-1);
         }
 
         return responseQuitGame;

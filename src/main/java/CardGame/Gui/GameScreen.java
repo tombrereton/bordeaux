@@ -168,7 +168,6 @@ public class GameScreen extends JPanel implements Observer {
         /**
          * Game buttons
          */
-
         //DoubleDown Button
         btnDoubleDown.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -362,9 +361,14 @@ public class GameScreen extends JPanel implements Observer {
 //		add(lblDeck);
 
 
+        /**
+         * leave game button
+         */
         btnLeaveGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
