@@ -1,5 +1,6 @@
 package CardGame;
 
+import CardGame.GameEngine.Hand;
 import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
@@ -12,6 +13,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -44,7 +46,17 @@ public class GameClient extends Observable {
     // game variables
     private volatile ConcurrentSkipListSet<String> listOfGames;
     private String gameJoined;
-
+    private Map<String, Boolean> playersFinished;
+    private Hand dealerHand;
+    private Map<String, Integer> playerBets;
+    private Map<String, Integer> playerBudgets;
+    private Map<String, Hand> playerHands;
+    private ArrayList<String> playerNames;
+    private Map<String, Boolean> playersBust;
+    private Map<String, Boolean> playersStand;
+    private Map<String, Boolean> playersWon;
+    
+    
     // chat variables
     private int chatOffset;
     private volatile ConcurrentLinkedDeque<MessageObject> messages;
@@ -52,8 +64,11 @@ public class GameClient extends Observable {
     // Threads
     Thread gameNamesThread;
     Thread getMessagesThread;
+    Thread getGameData;
     private volatile boolean isGettingGames;
     private volatile boolean isGettingMessages;
+    private volatile boolean isGettingGameData;
+    
 
 
     public GameClient(String HOST, int PORT) {
@@ -550,6 +565,8 @@ public class GameClient extends Observable {
         // get response from server and returnit
         return getResponse(PushPlayersWon.class);
     }
+    
+    
 
 
     /**
@@ -675,6 +692,55 @@ public class GameClient extends Observable {
     public void stopGettingMessages() {
         this.isGettingMessages = false;
     }
+    public void getGameData(){
+    	//Get all pushes
+    	PushDealerHand pushDealerHand = requestGetDealerHand();
+    	this.dealerHand = pushDealerHand.getDealerHand();
+    	PushPlayerBets pushPlayerBets = requestGetPlayerBets();
+    	playerBets = pushPlayerBets.getPlayerBets();
+    	PushPlayerBudgets pushPlayerBudgets = requestGetPlayerBudgets();
+    	playerBudgets = pushPlayerBudgets.getPlayerBudgets();
+    	PushPlayerHands pushPlayerHands = requestGetPlayerHands();
+    	playerHands = pushPlayerHands.getPlayerHands();
+    	PushPlayerNames pushPlayerNames = requestGetPlayerNames();
+    	playerNames = pushPlayerNames.getPlayerNames();
+    	PushPlayersBust pushPlayersBust = requestGetPlayersBust();
+    	playersBust = pushPlayersBust.getPlayersBust();
+    	PushPlayersStand pushPlayersStand = requestGetPlayersStand();
+    	playersStand = pushPlayersStand.getPlayersStand();
+    	PushPlayersWon pushPlayersWon = requestGetPlayersWon();
+    	playersWon = pushPlayersWon.getPlayersWon();
+    	//notify and stuff
+    	setChanged();
+    	notifyObservers();
+    	
+    	
+   }
+    
+    
+    public void startGettingGameData(){
+    	this.isGettingGameData = true;
+    	Runnable getGameDataJob = () -> {
+    	while(isGettingGameData){
+    		getGameData();
+    		try {
+                Thread.sleep(100);
+            } catch (NullPointerException e){
+                System.out.println("Server down.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+    	}
+    	};
+    	
+    	getGameData = new Thread(getGameDataJob);
+    	getGameData.start();
+    	
+    }
+    
+    public void stopGettingGameData(){
+    	this.isGettingGameData = false;
+    }
 
     public ConcurrentLinkedDeque<MessageObject> getMessages() {
         return messages;
@@ -693,8 +759,38 @@ public class GameClient extends Observable {
     public void setGameJoined(String gameJoined) {
         this.gameJoined = gameJoined;
     }
+    
+    
+    			
+    public Hand getDealerHand() {
+		return dealerHand;
+	}
 
-    public static void main(String[] args) {
+	public Map<String, Integer> getPlayerBets() {
+		return playerBets;
+	}
+
+	public Map<String, Integer> getPlayerBudgets() {
+		return playerBudgets;
+	}
+
+	public Map<String, Hand> getPlayerHands() {
+		return playerHands;
+	}
+
+	public ArrayList<String> getPlayerNames() {
+		return playerNames;
+	}
+
+	public Map<String, Boolean> getPlayersBust() {
+		return playersBust;
+	}
+
+	public Map<String, Boolean> getPlayersStand() {
+		return playersStand;
+	}
+
+	public static void main(String[] args) {
         // connect to server
         GameClient client = new GameClient("localhost", 7654);
         client.connectToServer();
@@ -707,5 +803,9 @@ public class GameClient extends Observable {
         client.closeConnections();
     }
 
+    
+    
 
 }
+
+
