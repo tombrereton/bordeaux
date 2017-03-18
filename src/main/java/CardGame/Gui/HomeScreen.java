@@ -60,7 +60,7 @@ public class HomeScreen extends JPanel {
 		 * button events for the logout button
 		 */
 		btnLogout.setBackground(new Color(255, 255, 255));
-		btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
+		btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 16));
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			    getClientModel().requestLogOut();

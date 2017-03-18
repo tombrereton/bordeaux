@@ -20,30 +20,44 @@ public class GameScreen extends JPanel {
 	private ClientModel clientModel;
 	private ScreenFactory screenFactory;
 
+	//message panel
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
 	private JLabel lblChat;
 	private JButton btnSendMessage;
-	private JButton btnDoubleDown;
-	private JButton btnStand;
-	private JButton btnHit;
-	private JButton btnFold;
-	private JLabel lblCredits;
-	private JLabel lblSubmitBet;
+	private JButton btnLeaveGame;
+
+	//Hud buttons
 	private JButton btnSubmitBet;
 	private JButton btnBet1;
 	private JButton btnBet2;
 	private JButton btnBet3;
 	private JButton btnBet4;
-	private JButton btnLeaveGame;
+	private JButton btnDoubleDown;
+	private JButton btnStand;
+	private JButton btnHit;
+	private JButton btnFold;
+
+	//Credits boxes
+	private JLabel lblCredits;
+	private JLabel lblSubmitBet;
 	private JLabel lblCreditsBox;
 	private JLabel lblSubmitBetBox;
+
+	//Hud background
 	private JLabel lblBackHud;
     private JLabel lblSideHud;
     private JLabel lblSideFillHud;
 
+    //board images and players
     private JLabel lblDeck;
+	private PlayerGui dealerGui;
+    private PlayerGui playerGui1;
+	private PlayerGui playerGui2;
+	private PlayerGui playerGui3;
+	private PlayerGui playerGui4;
 
+    //current credits and bets
     private int amountToBet;
     private int credits;
 
@@ -56,11 +70,15 @@ public class GameScreen extends JPanel {
 		this.amountToBet = amountToBet;
 		this.credits = 1000;
 
+		//message panel
+		textArea = new JTextArea();
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
         btnLeaveGame = new JButton("Leave");
 
+        //Hud buttons
+		btnSubmitBet = new JButton();
         btnBet1 = new JButton();
         btnBet2 = new JButton();
         btnBet3 = new JButton();
@@ -70,17 +88,24 @@ public class GameScreen extends JPanel {
         btnHit = new JButton();
         btnFold = new JButton();
 
+        //Credits boxes
         lblCredits = new JLabel("Credits: £ "+ Integer.toString(credits));
         lblCreditsBox = new JLabel();
         lblSubmitBet = new JLabel(Integer.toString(amountToBet));
         lblSubmitBetBox = new JLabel();
-        btnSubmitBet = new JButton();
 
+		//Hud background
         lblBackHud = new JLabel();
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
+		//board images and players
 		lblDeck = new JLabel();
+		playerGui1 = new PlayerGui("14");
+		playerGui2 = new PlayerGui("31");
+		playerGui3 = new PlayerGui("5");
+		playerGui4 = new PlayerGui("3");
+		dealerGui = new PlayerGui("1");
 
         setBackground(new Color(46, 139, 87));
         initialize();
@@ -92,21 +117,17 @@ public class GameScreen extends JPanel {
 	 */
 	private void initialize() {
 
-		/**
-		 * Chat message box as a JScroll Pane
-		 */
+		//Message panel: textArea, scrollPane, lblChat, btnSendMessage, btnLeaveGame
+		textArea.setLineWrap(true);
+		add(textArea);
+		textArea.setColumns(10);
+
 		add(scrollPane);
 
-		/**
-		 * chat label
-		 */
 		lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
 		lblChat.setForeground(Color.WHITE);
 		add(lblChat);
 
-		/**
-		 * Send message button
-		 */
 		btnSendMessage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(textArea.getText().equals("")){
@@ -132,99 +153,24 @@ public class GameScreen extends JPanel {
 		}
 		add(btnSendMessage);
 
-		/**
-		 * Editable text area for sending messages
-		 */
-		textArea = new JTextArea();
-		textArea.setLineWrap(true);
-		add(textArea);
-		textArea.setColumns(10);
-
-		/**
-		 * Game buttons
-		 */
-
-		//DoubleDown Button
-		btnDoubleDown.addActionListener(new ActionListener() {
+		btnLeaveGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// todo make this a request leave game
+				getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
-		btnDoubleDown.setContentAreaFilled(false);
-		btnDoubleDown.setBorderPainted(false);
-		try {
-			Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
-			btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnDoubleDown);
+		btnLeaveGame.setBackground(Color.WHITE);
+		btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 13));
+		add(btnLeaveGame);
 
-		//Stand Button
-		btnStand.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnStand.setContentAreaFilled(false);
-		btnStand.setBorderPainted(false);
-		try {
-			Image imgStand = ImageIO.read(getClass().getResource("/gameHud/imageBtnStand.png"));
-			btnStand.setIcon(new ImageIcon(imgStand));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnStand);
 
-		//Hit Button
-		btnHit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnHit.setContentAreaFilled(false);
-		btnHit.setBorderPainted(false);
-		try {
-			Image imgHit = ImageIO.read(getClass().getResource("/gameHud/imageBtnHit.png"));
-			btnHit.setIcon(new ImageIcon(imgHit));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnHit);
-
-		//Hold Button
-		btnFold.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnFold.setContentAreaFilled(false);
-		btnFold.setBorderPainted(false);
-		try {
-			Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
-			btnFold.setIcon(new ImageIcon(imgFold));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnFold);
-
-		/**
-		 * Player credits label
-		 */
-		lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblCredits.setForeground(Color.BLACK);
-		add(lblCredits);
-
-		/**
-		 * Player credits to bet label
-		 */
-		lblSubmitBet.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblSubmitBet.setForeground(Color.BLACK);
-		add(lblSubmitBet);
-
-		//Submit Bet
+		//Hud Buttons: btnSubmitBet, btnBet1, btnBet2, btnBet3, btnBet4, btnDoubleDown, btnStand, btnHit, btnFold
 		btnSubmitBet.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			    credits = credits - amountToBet;
-                amountToBet = 0;
-                lblCredits.setText("Credits: £ "+ Integer.toString(credits));
-                lblSubmitBet.setText(Integer.toString(amountToBet));
+				credits = credits - amountToBet;
+				amountToBet = 0;
+				lblCredits.setText("Credits: £ "+ Integer.toString(credits));
+				lblSubmitBet.setText(Integer.toString(amountToBet));
 			}
 		});
 		btnSubmitBet.setContentAreaFilled(false);
@@ -237,14 +183,11 @@ public class GameScreen extends JPanel {
 		}
 		add(btnSubmitBet);
 
-		/**
-		 * Bet Buttons
-		 */
 		//Bet 1: small
 		btnBet1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                amountToBet += 5;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
+				amountToBet += 5;
+				lblSubmitBet.setText(Integer.toString(amountToBet));
 			}
 		});
 		btnBet1.setContentAreaFilled(false);
@@ -261,8 +204,8 @@ public class GameScreen extends JPanel {
 		//Bet 2: medium
 		btnBet2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                amountToBet += 10;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
+				amountToBet += 10;
+				lblSubmitBet.setText(Integer.toString(amountToBet));
 			}
 		});
 		btnBet2.setContentAreaFilled(false);
@@ -278,8 +221,8 @@ public class GameScreen extends JPanel {
 		//Bet 3: high
 		btnBet3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                amountToBet += 20;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
+				amountToBet += 20;
+				lblSubmitBet.setText(Integer.toString(amountToBet));
 			}
 		});
 		btnBet3.setContentAreaFilled(false);
@@ -295,8 +238,8 @@ public class GameScreen extends JPanel {
 		//Bet 4: very high
 		btnBet4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                amountToBet += 50;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
+				amountToBet += 50;
+				lblSubmitBet.setText(Integer.toString(amountToBet));
 			}
 		});
 		btnBet4.setContentAreaFilled(false);
@@ -309,20 +252,75 @@ public class GameScreen extends JPanel {
 		}
 		add(btnBet4);
 
-		btnLeaveGame.addActionListener(new ActionListener() {
+		btnDoubleDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			    // todo make this a request leave game
-			    getClientModel().setCurrentScreen(LOBBYSCREEN);
 			}
 		});
-		btnLeaveGame.setBackground(Color.WHITE);
-		btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 13));
-		add(btnLeaveGame);
+		btnDoubleDown.setContentAreaFilled(false);
+		btnDoubleDown.setBorderPainted(false);
+		try {
+			Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
+			btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(btnDoubleDown);
 
+		btnStand.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnStand.setContentAreaFilled(false);
+		btnStand.setBorderPainted(false);
+		try {
+			Image imgStand = ImageIO.read(getClass().getResource("/gameHud/imageBtnStand.png"));
+			btnStand.setIcon(new ImageIcon(imgStand));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(btnStand);
+
+		btnHit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnHit.setContentAreaFilled(false);
+		btnHit.setBorderPainted(false);
+		try {
+			Image imgHit = ImageIO.read(getClass().getResource("/gameHud/imageBtnHit.png"));
+			btnHit.setIcon(new ImageIcon(imgHit));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(btnHit);
+
+		btnFold.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnFold.setContentAreaFilled(false);
+		btnFold.setBorderPainted(false);
+		try {
+			Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
+			btnFold.setIcon(new ImageIcon(imgFold));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		add(btnFold);
+
+		//Credits boxes: lblCredits, lblSubmitBet, lblCreditsBox,lblSubmitBetBox
+		lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblCredits.setForeground(Color.BLACK);
+		add(lblCredits);
 
 		/**
-		 * Credits Box
+		 * Player credits to bet label
 		 */
+		lblSubmitBet.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblSubmitBet.setForeground(Color.BLACK);
+		add(lblSubmitBet);
+
+
 		try {
 			Image imgBoxCredits = ImageIO.read(getClass().getResource("/gameHud/imageBoxCredits.png"));
 			lblCreditsBox.setIcon(new ImageIcon(imgBoxCredits));
@@ -331,9 +329,6 @@ public class GameScreen extends JPanel {
 		}
 		add(lblCreditsBox);
 
-		/**
-		 * Bet Box
-		 */
 		try {
 			Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
 			lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
@@ -342,9 +337,8 @@ public class GameScreen extends JPanel {
 		}
 		add(lblSubmitBetBox);
 
-		/**
-		 * Back hud
-		 */
+
+		//Hud background, lblBackHud, lblSideHud, lblSideFillHud
 		try {
 			Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
 			lblBackHud.setIcon(new ImageIcon(imgHud));
@@ -366,9 +360,7 @@ public class GameScreen extends JPanel {
         add(lblSideHud);
 
 
-		/**
-		 * Player positions and cards
-		 */
+        //Player positions and board images: lblDeck, playerGui1, playerGui2, playerGui3, playerGui4
 		try {
 			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
 			lblDeck.setIcon(new ImageIcon(imgDeck));
@@ -376,6 +368,12 @@ public class GameScreen extends JPanel {
 			System.out.println(ex);
 		}
 		add(lblDeck);
+
+		add(dealerGui);
+		add(playerGui1);
+		add(playerGui2);
+		add(playerGui3);
+		add(playerGui4);
 
 	}
 
@@ -406,7 +404,13 @@ public class GameScreen extends JPanel {
 		lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent()-86, 241, 42);
 		lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent()-126, 144, 45);
 		lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent()-176, 2590, 204);
-		lblDeck.setBounds(screenFactory.getxOrigin()+720, 50, 64, 93);
+        lblDeck.setBounds(screenFactory.getxOrigin()+650, 20, 64, 93);
+
+		dealerGui.setBounds((int)(screenFactory.getxOrigin()*0.5)+320, 20, 200, 200);
+		playerGui1.setBounds(20, screenFactory.getScreenHeightCurrent()-425, 200, 200);
+		playerGui2.setBounds((int)(screenFactory.getxOrigin()*0.3)+220, screenFactory.getScreenHeightCurrent()-350, 200, 200);
+		playerGui3.setBounds((int)(screenFactory.getxOrigin()*0.7)+420, screenFactory.getScreenHeightCurrent()-350, 200, 200);
+		playerGui4.setBounds(screenFactory.getxOrigin()+620, screenFactory.getScreenHeightCurrent()-425, 200, 200);
 	}
 
     public int getAmountToBet() {

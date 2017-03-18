@@ -25,7 +25,7 @@ public class User {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         Random r = new Random();
-        this.avatarID = Integer.toString(r.nextInt(40)+1);
+        this.avatarID = Integer.toString(r.nextInt(39)+2);
     }
 
     public User(String userName, String password, String firstName, String lastName) {
@@ -34,14 +34,14 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         Random r = new Random();
-        this.avatarID = Integer.toString(r.nextInt(40)+1);
+        this.avatarID = Integer.toString(r.nextInt(39)+2);
     }
 
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
         Random r = new Random();
-        this.avatarID = Integer.toString(r.nextInt(40)+1);
+        this.avatarID = Integer.toString(r.nextInt(39)+2);
     }
 
     public User(String userName) {
@@ -50,7 +50,7 @@ public class User {
 
     public User(){
         Random r = new Random();
-        this.avatarID = Integer.toString(r.nextInt(39));
+        this.avatarID = Integer.toString(r.nextInt(39)+2);
     }
 
     public String getUserName() {

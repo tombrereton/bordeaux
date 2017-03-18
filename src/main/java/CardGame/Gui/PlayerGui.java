@@ -10,6 +10,10 @@ import java.awt.*;
 public class PlayerGui extends JPanel {
 
     private JLabel lblAvatar;
+    private JLabel lblName;
+    private JLabel lblBetAmount;
+    private JLabel lblCredits;
+
     private JLabel lblCard1;
     private JLabel lblCard2;
     private JLabel lblCard3;
@@ -24,7 +28,67 @@ public class PlayerGui extends JPanel {
     private JLabel lblCard12;
 
     public PlayerGui(){
-        lblAvatar = new JLabel();
+        setOpaque(false);
+        createPlayerComponents();
+        setLblAvatar("0");
+        setLblName("username");
+        setLblBetAmount("to bet...");
+        setLblCredits("credits");
+        setPlayerBounds();
+        addPlayerComponents();
+        createCards();
+        setPlayerCardBounds();
+        initialize();
+    }
+
+    /**
+     * Creates a new player with specified avatar, if 1 is given a dealerGui is made
+     */
+    public PlayerGui(String avatarID){
+        setOpaque(false);
+        if (avatarID =="1"){
+            createDealerComponents();
+            setLblName("Dealer");
+            setDealerBounds();
+            addDealerComponents();
+            createCards();
+            setDealerCardBounds();
+        } else {
+            createPlayerComponents();
+            setLblName("username");
+            setLblBetAmount("amount to bet");
+            setLblCredits("credits");
+            setPlayerBounds();
+            addPlayerComponents();
+            createCards();
+            setPlayerCardBounds();
+        }
+        setLblAvatar(avatarID);
+        initialize();
+    }
+
+    public void initialize() {
+
+        setLayout(null);
+        setSize(new Dimension(200,200));
+
+        //TEST CARD
+        setLblCard12("001");
+        setLblCard11("001");
+        setLblCard10("001");
+        setLblCard9("001");
+        setLblCard8("001");
+        setLblCard7("001");
+        setLblCard6("001");
+        setLblCard5("001");
+        setLblCard4("001");
+        setLblCard3("001");
+        setLblCard2("001");
+        setLblCard1("001");
+
+    }
+
+    public void createCards(){
         lblCard1 = new JLabel();
         lblCard2 = new JLabel();
         lblCard3 = new JLabel();
@@ -37,43 +101,116 @@ public class PlayerGui extends JPanel {
         lblCard10 = new JLabel();
         lblCard11 = new JLabel();
         lblCard12 = new JLabel();
-        initialize();
     }
 
-    public void initialize() {
 
-        setSize(new Dimension(200,150));
-
-        //Set the initial avatar to an empty chair
-        try {
-            Image imgAvatar = ImageIO.read(getClass().getResource("/avatar/0.png"));
-            lblAvatar.setIcon(new ImageIcon(imgAvatar));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblAvatar);
-
-        //set the bounds of the avatar and card images
-        lblAvatar.setBounds(0, 70, 64, 64);
+    public void setPlayerCardBounds(){
         lblCard1.setBounds(0, 0, 64, 93);
-        lblCard2.setBounds(10, 10, 64, 93);
-        lblCard2.setBounds(20, 20, 64, 93);
-        lblCard2.setBounds(30, 30, 64, 93);
-        lblCard2.setBounds(40, 40, 64, 93);
-        lblCard2.setBounds(50, 40, 64, 93);
-        lblCard2.setBounds(60, 40, 64, 93);
-        lblCard2.setBounds(70, 40, 64, 93);
-        lblCard2.setBounds(80, 40, 64, 93);
-        lblCard2.setBounds(90, 40, 64, 93);
-        lblCard2.setBounds(100, 40, 64, 93);
-        lblCard2.setBounds(110, 40, 64, 93);
+        lblCard2.setBounds(25, 2, 64, 93);
+        lblCard3.setBounds(50, 4, 64, 93);
+        lblCard4.setBounds(75, 6, 64, 93);
+        lblCard5.setBounds(100, 8, 64, 93);
+        lblCard6.setBounds(125, 10, 64, 93);
+        lblCard7.setBounds(100, 38, 64, 93);
+        lblCard8.setBounds(125, 40, 64, 93);
+        lblCard9.setBounds(100, 68, 64, 93);
+        lblCard10.setBounds(125, 70, 64, 93);
+        lblCard11.setBounds(100, 98, 64, 93);
+        lblCard12.setBounds(125, 100, 64, 93);
+    }
 
+    public void setDealerCardBounds(){
+        lblCard1.setBounds(0, 0, 64, 93);
+        lblCard2.setBounds(25, 2, 64, 93);
+        lblCard3.setBounds(0, 30, 64, 93);
+        lblCard4.setBounds(25, 32, 64, 93);
+        lblCard5.setBounds(0, 60, 64, 93);
+        lblCard6.setBounds(25, 62, 64, 93);
+        lblCard7.setBounds(0, 90, 64, 93);
+        lblCard8.setBounds(25, 92, 64, 93);
+        lblCard9.setBounds(50, 94, 64, 93);
+        lblCard10.setBounds(75, 96, 64, 93);
+        lblCard11.setBounds(100, 98, 64, 93);
+        lblCard12.setBounds(125, 100, 64, 93);
+    }
+
+    public void setPlayerBounds(){
+        lblAvatar.setBounds(10, 60, 64, 64);
+        lblName.setBounds(0, 124, 94, 20);
+        lblCredits.setBounds(0, 144, 94, 20);
+        lblBetAmount.setBounds(0, 164, 94, 20);
+        lblName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblCredits.setHorizontalAlignment(SwingConstants.CENTER);
+        lblBetAmount.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+
+    public void createPlayerComponents(){
+        lblAvatar = new JLabel();
+        lblName = new JLabel();
+        lblBetAmount = new JLabel();
+        lblCredits = new JLabel();
+        lblName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblName.setForeground(Color.BLACK);
+        lblName.setBackground(Color.WHITE);
+        lblName.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        lblName.setOpaque(true);
+        lblBetAmount.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblBetAmount.setForeground(Color.BLACK);
+        lblBetAmount.setBackground(Color.WHITE);
+        lblBetAmount.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        lblBetAmount.setOpaque(true);
+        lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblCredits.setForeground(Color.BLACK);
+        lblCredits.setBackground(Color.WHITE);
+        lblCredits.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        lblCredits.setOpaque(true);
+    }
+
+    public void addPlayerComponents(){
+        add(lblAvatar);
+        add(lblName);
+        add(lblBetAmount);
+        add(lblCredits);
+    }
+
+    public void setDealerBounds(){
+        lblAvatar.setBounds(100, 0, 64, 64);
+        lblName.setBounds(100, 64, 64, 20);
+        lblName.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    public void createDealerComponents(){
+        lblAvatar = new JLabel();
+        lblName = new JLabel();
+        lblName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblName.setBackground(Color.WHITE);
+        lblName.setForeground(Color.BLACK);
+        lblName.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        lblName.setOpaque(true);
+    }
+
+    public void addDealerComponents(){
+        add(lblAvatar);
+        add(lblName);
+    }
+
+    public void setLblName(String username){
+        lblName.setText(username);
+    }
+
+    public void setLblCredits(String credits){
+        lblCredits.setText(credits);
+    }
+
+    public void setLblBetAmount(String betAmount){
+        lblBetAmount.setText(betAmount);
     }
 
     public void setLblAvatar(String avatarID) {
         remove(lblAvatar);
         try {
-            Image imgAvatar = ImageIO.read(getClass().getResource("/avatar/"+avatarID+".png"));
+            Image imgAvatar = ImageIO.read(getClass().getResource("/avatars/"+avatarID+".png"));
             lblAvatar.setIcon(new ImageIcon(imgAvatar));
         } catch (Exception ex) {
             System.out.println(ex);
