@@ -28,6 +28,7 @@ public class ProtocolMessages {
     public static final String EMPTY_MSG = "message sent is empty or null.";
     public static final String EMPTY = "protocol sent contains empty or null elements.";
     public static final String BET_NOT_IN_BUDGET = "bet not within player budget.";
+    public static final String BET_TOO_SMALL = "bet must be greater than or equal to 5.";
     public static final String WRONG_OFFSET = "incorrect offset for messages.";
     public static final String NOT_FINISHED_ROUND = "player has not finished their round.";
     public static final String FINISHED_ROUND = "player has already finished their round.";

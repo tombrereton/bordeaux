@@ -393,6 +393,9 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (betAmount < 5){
+            // return fail if bet is less than 5 pounds
+            return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
