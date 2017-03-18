@@ -46,6 +46,8 @@ public class GameClient extends Observable {
     // game variables
     private volatile ConcurrentSkipListSet<String> listOfGames;
     private String gameJoined;
+
+    // game data
     private Map<String, Boolean> playersFinished;
     private Hand dealerHand;
     private Map<String, Integer> playerBets;
@@ -55,8 +57,8 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
-    
-    
+
+
     // chat variables
     private int chatOffset;
     private volatile ConcurrentLinkedDeque<MessageObject> messages;
@@ -68,7 +70,6 @@ public class GameClient extends Observable {
     private volatile boolean isGettingGames;
     private volatile boolean isGettingMessages;
     private volatile boolean isGettingGameData;
-    
 
 
     public GameClient(String HOST, int PORT) {
@@ -318,7 +319,7 @@ public class GameClient extends Observable {
      * @param message
      * @return
      */
-    public ResponseSendMessage requestSendMessage(String message) {
+    public synchronized ResponseSendMessage requestSendMessage(String message) {
         // create request and send request
         RequestSendMessage requestSendMessage = new RequestSendMessage(getLoggedInUser().getUserName(), message);
         sendRequest(requestSendMessage);
@@ -334,7 +335,7 @@ public class GameClient extends Observable {
      * @return
      */
 
-    public ResponseGetMessages requestGetMessages(int offset) {
+    public synchronized ResponseGetMessages requestGetMessages(int offset) {
         // create request and send request
         RequestGetMessages requestGetMessages = new RequestGetMessages(offset);
         sendRequest(requestGetMessages);
@@ -377,6 +378,7 @@ public class GameClient extends Observable {
             setCurrentScreen(GAMESCREEN);
             stopGettingGameNames();
             startGettingMessages();
+            startGettingGameData();
             setGameJoined(gameToJoin);
         }
 
@@ -401,6 +403,7 @@ public class GameClient extends Observable {
         if (success == 1) {
             setCurrentScreen(LOBBYSCREEN);
             stopGettingMessages();
+            stopGettingGameData();
             listOfGames.clear();
             startGettingGameNames();
             messages.clear();
@@ -420,7 +423,7 @@ public class GameClient extends Observable {
      * @param betAmount
      * @return
      */
-    public ResponseBet requestBet(int betAmount) {
+    public synchronized ResponseBet requestBet(int betAmount) {
         // create request and send request
         RequestBet requestBet = new RequestBet(betAmount, getLoggedInUser().getUserName());
         sendRequest(requestBet);
@@ -434,7 +437,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseHit requestHit() {
+    public synchronized ResponseHit requestHit() {
         // create request and send request
         RequestHit requestHit = new RequestHit(getLoggedInUser().getUserName());
         sendRequest(requestHit);
@@ -448,7 +451,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseDoubleBet requestDoubleBet() {
+    public synchronized ResponseDoubleBet requestDoubleBet() {
         // create request and send request
         RequestDoubleBet requestDoubleBet = new RequestDoubleBet(getLoggedInUser().getUserName());
         sendRequest(requestDoubleBet);
@@ -462,7 +465,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseFold requestFold() {
+    public synchronized ResponseFold requestFold() {
         // create request and send request
         RequestFold requestFold = new RequestFold(getLoggedInUser().getUserName());
         sendRequest(requestFold);
@@ -476,7 +479,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public ResponseStand requestStand() {
+    public synchronized ResponseStand requestStand() {
         // create request and send request
         RequestStand requestStand = new RequestStand(getLoggedInUser().getUserName());
         sendRequest(requestStand);
@@ -485,7 +488,7 @@ public class GameClient extends Observable {
         return getResponse(ResponseStand.class);
     }
 
-    public PushDealerHand requestGetDealerHand() {
+    public synchronized PushDealerHand requestGetDealerHand() {
         // create request and send request
         RequestGetDealerHand requestGetDealerHand = new RequestGetDealerHand();
         sendRequest(requestGetDealerHand);
@@ -494,7 +497,7 @@ public class GameClient extends Observable {
         return getResponse(PushDealerHand.class);
     }
 
-    public PushGameNames requestGetGameNames() {
+    public synchronized PushGameNames requestGetGameNames() {
         // create request and send request
         RequestGetGameNames requestGetGameNames = new RequestGetGameNames();
         sendRequest(requestGetGameNames);
@@ -503,7 +506,7 @@ public class GameClient extends Observable {
         return getResponse(PushGameNames.class);
     }
 
-    public PushPlayerBets requestGetPlayerBets() {
+    public synchronized PushPlayerBets requestGetPlayerBets() {
         // create request and send request
         RequestGetPlayerBets requestGetPlayerBets = new RequestGetPlayerBets();
         sendRequest(requestGetPlayerBets);
@@ -512,7 +515,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayerBets.class);
     }
 
-    public PushPlayerBudgets requestGetPlayerBudgets() {
+    public synchronized PushPlayerBudgets requestGetPlayerBudgets() {
         // create request and send request
         RequestGetPlayerBudgets requestGetPlayerBudgets = new RequestGetPlayerBudgets();
         sendRequest(requestGetPlayerBudgets);
@@ -521,7 +524,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayerBudgets.class);
     }
 
-    public PushPlayersBust requestGetPlayersBust() {
+    public synchronized PushPlayersBust requestGetPlayersBust() {
         // create request and send request
         RequestGetPlayersBust requestGetPlayersBust = new RequestGetPlayersBust();
         sendRequest(requestGetPlayersBust);
@@ -530,7 +533,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayersBust.class);
     }
 
-    public PushPlayerHands requestGetPlayerHands() {
+    public synchronized PushPlayerHands requestGetPlayerHands() {
         // create request and send request
         RequestGetPlayerHands requestGetPlayerHands = new RequestGetPlayerHands();
         sendRequest(requestGetPlayerHands);
@@ -539,7 +542,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayerHands.class);
     }
 
-    public PushPlayerNames requestGetPlayerNames() {
+    public synchronized PushPlayerNames requestGetPlayerNames() {
         // create request and send request
         RequestGetPlayerNames requestGetPlayerNames = new RequestGetPlayerNames();
         sendRequest(requestGetPlayerNames);
@@ -548,7 +551,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayerNames.class);
     }
 
-    public PushPlayersStand requestGetPlayersStand() {
+    public synchronized PushPlayersStand requestGetPlayersStand() {
         // create request and send request
         RequestGetPlayersStand requestGetPlayersStand = new RequestGetPlayersStand();
         sendRequest(requestGetPlayersStand);
@@ -557,7 +560,7 @@ public class GameClient extends Observable {
         return getResponse(PushPlayersStand.class);
     }
 
-    public PushPlayersWon requestGetPlayersWon() {
+    public synchronized PushPlayersWon requestGetPlayersWon() {
         // create request and send request
         RequestGetPlayersWon requestGetPlayersWon = new RequestGetPlayersWon();
         sendRequest(requestGetPlayersWon);
@@ -565,8 +568,6 @@ public class GameClient extends Observable {
         // get response from server and returnit
         return getResponse(PushPlayersWon.class);
     }
-    
-    
 
 
     /**
@@ -674,7 +675,7 @@ public class GameClient extends Observable {
 
                 try {
                     Thread.sleep(100);
-                } catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     System.out.println("Server down.");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -692,61 +693,90 @@ public class GameClient extends Observable {
     public void stopGettingMessages() {
         this.isGettingMessages = false;
     }
-    public void getGameData(){
-    	//Get all pushes
-    	PushDealerHand pushDealerHand = requestGetDealerHand();
-    	this.dealerHand = pushDealerHand.getDealerHand();
-    	PushPlayerBets pushPlayerBets = requestGetPlayerBets();
-    	playerBets = pushPlayerBets.getPlayerBets();
-    	PushPlayerBudgets pushPlayerBudgets = requestGetPlayerBudgets();
-    	playerBudgets = pushPlayerBudgets.getPlayerBudgets();
-    	PushPlayerHands pushPlayerHands = requestGetPlayerHands();
-    	playerHands = pushPlayerHands.getPlayerHands();
-    	PushPlayerNames pushPlayerNames = requestGetPlayerNames();
-    	playerNames = pushPlayerNames.getPlayerNames();
-    	PushPlayersBust pushPlayersBust = requestGetPlayersBust();
-    	playersBust = pushPlayersBust.getPlayersBust();
-    	PushPlayersStand pushPlayersStand = requestGetPlayersStand();
-    	playersStand = pushPlayersStand.getPlayersStand();
-    	PushPlayersWon pushPlayersWon = requestGetPlayersWon();
-    	playersWon = pushPlayersWon.getPlayersWon();
-    	//notify and stuff
-    	setChanged();
-    	notifyObservers();
-    	
-    	
-   }
-    
-    
-    public void startGettingGameData(){
-    	this.isGettingGameData = true;
-    	Runnable getGameDataJob = () -> {
-    	while(isGettingGameData){
-    		getGameData();
-    		try {
-                Thread.sleep(100);
-            } catch (NullPointerException e){
-                System.out.println("Server down.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-    	}
-    	};
-    	
-    	getGameData = new Thread(getGameDataJob);
-    	getGameData.start();
-    	
+
+    /**
+     * This method sends requests for the game data
+     */
+    public void getGameData() {
+        // Dealer hand
+        PushDealerHand pushDealerHand = requestGetDealerHand();
+        dealerHand = pushDealerHand.getDealerHand();
+
+        // player bets
+        PushPlayerBets pushPlayerBets = requestGetPlayerBets();
+        playerBets = pushPlayerBets.getPlayerBets();
+
+        // player budgets
+        PushPlayerBudgets pushPlayerBudgets = requestGetPlayerBudgets();
+        playerBudgets = pushPlayerBudgets.getPlayerBudgets();
+
+        // player hands
+        PushPlayerHands pushPlayerHands = requestGetPlayerHands();
+        playerHands = pushPlayerHands.getPlayerHands();
+
+        // player names
+        PushPlayerNames pushPlayerNames = requestGetPlayerNames();
+        playerNames = pushPlayerNames.getPlayerNames();
+
+        // players bust
+        PushPlayersBust pushPlayersBust = requestGetPlayersBust();
+        playersBust = pushPlayersBust.getPlayersBust();
+
+        // players stand
+        PushPlayersStand pushPlayersStand = requestGetPlayersStand();
+        playersStand = pushPlayersStand.getPlayersStand();
+
+        // players won
+        PushPlayersWon pushPlayersWon = requestGetPlayersWon();
+        playersWon = pushPlayersWon.getPlayersWon();
+
     }
-    
-    public void stopGettingGameData(){
-    	this.isGettingGameData = false;
+
+
+    /**
+     * This method starts a thread to poll for game data
+     */
+    public void startGettingGameData() {
+
+        this.isGettingGameData = true;
+
+        // create the job
+        Runnable getGameDataJob = () -> {
+
+            while (isGettingGameData) {
+
+                // get game data
+                getGameData();
+
+
+                // sleep thread for 1000
+                try {
+                    Thread.sleep(1000);
+                } catch (NullPointerException e) {
+                    System.out.println("Server down.");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        // create the thread
+        getGameData = new Thread(getGameDataJob);
+
+        // start thread
+        getGameData.start();
+
+    }
+
+    public void stopGettingGameData() {
+        this.isGettingGameData = false;
     }
 
     public ConcurrentLinkedDeque<MessageObject> getMessages() {
         return messages;
     }
 
-    public void addMessages(ArrayList<MessageObject> messages) {
+    public synchronized void addMessages(ArrayList<MessageObject> messages) {
         for (MessageObject mo : messages) {
             this.messages.add(mo);
         }
@@ -759,52 +789,35 @@ public class GameClient extends Observable {
     public void setGameJoined(String gameJoined) {
         this.gameJoined = gameJoined;
     }
-    
-    
-    			
+
+
     public Hand getDealerHand() {
-		return dealerHand;
-	}
-
-	public Map<String, Integer> getPlayerBets() {
-		return playerBets;
-	}
-
-	public Map<String, Integer> getPlayerBudgets() {
-		return playerBudgets;
-	}
-
-	public Map<String, Hand> getPlayerHands() {
-		return playerHands;
-	}
-
-	public ArrayList<String> getPlayerNames() {
-		return playerNames;
-	}
-
-	public Map<String, Boolean> getPlayersBust() {
-		return playersBust;
-	}
-
-	public Map<String, Boolean> getPlayersStand() {
-		return playersStand;
-	}
-
-	public static void main(String[] args) {
-        // connect to server
-        GameClient client = new GameClient("localhost", 7654);
-        client.connectToServer();
-
-        // send login request to server
-        ResponseLoginUser responseLoginUser = client.requestLogin("user111", "password");
-        System.out.println(responseLoginUser);
-
-        // close connections
-        client.closeConnections();
+        return dealerHand;
     }
 
-    
-    
+    public Map<String, Integer> getPlayerBets() {
+        return playerBets;
+    }
+
+    public Map<String, Integer> getPlayerBudgets() {
+        return playerBudgets;
+    }
+
+    public Map<String, Hand> getPlayerHands() {
+        return playerHands;
+    }
+
+    public ArrayList<String> getPlayerNames() {
+        return playerNames;
+    }
+
+    public Map<String, Boolean> getPlayersBust() {
+        return playersBust;
+    }
+
+    public Map<String, Boolean> getPlayersStand() {
+        return playersStand;
+    }
 
 }
 
