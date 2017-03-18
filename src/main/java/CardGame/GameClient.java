@@ -151,7 +151,7 @@ public class GameClient extends Observable {
             // write request to server
             this.serverOutputStream.writeUTF(jsonOutput);
             this.serverOutputStream.flush();
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             System.out.println("Server down.");
         } catch (IOException e) {
             System.out.println("Server down.");
@@ -606,33 +606,33 @@ public class GameClient extends Observable {
         // create the job
         Runnable gameNamesJob = () -> {
 
-                try {
-                    while (isGettingGames) {
-                        PushGameNames pushGameNames = requestGetGameNames();
+            try {
+                while (isGettingGames) {
+                    PushGameNames pushGameNames = requestGetGameNames();
 
-                        ArrayList<String> responseGamesNames = pushGameNames.getGameNames();
-                        getListOfGames().clear();
-                        getListOfGames().addAll(responseGamesNames);
+                    ArrayList<String> responseGamesNames = pushGameNames.getGameNames();
+                    getListOfGames().clear();
+                    getListOfGames().addAll(responseGamesNames);
 
-                        Thread.sleep(1000);
-                    }
-                } catch (NullPointerException e) {
-                    System.out.println("Can't get game names. Server down.");
-                } catch (InterruptedException e) {
-                    System.out.println("Polling for game list interrupted.");
-                } finally {
-                    while (socket.isClosed()){
-                        connectToServer();
-                        try {
-                            requestLogin(getLoggedInUser().getUserName(), getLoggedInUser().getPassword());
-                            Thread.sleep(2000);
-                        } catch (NullPointerException e){
-                            System.out.println("Still can't log in, server is down.");
-                        } catch (InterruptedException e) {
-                            System.out.println("Trying to reconnect");
-                        }
-                    }
+                    Thread.sleep(1000);
                 }
+            } catch (NullPointerException e) {
+                System.out.println("Can't get game names. Server down.");
+            } catch (InterruptedException e) {
+                System.out.println("Polling for game list interrupted.");
+            } //finally {
+//                    while (socket.isClosed()){
+//                        connectToServer();
+//                        try {
+//                            requestLogin(getLoggedInUser().getUserName(), getLoggedInUser().getPassword());
+//                            Thread.sleep(2000);
+//                        } catch (NullPointerException e){
+//                            System.out.println("Still can't log in, server is down.");
+//                        } catch (InterruptedException e) {
+//                            System.out.println("Trying to reconnect");
+//                        }
+//                    }
+//                }
         };
 
         gameNamesThread = new Thread(gameNamesJob);

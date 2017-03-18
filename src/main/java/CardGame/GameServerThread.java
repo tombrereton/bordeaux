@@ -931,7 +931,6 @@ public class GameServerThread implements Runnable {
      */
     public void addToMessageQueue(MessageObject msg) {
         getGame(gameJoined).getMessageQueue().add(msg);
-//        this.messageQueue.add(msg);
     }
 
 
