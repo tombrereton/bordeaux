@@ -131,7 +131,7 @@ public class CreateAccountScreen extends JPanel {
 
 	public void updateBounds(){
 		btnSignUp.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+392, 146, 23);
-		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-70, 89, 23);
+		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
 		emailField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+338, 146, 20);
 		passwordField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+308, 146, 20);
 		usernameField.setBounds(screenFactory.getxOrigin()+501, screenFactory.getyOrigin()+278, 146, 20);

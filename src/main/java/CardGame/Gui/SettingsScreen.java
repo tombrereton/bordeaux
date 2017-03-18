@@ -60,7 +60,7 @@ public class SettingsScreen extends JPanel {
 
 	public void updateBounds(){
 		lblTitle.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
-		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-70, 89, 23);
+		btnBack.setBounds(10, screenFactory.getScreenHeightCurrent()-80, 100, 30);
 	}
 
 	public ClientModel getClientModel() {
