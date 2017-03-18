@@ -1,17 +1,19 @@
 package CardGame.Pushes;
 
-import CardGame.ProtocolTypes;
+import CardGame.Responses.ResponseProtocol;
 
 import java.util.ArrayList;
+
+import static CardGame.ProtocolTypes.PUSH_GAME_NAMES;
 
 /**
  * Created by tom on 11/03/17.
  */
-public class PushGameNames extends PushProtocol {
+public class PushGameNames extends ResponseProtocol {
     private ArrayList<String> gameNames;
 
-    public PushGameNames(ArrayList<String> gameNames) {
-        super(ProtocolTypes.PUSH_GAME_NAMES);
+    public PushGameNames(int protocolID, int success, ArrayList<String> gameNames) {
+        super(protocolID, PUSH_GAME_NAMES, success);
         this.gameNames = gameNames;
     }
 

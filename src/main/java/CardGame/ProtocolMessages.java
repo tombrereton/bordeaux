@@ -15,7 +15,8 @@ public class ProtocolMessages {
     public static final String DUPE_USERNAME = "duplicate username in database.";
     public static final String NON_EXIST = "does not exist.";
     public static final String PASSWORD_MISMATCH = "username or password does not match.";
-    public static final String EMPTY_INSERT = "cannot insert empty object into database.";
+    public static final String EMPTY_INSERT = "cannot insert empty user into database.";
+    public static final String REGISTERED = "successfully registered user";
     public static final String NO_CLIENTS = "no clients connected.";
     public static final String NOT_LOGGED_IN = "user not logged in.";
     public static final String ALREADY_LOGGED_IN = "user already logged in.";

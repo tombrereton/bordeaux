@@ -1,7 +1,6 @@
 package CardGame;
 
 import CardGame.GameEngine.GameLobby;
-import CardGame.Pushes.PushGameNames;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -34,7 +33,7 @@ public class GameServerTest {
     GameServerThread cardGameServerThread;
     GameServerThread cardGameServerThreadTwo;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
-    CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
+    ConcurrentLinkedDeque<String> gameNames = new ConcurrentLinkedDeque<>();
     CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
     User userTest = new User("N00b_D3STROYER", "password", "Gwenith", "Hazlenut");
     User userTestTwo = new User("boris99", "dog", "Thomas", "Brereton");
@@ -439,7 +438,7 @@ public class GameServerTest {
                 new CopyOnWriteArrayList<User>(),
                 new FunctionDB(),
                 new CopyOnWriteArrayList<GameLobby>(),
-                new CopyOnWriteArrayList<String>());
+                new ConcurrentLinkedDeque<>());
 
         RequestProtocol requestCreateGame = new RequestCreateGame(userTest.getUserName());
 
@@ -531,8 +530,7 @@ public class GameServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
+
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());
@@ -603,8 +601,6 @@ public class GameServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());
@@ -695,8 +691,6 @@ public class GameServerTest {
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
-        ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
         expectedGames.add(this.userTest.getUserName());

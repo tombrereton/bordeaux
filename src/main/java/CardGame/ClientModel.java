@@ -3,7 +3,6 @@ package CardGame;
 import CardGame.GameEngine.BlackjackHand;
 import CardGame.GameEngine.Hand;
 import CardGame.Gui.Screens;
-import CardGame.Pushes.PushProtocol;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
 import com.google.gson.Gson;
@@ -13,9 +12,10 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static CardGame.Gui.Screens.*;
@@ -41,27 +41,28 @@ public class ClientModel extends Observable {
     private boolean connected, loggedIn;
 
     // Screen state variable
-    // this variable can only be set the predefined screens
-    // in CardGame.Gui.Screens
     private int currentScreen;
 
     // fields
     Gson gson = new Gson();
     User user;
     ArrayList<User> users;
-    LinkedBlockingQueue<PushProtocol> pushRequestQueue;
 
     // Game variables
-    private ArrayList<String> playerNames;
-    private Hand dealerHand;
-    private Map<String, Hand> playerHands;
-    private Map<String, Integer> playerBets;
-    private Map<String, Integer> playerBudgets;
-    private Map<String, Boolean> playersFinished;
-    private Map<String, Boolean> playersWon;
-    private Map<String, Boolean> playersBust;
-    private Map<String, Boolean> playersStand;
-    private ArrayList<String> listOfGames;
+    private volatile LinkedBlockingQueue<ResponseProtocol> pushProtocolQueue;
+    private volatile CopyOnWriteArrayList<String> playerNames;
+    private volatile Hand dealerHand;
+    private volatile ConcurrentHashMap<String, Hand> playerHands;
+    private volatile ConcurrentHashMap<String, Integer> playerBets;
+    private volatile ConcurrentHashMap<String, Integer> playerBudgets;
+    private volatile ConcurrentHashMap<String, Boolean> playersFinished;
+    private volatile ConcurrentHashMap<String, Boolean> playersWon;
+    private volatile ConcurrentHashMap<String, Boolean> playersBust;
+    private volatile ConcurrentHashMap<String, Boolean> playersStand;
+    private volatile CopyOnWriteArrayList<String> listOfGames;
+
+    // chat variables
+    private int chatOffset;
 
     /**
      * Constructor.
@@ -83,18 +84,23 @@ public class ClientModel extends Observable {
 
         this.connected = false;
         this.loggedIn = false;
-        this.pushRequestQueue = new LinkedBlockingQueue<PushProtocol>();
+        this.pushProtocolQueue = new LinkedBlockingQueue<ResponseProtocol>();
         this.currentScreen = Screens.LOGINSCREEN;
 
         // instantiate game variables
-        this.playerNames = new ArrayList<>();
-        this.playerHands = new HashMap<>();
-        this.playerBudgets = new HashMap<>();
-        this.playersBust = new HashMap<>();
-        this.playersWon = new HashMap<>();
-        this.playersStand = new HashMap<>();
+        this.playerNames = new CopyOnWriteArrayList<>();
+        this.playerHands = new ConcurrentHashMap<>();
+        this.playerBudgets = new ConcurrentHashMap<>();
+        this.playersBust = new ConcurrentHashMap<>();
+        this.playersWon = new ConcurrentHashMap<>();
+        this.playersStand = new ConcurrentHashMap<>();
         this.dealerHand = new BlackjackHand();
-        this.listOfGames = new ArrayList<>();
+        this.listOfGames = new CopyOnWriteArrayList<>();
+
+        this.chatOffset = -1;
+
+        // method which starts a thread to listen for pushes
+//        getPushFromQueue();
     }
 
     /**
@@ -200,8 +206,8 @@ public class ClientModel extends Observable {
             responseCreateGame = gson.fromJson(responseString, ResponseCreateGame.class);
             if (responseCreateGame.getRequestSuccess() == 1) {
                 System.out.println("Created Game");
-                String gameName = responseCreateGame.getGameName();
-                listOfGames.add(gameName);
+//                String gameName = responseCreateGame.getGameName();
+//                listOfGames.add(gameName);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -366,6 +372,7 @@ public class ClientModel extends Observable {
     }
 
 
+
     /**
      * getter for cardgameclient object.
      *
@@ -425,7 +432,7 @@ public class ClientModel extends Observable {
      *
      * @return
      */
-    public ArrayList<String> getListOfGames() {
+    public CopyOnWriteArrayList<String> getListOfGames() {
         return listOfGames;
     }
 
@@ -441,11 +448,27 @@ public class ClientModel extends Observable {
     }
 
     /**
+     * Getter for chatoffset
+     * @return
+     */
+    public int getChatOffset() {
+        return chatOffset;
+    }
+
+    /**
+     * setter for chat offset
+     * @param chatOffset
+     */
+    public void setChatOffset(int chatOffset) {
+        this.chatOffset = chatOffset;
+    }
+
+    /**
      * Setter for list of games.
      *
      * @param listOfGames
      */
-    public void setListOfGames(ArrayList<String> listOfGames) {
+    public void setListOfGames(CopyOnWriteArrayList<String> listOfGames) {
         this.listOfGames = listOfGames;
     }
 
@@ -454,7 +477,7 @@ public class ClientModel extends Observable {
      *
      * @return
      */
-    public ArrayList<String> getPlayerNames() {
+    public CopyOnWriteArrayList<String> getPlayerNames() {
         return playerNames;
     }
 
@@ -535,7 +558,7 @@ public class ClientModel extends Observable {
      *
      * @param playerNames
      */
-    public void setPlayerNames(ArrayList<String> playerNames) {
+    public void setPlayerNames(CopyOnWriteArrayList<String> playerNames) {
         this.playerNames = playerNames;
     }
 
@@ -553,7 +576,7 @@ public class ClientModel extends Observable {
      *
      * @param playerHands
      */
-    public void setPlayerHands(Map<String, Hand> playerHands) {
+    public void setPlayerHands(ConcurrentHashMap<String, Hand> playerHands) {
         this.playerHands = playerHands;
     }
 
@@ -562,7 +585,7 @@ public class ClientModel extends Observable {
      *
      * @param playerBets
      */
-    public void setPlayerBets(Map<String, Integer> playerBets) {
+    public void setPlayerBets(ConcurrentHashMap<String, Integer> playerBets) {
         this.playerBets = playerBets;
     }
 
@@ -571,7 +594,7 @@ public class ClientModel extends Observable {
      *
      * @param playerBudgets
      */
-    public void setPlayerBudgets(Map<String, Integer> playerBudgets) {
+    public void setPlayerBudgets(ConcurrentHashMap<String, Integer> playerBudgets) {
         this.playerBudgets = playerBudgets;
     }
 
@@ -580,7 +603,7 @@ public class ClientModel extends Observable {
      *
      * @param playersFinished
      */
-    public void setPlayersFinished(Map<String, Boolean> playersFinished) {
+    public void setPlayersFinished(ConcurrentHashMap<String, Boolean> playersFinished) {
         this.playersFinished = playersFinished;
     }
 
@@ -589,7 +612,7 @@ public class ClientModel extends Observable {
      *
      * @param playersWon
      */
-    public void setPlayersWon(Map<String, Boolean> playersWon) {
+    public void setPlayersWon(ConcurrentHashMap<String, Boolean> playersWon) {
         this.playersWon = playersWon;
     }
 
@@ -598,7 +621,7 @@ public class ClientModel extends Observable {
      *
      * @param playersBust
      */
-    public void setPlayersBust(Map<String, Boolean> playersBust) {
+    public void setPlayersBust(ConcurrentHashMap<String, Boolean> playersBust) {
         this.playersBust = playersBust;
     }
 
@@ -608,15 +631,20 @@ public class ClientModel extends Observable {
      *
      * @param playersStand
      */
-    public void setPlayersStand(Map<String, Boolean> playersStand) {
+    public void setPlayersStand(ConcurrentHashMap<String, Boolean> playersStand) {
         this.playersStand = playersStand;
     }
+
 
     public PipedOutputStream getPout() {
         return pout;
     }
 
-    public LinkedBlockingQueue<PushProtocol> getPushRequestQueue() {
-        return pushRequestQueue;
+    /**
+     * getter for the push protocol queue
+     * @return
+     */
+    public LinkedBlockingQueue<ResponseProtocol> getPushProtocolQueue() {
+        return pushProtocolQueue;
     }
 }
