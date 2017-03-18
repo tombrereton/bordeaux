@@ -213,6 +213,7 @@ public class GameLobby {
         for (Player player : players) {
             if (player.getUsername().equals(username)) {
                 removeID = index;
+                break;
             }
             index++;
         }

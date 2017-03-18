@@ -538,6 +538,12 @@ public class GameServerThread implements Runnable {
         getGame(gameToQuit).removePlayer(requestUsername);
         this.gameJoined = null;
 
+        // TODO: fix this
+        // if no players in the game, remove the game
+        if (getGame(gameToQuit).getPlayers().size() == 0){
+            games.remove(gameToQuit);
+        }
+
         return getGame(gameToQuit).getPlayer(requestUsername) == null;
     }
 
@@ -607,8 +613,8 @@ public class GameServerThread implements Runnable {
             String gameName = newGame.getLobbyName();
 
             // join game
-            gameJoined = gameName;
-            joinGame(gameJoined);
+//            gameJoined = gameName;
+//            joinGame(gameJoined);
 
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
