@@ -546,7 +546,6 @@ public class GameServerThread implements Runnable {
             getGame(gameToQuit).removePlayer(requestUsername);
             this.gameJoined = null;
 
-            // TODO: fix this
             // if no players in the game, remove the game
             if (getGame(gameToQuit).getPlayers().size() == 0) {
                 removeGame(gameToQuit);

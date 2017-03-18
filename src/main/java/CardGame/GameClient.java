@@ -319,7 +319,7 @@ public class GameClient extends Observable {
      * @return
      */
 
-    public ResponseGetMessages requestGetMessages(int offset) {
+    public synchronized ResponseGetMessages requestGetMessages(int offset) {
         // create request and send request
         RequestGetMessages requestGetMessages = new RequestGetMessages(offset);
         sendRequest(requestGetMessages);
@@ -479,7 +479,7 @@ public class GameClient extends Observable {
         return getResponse(PushDealerHand.class);
     }
 
-    public PushGameNames requestGetGameNames() {
+    public synchronized PushGameNames requestGetGameNames() {
         // create request and send request
         RequestGetGameNames requestGetGameNames = new RequestGetGameNames();
         sendRequest(requestGetGameNames);

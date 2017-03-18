@@ -1,6 +1,7 @@
 package CardGame.Gui;
 
 import CardGame.GameClient;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -124,7 +125,15 @@ public class LobbyScreen extends JPanel implements Observer {
         btnJoinGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                getClientModel().requestJoinGame(getGameName());
+                ResponseProtocol responseProtocol = getClientModel().requestJoinGame(getGameName());
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
         btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
@@ -138,8 +147,24 @@ public class LobbyScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
 
                 // send request to create a game
-                getClientModel().requestCreateGame();
-                getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
+                ResponseProtocol responseProtocol = getClientModel().requestCreateGame();
+                ResponseProtocol responseProtocol1 = getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                int success2 = responseProtocol1.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                String errorMsg1 = responseProtocol1.getErrorMsg();
+
+                if (success == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                } else if (success2 == 0) {
+                    JOptionPane.showMessageDialog(null, errorMsg1, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
+
             }
         });
         btnCreateGame.setFont(new Font("Soho Std", Font.PLAIN, 16));

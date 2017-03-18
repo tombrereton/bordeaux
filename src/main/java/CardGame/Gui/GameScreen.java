@@ -146,9 +146,18 @@ public class GameScreen extends JPanel implements Observer {
                 }
 
                 // send message from text area to server
-                client.requestSendMessage(textArea.getText());
+                ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
                 textArea.setText("");
                 textArea.grabFocus();
+
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
+                String errorMsg = responseProtocol.getErrorMsg();
+                if (success == 0){
+                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                }
 
             }
         });
@@ -373,8 +382,11 @@ public class GameScreen extends JPanel implements Observer {
         btnLeaveGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
-                chatMessageModel.clear();
-                gameScreenChatOffset = 0;
+
+                if (leaveGame.getRequestSuccess() == 1){
+                    chatMessageModel.clear();
+                    gameScreenChatOffset = 0;
+                }
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
