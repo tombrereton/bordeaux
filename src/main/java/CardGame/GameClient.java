@@ -502,7 +502,10 @@ public class GameClient extends Observable {
         sendRequest(requestGetDealerHand);
 
         // get response from server and returnit
-        return getResponse(PushDealerHand.class);
+        PushDealerHand pushDealerHand = getResponse(PushDealerHand.class);
+        this.dealerHand = pushDealerHand.getDealerHand();
+
+        return pushDealerHand;
     }
 
     public synchronized PushGameNames requestGetGameNames() {
@@ -722,8 +725,7 @@ public class GameClient extends Observable {
      */
     public void getGameData() {
         // Dealer hand
-        PushDealerHand pushDealerHand = requestGetDealerHand();
-        dealerHand = pushDealerHand.getDealerHand();
+        requestGetDealerHand();
 
         // player bets
         PushPlayerBets pushPlayerBets = requestGetPlayerBets();
