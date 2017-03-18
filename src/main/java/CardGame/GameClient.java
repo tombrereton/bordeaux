@@ -261,7 +261,15 @@ public class GameClient extends Observable {
         RequestRegisterUser requestRegisterUser = new RequestRegisterUser(user);
         sendRequest(requestRegisterUser);
 
-        return getResponse(ResponseRegisterUser.class);
+        // get the response from the server
+        ResponseRegisterUser responseRegisterUser = getResponse(ResponseRegisterUser.class);
+        int success = responseRegisterUser.getRequestSuccess();
+
+        if (success == 1){
+            setCurrentScreen(LOGINSCREEN);
+        }
+
+        return responseRegisterUser;
     }
 
 
@@ -375,10 +383,11 @@ public class GameClient extends Observable {
         ResponseQuitGame responseQuitGame = getResponse(ResponseQuitGame.class);
         int success = responseQuitGame.getRequestSuccess();
 
-        if (success == 1){
+        if (success == 1) {
             setCurrentScreen(LOBBYSCREEN);
             stopGettingMessages();
             startGettingGameNames();
+            messages.clear();
         }
 
         return responseQuitGame;
@@ -602,7 +611,7 @@ public class GameClient extends Observable {
         gameNamesThread.start();
     }
 
-    public void stopGettingGameNames(){
+    public void stopGettingGameNames() {
         isGettingGames = false;
     }
 
@@ -654,7 +663,7 @@ public class GameClient extends Observable {
         getMessagesThread.start();
     }
 
-    public void stopGettingMessages(){
+    public void stopGettingMessages() {
         this.isGettingMessages = false;
     }
 
@@ -662,8 +671,8 @@ public class GameClient extends Observable {
         return messages;
     }
 
-    public void addMessages(ArrayList<MessageObject> messages){
-        for (MessageObject mo : messages){
+    public void addMessages(ArrayList<MessageObject> messages) {
+        for (MessageObject mo : messages) {
             this.messages.add(mo);
         }
     }

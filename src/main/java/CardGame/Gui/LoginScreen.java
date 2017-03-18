@@ -90,9 +90,10 @@ public class LoginScreen extends JPanel {
                 usernameField.setText("");
                 passwordField.setText("");
 
-                // We display the error if not null
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (!errorMsg.equals("")){
+                if (success == 0){
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }

@@ -96,11 +96,9 @@ public class GameServerThread implements Runnable {
             System.out.println(e.getMessage());
             e.printStackTrace();
         } finally {
+            closeConnections();
             try {
                 Thread.sleep(10);
-                closeConnections();
-            } catch (IOException e) {
-                System.out.println("connection couldn't be closed");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -121,11 +119,15 @@ public class GameServerThread implements Runnable {
      *
      * @throws IOException
      */
-    public void closeConnections() throws IOException {
-        this.inputStream.close();
-        this.outputStream.close();
-        this.toClientSocket.close();
-        this.pushOutputStream.close();
+    public void closeConnections() {
+        try {
+            this.inputStream.close();
+            this.outputStream.close();
+            this.toClientSocket.close();
+            this.pushOutputStream.close();
+        } catch (IOException e) {
+            System.out.println("Problem closing connections.");
+        }
     }
 
     /**
@@ -702,7 +704,7 @@ public class GameServerThread implements Runnable {
             ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
 
             // get offset
-            int offsetFromQueue = this.messageQueue.size();
+            int offsetFromQueue = getGame(gameJoined).getMessageQueue().size();
 
             // return success if offset greater than -2
             return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient, offsetFromQueue);
@@ -725,7 +727,7 @@ public class GameServerThread implements Runnable {
 
         int offset = requestGetMessages.getOffset();
 
-        ArrayList<MessageObject> messageArrayList = new ArrayList<>(messageQueue);
+        ArrayList<MessageObject> messageArrayList = new ArrayList<>(getGame(gameJoined).getMessageQueue());
         ArrayList<MessageObject> messagesToClient = new ArrayList<>();
 
         for (int i = offset + 1; i < messageArrayList.size(); i++) {
@@ -872,7 +874,7 @@ public class GameServerThread implements Runnable {
             return new ResponseRegisterUser(protocolId, FAIL, ALREADY_LOGGED_IN);
         } else if (successRegister) {
             // return success if user inserted into database
-            return new ResponseRegisterUser(protocolId, SUCCESS);
+            return new ResponseRegisterUser(protocolId, SUCCESS, REGISTERED);
         } else {
             // return fail for unknown error
             return new ResponseRegisterUser(protocolId, FAIL, UNKNOWN_ERROR);
@@ -899,7 +901,8 @@ public class GameServerThread implements Runnable {
      * @throws IOException
      */
     public void addToMessageQueue(MessageObject msg) {
-        this.messageQueue.add(msg);
+        getGame(gameJoined).getMessageQueue().add(msg);
+//        this.messageQueue.add(msg);
     }
 
 
