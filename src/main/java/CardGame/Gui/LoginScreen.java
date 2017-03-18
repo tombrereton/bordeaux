@@ -20,7 +20,7 @@ import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
 public class LoginScreen extends JPanel {
 
 	private GameClient client;
-	private ScreenFactory screenFactory;
+	private BlackjackOnline screenFactory;
 
 	private JButton btnCreateAccount;
 	private JButton btnLogin;
@@ -33,7 +33,7 @@ public class LoginScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(GameClient client, ScreenFactory screenFactory) {
+	public LoginScreen(GameClient client, BlackjackOnline screenFactory) {
 		this.client = client;
 		this.screenFactory = screenFactory;
 		btnCreateAccount = new JButton("Create Account");

@@ -22,7 +22,7 @@ import java.util.Observer;
 public class GameScreen extends JPanel implements Observer {
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline screenFactory;
 
     private JTextArea textArea;
     private JList<String> listChat;
@@ -65,7 +65,7 @@ public class GameScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public GameScreen(GameClient gameClient, ScreenFactory screenFactory) {
+    public GameScreen(GameClient gameClient, BlackjackOnline screenFactory) {
         // we add this to list of observers
         this.client = gameClient;
         gameClient.addObserver(this);

@@ -25,7 +25,7 @@ public class LobbyScreen extends JPanel implements Observer {
     private String gameName;
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline screenFactory;
 
     private JLabel lblLobby;
     private JButton btnBack;
@@ -40,7 +40,7 @@ public class LobbyScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public LobbyScreen(GameClient client, ScreenFactory screenFactory) {
+    public LobbyScreen(GameClient client, BlackjackOnline screenFactory) {
         // we become an observer
         this.client = client;
         this.screenFactory = screenFactory;
@@ -189,7 +189,7 @@ public class LobbyScreen extends JPanel implements Observer {
         return gameName;
     }
 
-    public ScreenFactory getScreenFactory() {
+    public BlackjackOnline getScreenFactory() {
         return screenFactory;
     }
 

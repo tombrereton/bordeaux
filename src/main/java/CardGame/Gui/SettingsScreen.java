@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
 public class SettingsScreen extends JPanel {
 
 	private GameClient client;
-	private ScreenFactory screenFactory;
+	private BlackjackOnline screenFactory;
 
 	private JLabel lblTitle;
 	private JButton btnBack;
@@ -23,7 +23,7 @@ public class SettingsScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public SettingsScreen(GameClient client, ScreenFactory screenFactory) {
+	public SettingsScreen(GameClient client, BlackjackOnline screenFactory) {
 		this.client = client;
 		this.screenFactory = screenFactory;
 		lblTitle = new JLabel("Settings");

@@ -20,7 +20,7 @@ import static CardGame.Gui.Screens.*;
 public class HomeScreen extends JPanel implements Observer {
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline screenFactory;
 
     private JButton btnLogout;
     private String username;
@@ -36,7 +36,7 @@ public class HomeScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public HomeScreen(GameClient client, ScreenFactory screenFactory) {
+    public HomeScreen(GameClient client, BlackjackOnline screenFactory) {
         this.screenFactory = screenFactory;
 
         // we add this to list of observers

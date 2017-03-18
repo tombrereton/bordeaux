@@ -13,7 +13,7 @@ import static CardGame.Gui.Screens.LOGINSCREEN;
 public class CreateAccountScreen extends JPanel {
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline screenFactory;
 
     private JTextField firstnameField;
     private JTextField lastnameField;
@@ -34,7 +34,7 @@ public class CreateAccountScreen extends JPanel {
     /**
      * Create the application.
      */
-    public CreateAccountScreen(GameClient client, ScreenFactory screenFactory) {
+    public CreateAccountScreen(GameClient client, BlackjackOnline screenFactory) {
         this.client = client;
         this.screenFactory = screenFactory;
         setBackground(new Color(46, 139, 87));

@@ -17,7 +17,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
 public class StatisticsScreen extends JPanel {
 
 	private GameClient client;
-	private ScreenFactory screenFactory;
+	private BlackjackOnline screenFactory;
 
 	private JLabel lblTitle;
 	private JButton btnBack;
@@ -26,7 +26,7 @@ public class StatisticsScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public StatisticsScreen(GameClient client, ScreenFactory screenFactory) {
+	public StatisticsScreen(GameClient client, BlackjackOnline screenFactory) {
 		this.client = client;
 		this.screenFactory = screenFactory;
 		lblTitle = new JLabel("Statistics");
