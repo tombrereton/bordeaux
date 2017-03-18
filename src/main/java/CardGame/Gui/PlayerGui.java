@@ -72,20 +72,6 @@ public class PlayerGui extends JPanel {
         setLayout(null);
         setSize(new Dimension(200,200));
 
-        //TEST CARD
-        setLblCard12("001");
-        setLblCard11("001");
-        setLblCard10("001");
-        setLblCard9("001");
-        setLblCard8("001");
-        setLblCard7("001");
-        setLblCard6("001");
-        setLblCard5("001");
-        setLblCard4("001");
-        setLblCard3("001");
-        setLblCard2("001");
-        setLblCard1("001");
-
     }
 
     public void createCards(){

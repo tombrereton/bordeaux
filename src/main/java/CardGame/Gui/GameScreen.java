@@ -366,19 +366,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-        /**
-         * Player positions and cards
-         */
-//		JLabel lblDeck = new JLabel();
-//		lblDeck.setBounds(700, 100, 241, 42);
-//		try {
-//			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
-//			lblDeck.setIcon(new ImageIcon(imgDeck));
-//		} catch (Exception ex) {
-//			System.out.println(ex);
-//		}
-//		add(lblDeck);
-
 
         /**
          * leave game button
