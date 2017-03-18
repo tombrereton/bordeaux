@@ -97,12 +97,14 @@ public class GameServerThread implements Runnable {
                 }
             } catch (EOFException e) {
                 System.out.println("GameClient disconnected.: " + e.toString());
-                System.out.println("Logged in user set to: " + getLoggedInUser());
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             } finally {
+                // log user out of client and game on disconnect
+                quitGame(gameJoined,getLoggedInUser().getUserName());
                 logUserOut();
+                System.out.println("Logged in user set to: " + getLoggedInUser());
                 closeConnections();
             }
     }
@@ -540,17 +542,20 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private void quitGame(String gameToQuit, String requestUsername) {
-        getGame(gameToQuit).removePlayer(requestUsername);
-        this.gameJoined = null;
+        if (getGame(gameToQuit) != null && getGame(gameToQuit).getPlayer(requestUsername) != null){
+            getGame(gameToQuit).removePlayer(requestUsername);
+            this.gameJoined = null;
 
-        // TODO: fix this
-        // if no players in the game, remove the game
-        if (getGame(gameToQuit).getPlayers().size() == 0) {
-            removeGame(gameToQuit);
-            gameNames.remove(gameToQuit);
+            // TODO: fix this
+            // if no players in the game, remove the game
+            if (getGame(gameToQuit).getPlayers().size() == 0) {
+                removeGame(gameToQuit);
+                gameNames.remove(gameToQuit);
+            }
+
+            updateGameNames();
+
         }
-
-        updateGameNames();
     }
 
     public void removeGame(String gameToRemove) {
@@ -629,10 +634,6 @@ public class GameServerThread implements Runnable {
             // create game if game does not exist
             GameLobby newGame = createGame();
             String gameName = newGame.getLobbyName();
-
-            // join game
-//            gameJoined = gameName;
-//            joinGame(gameJoined);
 
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);

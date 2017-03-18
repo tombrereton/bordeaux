@@ -175,7 +175,7 @@ public class GameClient extends Observable {
             // print out response
             System.out.println(jsonInput);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server down. Please try restarting client");
         }
 
         setChanged();
@@ -265,7 +265,7 @@ public class GameClient extends Observable {
         ResponseRegisterUser responseRegisterUser = getResponse(ResponseRegisterUser.class);
         int success = responseRegisterUser.getRequestSuccess();
 
-        if (success == 1){
+        if (success == 1) {
             setCurrentScreen(LOGINSCREEN);
         }
 
@@ -390,6 +390,9 @@ public class GameClient extends Observable {
             startGettingGameNames();
             messages.clear();
             setChatOffset(-1);
+
+//            setChanged();
+//            notifyObservers();
         }
 
         return responseQuitGame;
@@ -601,8 +604,10 @@ public class GameClient extends Observable {
 
                 try {
                     Thread.sleep(1000);
+                } catch (NullPointerException e) {
+                    System.out.println("Server down.");
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Polling for game list interrupted.");
                 }
             }
         };

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,7 +22,7 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  * @author Alex
  */
 public class LobbyScreen extends JPanel implements Observer {
-    public ArrayList<String> listOfGames;
+    private HashSet<String> listOfGames;
     private String gameName;
 
     private GameClient client;
@@ -32,9 +33,9 @@ public class LobbyScreen extends JPanel implements Observer {
     private JButton btnJoinGame;
     private JButton btnCreateGame;
 
-    // gameList variables
+    // gameJList variables
     private DefaultListModel gameNameListModel;
-    private JList gameList;
+    private JList gameJList;
     private int lobbyGamesOffset;
 
     /**
@@ -47,9 +48,10 @@ public class LobbyScreen extends JPanel implements Observer {
         client.addObserver(this);
 
 
-        // gameList variables
+        // gameJList variables
+        this.listOfGames = new HashSet<>();
         this.gameNameListModel = new DefaultListModel();
-        this.gameList = new JList(this.gameNameListModel);
+        this.gameJList = new JList(this.gameNameListModel);
         this.lobbyGamesOffset = 0;
 
         lblLobby = new JLabel("Lobby");
@@ -88,19 +90,19 @@ public class LobbyScreen extends JPanel implements Observer {
         /**
          * List of games
          */
-        gameList.setVisibleRowCount(20);
-        gameList.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-        gameList.setFont(new Font("Soho Std", Font.PLAIN, 18));
-        gameList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        gameJList.setVisibleRowCount(20);
+        gameJList.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        gameJList.setFont(new Font("Soho Std", Font.PLAIN, 18));
+        gameJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // add listener to gameList
-        ListSelectionModel listSelectionModel = gameList.getSelectionModel();
+        // add listener to gameJList
+        ListSelectionModel listSelectionModel = gameJList.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
 
-                // we get the index of the selected text in the gameList
+                // we get the index of the selected text in the gameJList
                 int selectionIndex = listSelectionEvent.getFirstIndex();
 
                 // we get the game name with the index
@@ -111,7 +113,7 @@ public class LobbyScreen extends JPanel implements Observer {
                 setGameName(gameNameSelected);
             }
         });
-        add(gameList);
+        add(gameJList);
 
         /**
          * Join button
@@ -142,15 +144,15 @@ public class LobbyScreen extends JPanel implements Observer {
         add(btnCreateGame);
     }
 
-	public void updateBounds(){
-		lblLobby.setBounds(screenFactory.getxOrigin()+391, 10, 242, 34);
-		btnBack.setBounds(50, screenFactory.getScreenHeightCurrent()-100, 300, 50);
-		gameList.setBounds(50, 50, screenFactory.getScreenWidthCurrent()-120, screenFactory.getScreenHeightCurrent()-160);
-		btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent()-370, screenFactory.getScreenHeightCurrent()-100, 300, 50);
-		btnCreateGame.setBounds(screenFactory.getxOrigin()+352, screenFactory.getScreenHeightCurrent()-100, 300, 50);
-	}
+    public void updateBounds() {
+        lblLobby.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
+        btnBack.setBounds(50, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
+        gameJList.setBounds(50, 50, screenFactory.getScreenWidthCurrent() - 120, screenFactory.getScreenHeightCurrent() - 160);
+        btnJoinGame.setBounds(screenFactory.getScreenWidthCurrent() - 370, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
+        btnCreateGame.setBounds(screenFactory.getxOrigin() + 352, screenFactory.getScreenHeightCurrent() - 100, 300, 50);
+    }
 
-    public ArrayList<String> getListOfGames() {
+    public HashSet<String> getListOfGames() {
         return listOfGames;
     }
 
@@ -170,7 +172,7 @@ public class LobbyScreen extends JPanel implements Observer {
         return screenFactory;
     }
 
-    public void setListOfGames(ArrayList<String> listOfGames) {
+    public void setListOfGames(HashSet<String> listOfGames) {
         this.listOfGames = listOfGames;
     }
 
@@ -178,15 +180,9 @@ public class LobbyScreen extends JPanel implements Observer {
         return gameNameListModel;
     }
 
-    private void addToList(ArrayList<String> gamesNames) {
-
-        int clientGameOffset = getClientModel().getListOfGames().size();
-
-        while (lobbyGamesOffset < clientGameOffset){
-            ArrayList<String> gameNames = new ArrayList<>(getClientModel().getListOfGames());
-            this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
-
-        }
+    public void resetGameList(){
+        this.lobbyGamesOffset = 0;
+        this.getGameNameListModel().clear();
     }
 
     @Override
@@ -197,11 +193,19 @@ public class LobbyScreen extends JPanel implements Observer {
             // get clientGameOf
             int clientGameOffset = model.getListOfGames().size();
 
+            ArrayList<String> gameNames = new ArrayList<>(model.getListOfGames());
             // add to list
-            while (lobbyGamesOffset < clientGameOffset){
-                ArrayList<String> gameNames = new ArrayList<>(model.getListOfGames());
+            while (lobbyGamesOffset < clientGameOffset) {
                 this.gameNameListModel.addElement(gameNames.get(lobbyGamesOffset));
                 lobbyGamesOffset++;
+            }
+
+            // remove game from game list if not in client list of games
+            for (int i = 0; i < gameNameListModel.size(); i++) {
+                if (!gameNames.contains(gameNameListModel.get(i))){
+                    gameNameListModel.remove(i);
+                    lobbyGamesOffset = 0;
+                }
             }
 
         }
