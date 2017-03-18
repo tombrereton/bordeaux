@@ -541,7 +541,10 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayersBust);
 
         // get response from server and returnit
-        return getResponse(PushPlayersBust.class);
+        PushPlayersBust pushPlayersBust = getResponse(PushPlayersBust.class);
+        playersBust = pushPlayersBust.getPlayersBust();
+
+        return pushPlayersBust;
     }
 
     public synchronized PushPlayerHands requestGetPlayerHands() {
@@ -559,7 +562,10 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayerNames);
 
         // get response from server and returnit
-        return getResponse(PushPlayerNames.class);
+        PushPlayerNames pushPlayerNames = getResponse(PushPlayerNames.class);
+        playerNames = pushPlayerNames.getPlayerNames();
+
+        return pushPlayerNames;
     }
 
     public synchronized PushPlayersStand requestGetPlayersStand() {
@@ -568,7 +574,10 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayersStand);
 
         // get response from server and returnit
-        return getResponse(PushPlayersStand.class);
+        PushPlayersStand pushPlayersStand = getResponse(PushPlayersStand.class);
+        playersStand = pushPlayersStand.getPlayersStand();
+
+        return pushPlayersStand;
     }
 
     public synchronized PushPlayersWon requestGetPlayersWon() {
@@ -577,7 +586,10 @@ public class GameClient extends Observable {
         sendRequest(requestGetPlayersWon);
 
         // get response from server and returnit
-        return getResponse(PushPlayersWon.class);
+        PushPlayersWon pushPlayersWon = getResponse(PushPlayersWon.class);
+        playersWon = pushPlayersWon.getPlayersWon();
+
+        return pushPlayersWon;
     }
 
 
@@ -740,20 +752,16 @@ public class GameClient extends Observable {
         playerHands = pushPlayerHands.getPlayerHands();
 
         // player names
-        PushPlayerNames pushPlayerNames = requestGetPlayerNames();
-        playerNames = pushPlayerNames.getPlayerNames();
+        requestGetPlayerNames();
 
         // players bust
-        PushPlayersBust pushPlayersBust = requestGetPlayersBust();
-        playersBust = pushPlayersBust.getPlayersBust();
+        requestGetPlayersBust();
 
         // players stand
-        PushPlayersStand pushPlayersStand = requestGetPlayersStand();
-        playersStand = pushPlayersStand.getPlayersStand();
+        requestGetPlayersStand();
 
         // players won
-        PushPlayersWon pushPlayersWon = requestGetPlayersWon();
-        playersWon = pushPlayersWon.getPlayersWon();
+        requestGetPlayersWon();
 
     }
 
