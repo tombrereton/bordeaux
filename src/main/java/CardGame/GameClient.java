@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Observable;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -48,12 +46,13 @@ public class GameClient extends Observable {
     private String gameJoined;
 
     // game data
+    private boolean isGameDataUpdated;
     private Map<String, Boolean> playersFinished;
     private Hand dealerHand;
     private Map<String, Integer> playerBets;
     private Map<String, Integer> playerBudgets;
     private Map<String, Hand> playerHands;
-    private ArrayList<String> playerNames;
+    private Set<String> playerNames;
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
@@ -64,9 +63,9 @@ public class GameClient extends Observable {
     private volatile ConcurrentLinkedDeque<MessageObject> messages;
 
     // Threads
-    Thread gameNamesThread;
-    Thread getMessagesThread;
-    Thread getGameData;
+    private Thread gameNamesThread;
+    private Thread getMessagesThread;
+    private Thread getGameData;
     private volatile boolean isGettingGames;
     private volatile boolean isGettingMessages;
     private volatile boolean isGettingGameData;
@@ -86,10 +85,18 @@ public class GameClient extends Observable {
         // instantiate game variables
         this.chatOffset = -1;
         this.listOfGames = new ConcurrentSkipListSet<>();
+        playersFinished = new TreeMap<>();
+        dealerHand  = new Hand();
+        playerBets  = new TreeMap<>();
+        playerBudgets = new TreeMap<>();
+        playerHands = new TreeMap<>();
+        playerNames = new TreeSet<>();
+        playersBust = new TreeMap<>();
+        playersStand = new TreeMap<>();
+        playersWon = new TreeMap<>();
 
         // chat variables
         this.messages = new ConcurrentLinkedDeque<>();
-
     }
 
     /**
@@ -649,7 +656,7 @@ public class GameClient extends Observable {
                 while (isGettingGames) {
                     PushGameNames pushGameNames = requestGetGameNames();
 
-                    ArrayList<String> responseGamesNames = pushGameNames.getGameNames();
+                    Set<String> responseGamesNames = pushGameNames.getGameNames();
                     getListOfGames().clear();
                     getListOfGames().addAll(responseGamesNames);
 
@@ -742,6 +749,9 @@ public class GameClient extends Observable {
      * This method sends requests for the game data
      */
     public void getGameData() {
+
+        isGameDataUpdated = false;
+
         // Dealer hand
         requestGetDealerHand();
 
@@ -765,6 +775,8 @@ public class GameClient extends Observable {
 
         // players won
         requestGetPlayersWon();
+
+        isGameDataUpdated = true;
 
     }
 
@@ -843,7 +855,7 @@ public class GameClient extends Observable {
         return playerHands;
     }
 
-    public ArrayList<String> getPlayerNames() {
+    public Set<String> getPlayerNames() {
         return playerNames;
     }
 

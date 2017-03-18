@@ -15,6 +15,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -252,7 +254,7 @@ public class GameServerThread implements Runnable {
     }
 
     private ResponseProtocol handleGetPlayerNames(int protocolId) {
-        ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
+        Set<String> playerNames = new TreeSet<>(this.getGame(gameJoined).getPlayerNames());
 
         return new PushPlayerNames(protocolId, SUCCESS, playerNames);
     }
@@ -988,8 +990,8 @@ public class GameServerThread implements Runnable {
         return games;
     }
 
-    public ArrayList<String> getGameNames() {
-        return new ArrayList<>(this.gameNames);
+    public Set<String> getGameNames() {
+        return new TreeSet<>(this.gameNames);
     }
 
     public String getGameJoined() {
