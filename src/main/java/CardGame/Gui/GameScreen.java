@@ -1,27 +1,32 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
+import CardGame.MessageObject;
+import CardGame.Pushes.PushPlayerBudgets;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import static CardGame.Gui.Screens.LOBBYSCREEN;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * gameScreen
- * @author Alex
  *
+ * @author Alex
  */
-public class GameScreen extends JPanel {
+public class GameScreen extends JPanel implements Observer {
 
-	private ClientModel clientModel;
-	private ScreenFactory screenFactory;
+    private GameClient client;
+    private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private JScrollPane scrollPane;
+	private JList<String> listChat;
+ 	private JScrollPane scrollPane;
 	private JLabel lblChat;
 	private JButton btnSendMessage;
 	private JButton btnDoubleDown;
@@ -47,15 +52,23 @@ public class GameScreen extends JPanel {
     private int amountToBet;
     private int credits;
 
-	/**
-	 * Create the application.
-	 */
-	public GameScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
-		this.screenFactory = screenFactory;
-		this.amountToBet = amountToBet;
-		this.credits = 1000;
+    // chat variables
+    public DefaultListModel<String> chatMessageModel;
+    public int gameScreenChatOffset;
 
+    /**
+     * Create the application.
+     */
+    public GameScreen(GameClient gameClient, ScreenFactory screenFactory) {
+        // we add this to list of observers
+        this.client = gameClient;
+        gameClient.addObserver(this);
+
+        // chat variables
+
+        this.screenFactory = screenFactory;
+        this.amountToBet = amountToBet;
+        this.credits = 1000;
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
@@ -70,7 +83,7 @@ public class GameScreen extends JPanel {
         btnHit = new JButton();
         btnFold = new JButton();
 
-        lblCredits = new JLabel("Credits: £ "+ Integer.toString(credits));
+        lblCredits = new JLabel("Credits: £ " + Integer.toString(credits));
         lblCreditsBox = new JLabel();
         lblSubmitBet = new JLabel(Integer.toString(amountToBet));
         lblSubmitBetBox = new JLabel();
@@ -80,256 +93,306 @@ public class GameScreen extends JPanel {
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
-		lblDeck = new JLabel();
+        lblDeck = new JLabel();
 
+        // chat variables
+        this.gameScreenChatOffset = 0;
+        this.chatMessageModel = new DefaultListModel<>();
+        this.listChat = new JList<>(this.chatMessageModel);
+
+        // create chat window
+        this.listChat.setValueIsAdjusting(true);
+        scrollPane = new JScrollPane(listChat);
+
+        // set background and initialize
         setBackground(new Color(46, 139, 87));
         initialize();
-		updateBounds();
+        updateBounds();
+
+        updateMessageList(gameClient);
     }
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
 
-		/**
-		 * Chat message box as a JScroll Pane
-		 */
-		add(scrollPane);
+        /**
+         * Chat message box as a JScroll Pane
+         */
 
-		/**
-		 * chat label
-		 */
-		lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
-		lblChat.setForeground(Color.WHITE);
-		add(lblChat);
+        add(scrollPane);
 
-		/**
-		 * Send message button
-		 */
-		btnSendMessage.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(textArea.getText().equals("")){
-					JOptionPane.showMessageDialog(null,
-							"You can not send empty messages!",
-							"Warning",
-							JOptionPane.WARNING_MESSAGE);
-					return;
-				}
-				textArea.setText("");
-				clientModel.requestSendMessages(textArea.getText());
-				textArea.grabFocus();
+        /**
+         * chat label
+         */
+        lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
+        lblChat.setForeground(Color.WHITE);
+        add(lblChat);
 
-			}
-		});
-		btnSendMessage.setContentAreaFilled(false);
-		btnSendMessage.setBorderPainted(false);
-		try {
-			Image imgSendMessage = ImageIO.read(getClass().getResource("/gameHud/imageBtnMessage.png"));
-			btnSendMessage.setIcon(new ImageIcon(imgSendMessage));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnSendMessage);
+        /**
+         * Send message button
+         */
+        btnSendMessage.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
 
-		/**
-		 * Editable text area for sending messages
-		 */
-		textArea = new JTextArea();
-		textArea.setLineWrap(true);
-		add(textArea);
-		textArea.setColumns(10);
+                // show error in pop up box
+                if (textArea.getText().equals("")) {
+                    JOptionPane.showMessageDialog(null,
+                            "You can not send empty messages!",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
-		/**
-		 * Game buttons
-		 */
+                // send message from text area to server
+                client.requestSendMessage(textArea.getText());
+                textArea.setText("");
+                textArea.grabFocus();
 
-		//DoubleDown Button
-		btnDoubleDown.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnDoubleDown.setContentAreaFilled(false);
-		btnDoubleDown.setBorderPainted(false);
-		try {
-			Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
-			btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnDoubleDown);
+            }
+        });
 
-		//Stand Button
-		btnStand.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnStand.setContentAreaFilled(false);
-		btnStand.setBorderPainted(false);
-		try {
-			Image imgStand = ImageIO.read(getClass().getResource("/gameHud/imageBtnStand.png"));
-			btnStand.setIcon(new ImageIcon(imgStand));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnStand);
+        btnSendMessage.setContentAreaFilled(false);
+        btnSendMessage.setBorderPainted(false);
+        try {
+            Image imgSendMessage = ImageIO.read(getClass().getResource("/gameHud/imageBtnMessage.png"));
+            btnSendMessage.setIcon(new ImageIcon(imgSendMessage));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnSendMessage);
 
-		//Hit Button
-		btnHit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnHit.setContentAreaFilled(false);
-		btnHit.setBorderPainted(false);
-		try {
-			Image imgHit = ImageIO.read(getClass().getResource("/gameHud/imageBtnHit.png"));
-			btnHit.setIcon(new ImageIcon(imgHit));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnHit);
+        /**
+         * Editable text area for sending messages
+         */
+        textArea = new JTextArea();
+        textArea.setLineWrap(true);
+        add(textArea);
+        textArea.setColumns(10);
 
-		//Hold Button
-		btnFold.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnFold.setContentAreaFilled(false);
-		btnFold.setBorderPainted(false);
-		try {
-			Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
-			btnFold.setIcon(new ImageIcon(imgFold));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnFold);
+        /**
+         * Game buttons
+         */
+        //DoubleDown Button
+        btnDoubleDown.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                client.requestDoubleBet();
+            }
+        });
+        btnDoubleDown.setContentAreaFilled(false);
+        btnDoubleDown.setBorderPainted(false);
+        try {
+            Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
+            btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnDoubleDown);
 
-		/**
-		 * Player credits label
-		 */
-		lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblCredits.setForeground(Color.BLACK);
-		add(lblCredits);
+        //Stand Button
+        btnStand.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                client.requestStand();
+            }
+        });
+        btnStand.setContentAreaFilled(false);
+        btnStand.setBorderPainted(false);
+        try {
+            Image imgStand = ImageIO.read(getClass().getResource("/gameHud/imageBtnStand.png"));
+            btnStand.setIcon(new ImageIcon(imgStand));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnStand);
 
-		/**
-		 * Player credits to bet label
-		 */
-		lblSubmitBet.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblSubmitBet.setForeground(Color.BLACK);
-		add(lblSubmitBet);
+        //Hit Button
+        btnHit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                client.requestHit();
+            }
+        });
 
-		//Submit Bet
-		btnSubmitBet.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    credits = credits - amountToBet;
+        btnHit.setContentAreaFilled(false);
+        btnHit.setBorderPainted(false);
+        try {
+            Image imgHit = ImageIO.read(getClass().getResource("/gameHud/imageBtnHit.png"));
+            btnHit.setIcon(new ImageIcon(imgHit));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnHit);
+
+        //Hold Button
+        btnFold.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                client.requestFold();
+            }
+        });
+
+        btnFold.setContentAreaFilled(false);
+        btnFold.setBorderPainted(false);
+        try {
+            Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
+            btnFold.setIcon(new ImageIcon(imgFold));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnFold);
+
+        /**
+
+         * Player credits label
+         */
+        lblCredits.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblCredits.setForeground(Color.BLACK);
+
+        add(lblCredits);
+
+        /**
+         * Player credits to bet label
+         */
+        lblSubmitBet.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblSubmitBet.setForeground(Color.BLACK);
+        add(lblSubmitBet);
+
+        //Submit Bet
+        btnSubmitBet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                credits = credits - amountToBet;
+                ResponseProtocol response = client.requestBet(amountToBet);
+                if (response.getRequestSuccess() == 1){
+                    PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
+                    if(responseBudgets.getRequestSuccess() == 1){
+                        lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
+                    }
+                }
                 amountToBet = 0;
-                lblCredits.setText("Credits: £ "+ Integer.toString(credits));
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-			}
-		});
-		btnSubmitBet.setContentAreaFilled(false);
-		btnSubmitBet.setBorderPainted(false);
-		try {
-			Image imgSubmitBet = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet.png"));
-			btnSubmitBet.setIcon(new ImageIcon(imgSubmitBet));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnSubmitBet);
+            }
+        });
+        btnSubmitBet.setContentAreaFilled(false);
+        btnSubmitBet.setBorderPainted(false);
+        try {
+            Image imgSubmitBet = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet.png"));
+            btnSubmitBet.setIcon(new ImageIcon(imgSubmitBet));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnSubmitBet);
 
-		/**
-		 * Bet Buttons
-		 */
-		//Bet 1: small
-		btnBet1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        /**
+         * Bet Buttons
+         */
+        //Bet 1: small
+        btnBet1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 amountToBet += 5;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-			}
-		});
-		btnBet1.setContentAreaFilled(false);
-		btnBet1.setBorderPainted(false);
-		try {
-			Image imgBet1 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet1.png"));
-			btnBet1.setIcon(new ImageIcon(imgBet1));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(btnBet1);
+            }
+        });
+        btnBet1.setContentAreaFilled(false);
+        btnBet1.setBorderPainted(false);
+        try {
+            Image imgBet1 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet1.png"));
+            btnBet1.setIcon(new ImageIcon(imgBet1));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(btnBet1);
 
 
-		//Bet 2: medium
-		btnBet2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        //Bet 2: medium
+        btnBet2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 amountToBet += 10;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-			}
-		});
-		btnBet2.setContentAreaFilled(false);
-		btnBet2.setBorderPainted(false);
-		try {
-			Image imgBet2 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet2.png"));
-			btnBet2.setIcon(new ImageIcon(imgBet2));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		add(btnBet2);
+            }
+        });
+        btnBet2.setContentAreaFilled(false);
+        btnBet2.setBorderPainted(false);
+        try {
+            Image imgBet2 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet2.png"));
+            btnBet2.setIcon(new ImageIcon(imgBet2));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        add(btnBet2);
 
-		//Bet 3: high
-		btnBet3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        //Bet 3: high
+        btnBet3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 amountToBet += 20;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-			}
-		});
-		btnBet3.setContentAreaFilled(false);
-		btnBet3.setBorderPainted(false);
-		try {
-			Image imgBet3 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet3.png"));
-			btnBet3.setIcon(new ImageIcon(imgBet3));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		add(btnBet3);
+            }
+        });
+        btnBet3.setContentAreaFilled(false);
+        btnBet3.setBorderPainted(false);
+        try {
+            Image imgBet3 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet3.png"));
+            btnBet3.setIcon(new ImageIcon(imgBet3));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        add(btnBet3);
 
-		//Bet 4: very high
-		btnBet4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        //Bet 4: very high
+        btnBet4.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 amountToBet += 50;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-			}
-		});
-		btnBet4.setContentAreaFilled(false);
-		btnBet4.setBorderPainted(false);
-		try {
-			Image imgBet4 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet4.png"));
-			btnBet4.setIcon(new ImageIcon(imgBet4));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		add(btnBet4);
+            }
+        });
+        btnBet4.setContentAreaFilled(false);
+        btnBet4.setBorderPainted(false);
+        try {
+            Image imgBet4 = ImageIO.read(getClass().getResource("/gameHud/imageBtnBet4.png"));
+            btnBet4.setIcon(new ImageIcon(imgBet4));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        add(btnBet4);
 
-		btnLeaveGame.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    // todo make this a request leave game
-			    getClientModel().setCurrentScreen(LOBBYSCREEN);
-			}
-		});
-		btnLeaveGame.setBackground(Color.WHITE);
-		btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 13));
-		add(btnLeaveGame);
+        /**
+         * Player positions and cards
+         */
+//		JLabel lblDeck = new JLabel();
+//		lblDeck.setBounds(700, 100, 241, 42);
+//		try {
+//			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
+//			lblDeck.setIcon(new ImageIcon(imgDeck));
+//		} catch (Exception ex) {
+//			System.out.println(ex);
+//		}
+//		add(lblDeck);
 
 
-		/**
-		 * Credits Box
-		 */
-		try {
-			Image imgBoxCredits = ImageIO.read(getClass().getResource("/gameHud/imageBoxCredits.png"));
-			lblCreditsBox.setIcon(new ImageIcon(imgBoxCredits));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblCreditsBox);
+        /**
+         * leave game button
+         */
+        btnLeaveGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
+            }
+        });
+        btnLeaveGame.setBackground(Color.WHITE);
+        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
+        add(btnLeaveGame);
+
+
+        /**
+         * Credits Box
+         */
+
+        try {
+            Image imgBoxCredits = ImageIO.read(getClass().getResource("/gameHud/imageBoxCredits.png"));
+            lblCreditsBox.setIcon(new ImageIcon(imgBoxCredits));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblCreditsBox);
 
 		/**
 		 * Bet Box
@@ -342,16 +405,17 @@ public class GameScreen extends JPanel {
 		}
 		add(lblSubmitBetBox);
 
-		/**
-		 * Back hud
-		 */
-		try {
-			Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
-			lblBackHud.setIcon(new ImageIcon(imgHud));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblBackHud);
+        /**
+         * Back hud
+         */
+
+        try {
+            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
+            lblBackHud.setIcon(new ImageIcon(imgHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblBackHud);
 
         lblSideFillHud.setOpaque(true);
         lblSideFillHud.setBackground(new Color(127, 37, 27));
@@ -365,8 +429,7 @@ public class GameScreen extends JPanel {
         }
         add(lblSideHud);
 
-
-		/**
+	/**
 		 * Player positions and cards
 		 */
 		try {
@@ -375,14 +438,15 @@ public class GameScreen extends JPanel {
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}
-		add(lblDeck);
+		add(lblDeck);}
 
-	}
-
-    public ClientModel getClientModel() {
-        return clientModel;
+    public GameClient getClientModel() {
+        return client;
     }
 
+    public DefaultListModel<String> getChatMessageModel() {
+        return chatMessageModel;
+    }
 
 	public void updateBounds(){
 		scrollPane.setBounds(screenFactory.getxOrigin()+850, 50,screenFactory.getxOrigin()+150, screenFactory.getScreenHeightCurrent()-230);
@@ -406,8 +470,7 @@ public class GameScreen extends JPanel {
 		lblCreditsBox.setBounds(10, screenFactory.getScreenHeightCurrent()-86, 241, 42);
 		lblSubmitBetBox.setBounds(10, screenFactory.getScreenHeightCurrent()-126, 144, 45);
 		lblBackHud.setBounds(-20, screenFactory.getScreenHeightCurrent()-176, 2590, 204);
-		lblDeck.setBounds(screenFactory.getxOrigin()+720, 50, 64, 93);
-	}
+	lblDeck.setBounds(screenFactory.getxOrigin()+720, 50, 64, 93);}
 
     public int getAmountToBet() {
         return amountToBet;
@@ -426,50 +489,26 @@ public class GameScreen extends JPanel {
     }
 
 
-//	public void StartCheckingMessages(){
-//
-//		Thread thread = new Thread(new Runnable() {
+    @Override
+    public void update(Observable observable, Object o) {
+        if (observable instanceof GameClient) {
+            GameClient model = (GameClient) observable;
+            updateMessageList(model);
 
-//			@Override
-//			public void run() {
-//				while (true) {
-//					ResponseGetMessages response = clientModel.requestGetMessages();
-//					if (response[0].equals("get-message")) {
-//						DefaultListModel<String> model = (DefaultListModel<String>) listChat.getModel();
-//						for (int i = 1; i < response.length; i = i + 4) {
-//							if (ChatClientApp.frame.client.offset < Integer.parseInt(response[i])) {
-//								ChatClientApp.frame.client.offset = Integer.parseInt(response[i]);
-//								model.addElement(String.format("%s @ (%s): %s", response.getMessages(), response[i + 2], response[i + 3]));
-//								try {
-//									Thread.sleep(10);
-//								} catch (InterruptedException e) {
-//									e.printStackTrace();
-//								}
-//							}
-//						}
-//
-//					}
-//					if (response[0].equals("send-message")) {
-//						if (response[1].equals("true")) {
-//							System.out.println("Message sent.");
-//						} else {
-//							JOptionPane.showMessageDialog(ChatClientApp.frame,
-//									"Cannot send message!",
-//									"Error",
-//									JOptionPane.WARNING_MESSAGE);
-//						}
-//					}
-//				}
-//			}
-//		});
-//		thread.start();
-//		timer = new java.util.Timer();
-//		timer.scheduleAtFixedRate(new TimerTask() {
-//			@Override
-//			public void run() {
-//				ChatClientApp.frame.client.get_message();
-//			}
-//		}, 1000, 2000);
 
-//	}
+        }
+    }
+
+    private void updateMessageList(GameClient model) {
+        // get clientGameOf
+        int clientMsgOffset = model.getMessages().size();
+
+        // add to list
+        while (gameScreenChatOffset < clientMsgOffset){
+            ArrayList<MessageObject> msg = new ArrayList<>(model.getMessages());
+            this.chatMessageModel.addElement(msg.get(gameScreenChatOffset).toString());
+            gameScreenChatOffset++;
+        }
+    }
+
 }

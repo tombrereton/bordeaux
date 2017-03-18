@@ -1,6 +1,6 @@
 package CardGame.Gui;
 
-import CardGame.ClientModel;
+import CardGame.GameClient;
 import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
@@ -19,7 +19,7 @@ import static CardGame.Gui.Screens.CREATE_ACCOUNTSCREEN;
  */
 public class LoginScreen extends JPanel {
 
-	private ClientModel clientModel;
+	private GameClient client;
 	private ScreenFactory screenFactory;
 
 	private JButton btnCreateAccount;
@@ -33,8 +33,8 @@ public class LoginScreen extends JPanel {
 	/**
 	 * Create the application.
 	 */
-	public LoginScreen(ClientModel clientModel, ScreenFactory screenFactory) {
-		this.clientModel = clientModel;
+	public LoginScreen(GameClient client, ScreenFactory screenFactory) {
+		this.client = client;
 		this.screenFactory = screenFactory;
 		btnCreateAccount = new JButton("Create Account");
 		btnLogin = new JButton("Login");
@@ -83,12 +83,17 @@ public class LoginScreen extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 			    // We send a request and get the response
-                ResponseProtocol responseProtocol = getClientModel().requestLogin(usernameField.getText(),
-                        String.valueOf(passwordField.getPassword()));
+				String username = usernameField.getText();
+                char[] password = passwordField.getPassword();
+                ResponseProtocol responseProtocol = getClientModel().requestLogin(username, String.valueOf(password));
 
-                // We display the error if not null
+                usernameField.setText("");
+                passwordField.setText("");
+
+                // We display the error if not successful
+                int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                if (!errorMsg.equals("")){
+                if (success == 0){
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -121,8 +126,8 @@ public class LoginScreen extends JPanel {
 		lblUsername.setBounds(screenFactory.getxOrigin()+345, screenFactory.getyOrigin()+300, 127, 31);
 	}
 
-	public ClientModel getClientModel() {
-		return clientModel;
+	public GameClient getClientModel() {
+		return client;
 	}
 
 }

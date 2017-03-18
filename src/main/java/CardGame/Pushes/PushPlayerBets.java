@@ -1,5 +1,7 @@
 package CardGame.Pushes;
 
+import CardGame.Responses.ResponseProtocol;
+
 import java.util.Map;
 
 import static CardGame.ProtocolTypes.PUSH_PLAYER_BETS;
@@ -7,11 +9,11 @@ import static CardGame.ProtocolTypes.PUSH_PLAYER_BETS;
 /**
  * Created by tom on 11/03/17.
  */
-public class PushPlayerBets extends PushProtocol {
+public class PushPlayerBets extends ResponseProtocol {
     private Map<String, Integer> playerBets;
 
-    public PushPlayerBets(Map<String, Integer> playerBets) {
-        super(PUSH_PLAYER_BETS);
+    public PushPlayerBets(int protocolID, int success, Map<String, Integer> playerBets) {
+        super(protocolID, PUSH_PLAYER_BETS, success);
         this.playerBets = playerBets;
     }
 

@@ -19,9 +19,9 @@ import java.util.concurrent.Executors;
  * @Author Tom Brereton
  */
 public class GameServer {
-    private final int port = 7654;
+    private final int PORT = 7654;
+    private final int NUMBER_OF_THREADS = 20;
     private ServerSocket serverSocket;
-    private final int numberOfThreads = 20;
     protected FunctionDB functionDB;
     private Gson gson;
 
@@ -30,10 +30,10 @@ public class GameServer {
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
-    private volatile CopyOnWriteArrayList<String> gameNames;
+    private volatile ConcurrentLinkedDeque<String> gameNames;
 
     public GameServer() {
-        this.gameNames = new CopyOnWriteArrayList<>();
+        this.gameNames = new ConcurrentLinkedDeque<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
         this.socketList = new ConcurrentLinkedDeque<>();
@@ -46,14 +46,14 @@ public class GameServer {
     }
 
     public void connectToClients() {
-        ExecutorService threadPool = Executors.newFixedThreadPool(this.numberOfThreads);
+        ExecutorService threadPool = Executors.newFixedThreadPool(this.NUMBER_OF_THREADS);
 
         try {
-            this.serverSocket = new ServerSocket(this.port);
+            this.serverSocket = new ServerSocket(this.PORT);
 
             while (true) {
                 // Wait for a client to connect
-                System.out.println("Waiting for connection from Client");
+                System.out.println("Waiting for connection from GameClient");
                 Socket socket = this.serverSocket.accept();
 
 
