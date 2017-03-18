@@ -18,21 +18,21 @@ import static CardGame.Requests.RequestProtocol.encodeRequest;
 import static org.junit.Assert.*;
 
 /**
- * This class tests the CardGameServer.
+ * This class tests the GameServer.
  * <p>
  * This inlcudes handling json objects and retrieving
  * and querying from the database.
  * <p>
  * Created by tom on 25/02/17.
  */
-public class CardGameServerTest {
+public class GameServerTest {
 
     // SET UP
 
-    CardGameServer server;
+    GameServer server;
     FunctionDB functionDB;
-    CardGameServerThread cardGameServerThread;
-    CardGameServerThread cardGameServerThreadTwo;
+    GameServerThread gameServerThread;
+    GameServerThread gameServerThreadTwo;
     CopyOnWriteArrayList<GameLobby> games = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<String> gameNames = new CopyOnWriteArrayList<>();
     CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
@@ -44,10 +44,10 @@ public class CardGameServerTest {
     @Before
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
-        server = new CardGameServer();
-        cardGameServerThread = new CardGameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
+        server = new GameServer();
+        gameServerThread = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        cardGameServerThreadTwo = new CardGameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
+        gameServerThreadTwo = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
     }
 
@@ -75,7 +75,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is register user
         int type = responseProtocol.getType();
@@ -115,7 +115,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is register user
         int type = responseProtocol.getType();
@@ -155,7 +155,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(request);
 
         // Create clienThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is register user
         int type = responseProtocol.getType();
@@ -193,8 +193,8 @@ public class CardGameServerTest {
         Gson gson = new Gson();
         String userJson = gson.toJson(request);
 
-        // Create cardGameServerThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        // Create gameServerThread object and handle the json object
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -215,11 +215,11 @@ public class CardGameServerTest {
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
 
         // We check user is added to users on clientSideThread
-        int userSize = this.cardGameServerThread.getUsers().size();
+        int userSize = this.gameServerThread.getUsers().size();
         assertEquals("Should return size of 1 ", 1, userSize);
 
         // We check correct user is added to users on clientSideThread
-        User userOnThread = this.cardGameServerThread.getLoggedInUser();
+        User userOnThread = this.gameServerThread.getLoggedInUser();
         assertEquals("Should return user matching userTest ", this.userTest, userOnThread);
     }
 
@@ -238,8 +238,8 @@ public class CardGameServerTest {
         Gson gson = new Gson();
         String userJson = gson.toJson(request);
 
-        // Create cardGameServerThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        // Create gameServerThread object and handle the json object
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -260,7 +260,7 @@ public class CardGameServerTest {
         assertEquals("Should return password mismatch error ", PASSWORD_MISMATCH, errorMsg);
 
         // We check no user was logged in
-        User userOnThread = this.cardGameServerThread.getLoggedInUser();
+        User userOnThread = this.gameServerThread.getLoggedInUser();
         assertEquals("Should return user matching userTest ", null, userOnThread);
     }
 
@@ -279,8 +279,8 @@ public class CardGameServerTest {
         Gson gson = new Gson();
         String userJson = gson.toJson(request);
 
-        // Create cardGameServerThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        // Create gameServerThread object and handle the json object
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -312,8 +312,8 @@ public class CardGameServerTest {
         Gson gson = new Gson();
         String userJson = gson.toJson(request);
 
-        // Create cardGameServerThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        // Create gameServerThread object and handle the json object
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -346,8 +346,8 @@ public class CardGameServerTest {
         Gson gson = new Gson();
         String userJson = gson.toJson(request);
 
-        // Create cardGameServerThread object and handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        // Create gameServerThread object and handle the json object
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -377,7 +377,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(requestLoginUser);
 
         // handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -397,13 +397,13 @@ public class CardGameServerTest {
         User fromDB = responseLoginUser.getUser();
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
 
-        User loggedInUser = this.cardGameServerThread.getLoggedInUser();
+        User loggedInUser = this.gameServerThread.getLoggedInUser();
 
         //CREATE GAME
         String createGameJson = gson.toJson(requestCreateGame);
 
         // Calling handle input will create game and add it to gameLobby list
-        ResponseProtocol responseCreateGame = this.cardGameServerThread.handleInput(createGameJson);
+        ResponseProtocol responseCreateGame = this.gameServerThread.handleInput(createGameJson);
 
         // We check the type is create game
         int typeCreateGame = responseCreateGame.getType();
@@ -420,7 +420,7 @@ public class CardGameServerTest {
                 expectedIDCreateGame, actualIDCreateGame);
 
         // We check we created the correct game
-        GameLobby game = this.cardGameServerThread.getGame(this.userTest);
+        GameLobby game = this.gameServerThread.getGame(this.userTest);
         assertNotNull(game);
     }
 
@@ -431,8 +431,8 @@ public class CardGameServerTest {
     public void CreateGameRequest02_test() {
         int expected = 0;
 
-        CardGameServerThread cardGameServerThreadEmpty = new CardGameServerThread(
-                new CardGameServer(),
+        GameServerThread gameServerThreadEmpty = new GameServerThread(
+                new GameServer(),
                 new Socket(),
                 new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(),
@@ -447,7 +447,7 @@ public class CardGameServerTest {
         String createGameJson = gson.toJson(requestCreateGame);
 
         // Calling handle input will create game and add it to gameLobby list
-        ResponseProtocol responseCreateGame = cardGameServerThreadEmpty.handleInput(createGameJson);
+        ResponseProtocol responseCreateGame = gameServerThreadEmpty.handleInput(createGameJson);
 
         // We check the type is create game
         int typeCreateGame = responseCreateGame.getType();
@@ -467,7 +467,7 @@ public class CardGameServerTest {
                 expectedIDCreateGame, actualIDCreateGame);
 
         // We check we created the correct game
-        GameLobby game = this.cardGameServerThread.getGame(this.userTest);
+        GameLobby game = this.gameServerThread.getGame(this.userTest);
         assertNull(game);
     }
 
@@ -484,7 +484,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(requestLoginUser);
 
         // handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -504,13 +504,13 @@ public class CardGameServerTest {
         User fromDB = responseLoginUser.getUser();
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
 
-        User loggedInUser = this.cardGameServerThread.getLoggedInUser();
+        User loggedInUser = this.gameServerThread.getLoggedInUser();
 
         //CREATE GAME
         String createGameJson = gson.toJson(requestCreateGame);
 
         // Calling handle input will create game and add it to gameLobby list
-        ResponseProtocol responseCreateGame = this.cardGameServerThread.handleInput(createGameJson);
+        ResponseProtocol responseCreateGame = this.gameServerThread.handleInput(createGameJson);
 
         // We check the type is create game
         int typeCreateGame = responseCreateGame.getType();
@@ -527,11 +527,11 @@ public class CardGameServerTest {
                 expectedIDCreateGame, actualIDCreateGame);
 
         // We check we created the correct game
-        GameLobby game = this.cardGameServerThread.getGame(this.userTest);
+        GameLobby game = this.gameServerThread.getGame(this.userTest);
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
+        PushGameNames push = this.gameServerThread.pushGameListToClient();
         ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
@@ -556,7 +556,7 @@ public class CardGameServerTest {
         String userJson = gson.toJson(requestLoginUser);
 
         // handle the json object
-        ResponseProtocol responseProtocol = cardGameServerThread.handleInput(userJson);
+        ResponseProtocol responseProtocol = gameServerThread.handleInput(userJson);
 
         // We check the type is login user
         int type = responseProtocol.getType();
@@ -576,13 +576,13 @@ public class CardGameServerTest {
         User fromDB = responseLoginUser.getUser();
         assertEquals("Should return user from database matching usertest ", this.userTest, fromDB);
 
-        User loggedInUser = this.cardGameServerThread.getLoggedInUser();
+        User loggedInUser = this.gameServerThread.getLoggedInUser();
 
         //CREATE GAME
         String createGameJson = gson.toJson(requestCreateGame);
 
         // Calling handle input will create game and add it to gameLobby list
-        ResponseProtocol responseCreateGame = this.cardGameServerThread.handleInput(createGameJson);
+        ResponseProtocol responseCreateGame = this.gameServerThread.handleInput(createGameJson);
 
         // We check the type is create game
         int typeCreateGame = responseCreateGame.getType();
@@ -599,11 +599,11 @@ public class CardGameServerTest {
                 expectedIDCreateGame, actualIDCreateGame);
 
         // We check we created the correct game
-        GameLobby game = this.cardGameServerThread.getGame(this.userTest);
+        GameLobby game = this.gameServerThread.getGame(this.userTest);
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
+        PushGameNames push = this.gameServerThread.pushGameListToClient();
         ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
@@ -613,7 +613,7 @@ public class CardGameServerTest {
 
         // JOIN GAME
         RequestJoinGame requestJoinGame = new RequestJoinGame(userTest.getUserName(), userTestTwo.getUserName());
-        ResponseProtocol responseJoin = this.cardGameServerThread.handleInput(encodeRequest(requestJoinGame));
+        ResponseProtocol responseJoin = this.gameServerThread.handleInput(encodeRequest(requestJoinGame));
 
         // we check for unsuccessful response
         int successJoin = responseJoin.getRequestSuccess();
@@ -639,8 +639,8 @@ public class CardGameServerTest {
         // LOGIN
 
         // handle the json object
-        ResponseProtocol responseLogin = cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
-        ResponseProtocol responseLogin2 = cardGameServerThreadTwo.handleInput(encodeRequest(requestLoginUser1));
+        ResponseProtocol responseLogin = gameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseLogin2 = gameServerThreadTwo.handleInput(encodeRequest(requestLoginUser1));
 
         // We check the type is login user
         int type = responseLogin.getType();
@@ -663,7 +663,7 @@ public class CardGameServerTest {
         // SECOND USER
 
         // We check the second user, userTestTwo
-        User loggedInUser = this.cardGameServerThreadTwo.getLoggedInUser();
+        User loggedInUser = this.gameServerThreadTwo.getLoggedInUser();
         assertEquals("Should return logged in user matching usertesttwo ", userTestTwo, loggedInUser);
 
         // we check second user logged in
@@ -674,7 +674,7 @@ public class CardGameServerTest {
         String createGameJson = gson.toJson(requestCreateGame);
 
         // Calling handle input will create game and add it to gameLobby list
-        ResponseProtocol responseCreateGame = this.cardGameServerThread.handleInput(createGameJson);
+        ResponseProtocol responseCreateGame = this.gameServerThread.handleInput(createGameJson);
 
         // We check the type is create game
         int typeCreateGame = responseCreateGame.getType();
@@ -691,11 +691,11 @@ public class CardGameServerTest {
                 expectedIDCreateGame, actualIDCreateGame);
 
         // We check we created the correct game
-        GameLobby game = this.cardGameServerThread.getGame(this.userTest);
+        GameLobby game = this.gameServerThread.getGame(this.userTest);
         assertNotNull(game);
 
         // We check the game list is pushed
-        PushGameNames push = this.cardGameServerThread.pushGameListToClient();
+        PushGameNames push = this.gameServerThread.pushGameListToClient();
         ArrayList<String> gameNames = push.getGameNames();
 
         ArrayList<String> expectedGames = new ArrayList<>();
@@ -706,7 +706,7 @@ public class CardGameServerTest {
         // SECOND USER JOIN GAME
         String gameName = userTest.getUserName();
         RequestJoinGame requestJoinGame = new RequestJoinGame(gameName, userTestTwo.getUserName());
-        ResponseProtocol responseJoin = this.cardGameServerThreadTwo.handleInput(encodeRequest(requestJoinGame));
+        ResponseProtocol responseJoin = this.gameServerThreadTwo.handleInput(encodeRequest(requestJoinGame));
 
         // we check for successful response
         int successJoin = responseJoin.getRequestSuccess();
@@ -720,15 +720,15 @@ public class CardGameServerTest {
     public void bet01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // BET
         RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-        ResponseProtocol responseBet = this.cardGameServerThread.handleInput(encodeRequest(requestBet));
+        ResponseProtocol responseBet = this.gameServerThread.handleInput(encodeRequest(requestBet));
 
         // We check the bet was successful
         int successBet = responseBet.getRequestSuccess();
@@ -742,7 +742,7 @@ public class CardGameServerTest {
     public void hit01_test() {
         RequestHit requestHit = new RequestHit(userTest.getUserName());
 
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestHit));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestHit));
 
         // we check the hit was successful
         int successHit = responseProtocol.getRequestSuccess();
@@ -757,19 +757,19 @@ public class CardGameServerTest {
     public void hit02_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // BET
         RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-        ResponseProtocol responseBet = this.cardGameServerThread.handleInput(encodeRequest(requestBet));
+        ResponseProtocol responseBet = this.gameServerThread.handleInput(encodeRequest(requestBet));
 
         // HIT
         RequestHit requestHit = new RequestHit(userTest.getUserName());
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestHit));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestHit));
 
         // we check the hit was successful
         int successHit = responseProtocol2.getRequestSuccess();
@@ -783,19 +783,19 @@ public class CardGameServerTest {
     public void double01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // BET
         RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-        ResponseProtocol responseBet = this.cardGameServerThread.handleInput(encodeRequest(requestBet));
+        ResponseProtocol responseBet = this.gameServerThread.handleInput(encodeRequest(requestBet));
 
         // DOUBLE BET
         RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest.getUserName());
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestDoubleBet));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestDoubleBet));
 
         // we check the double bet was successful
         int successDouble = responseProtocol2.getRequestSuccess();
@@ -810,19 +810,19 @@ public class CardGameServerTest {
     public void stand01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // BET
         RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-        ResponseProtocol responseBet = this.cardGameServerThread.handleInput(encodeRequest(requestBet));
+        ResponseProtocol responseBet = this.gameServerThread.handleInput(encodeRequest(requestBet));
 
         // STAND
         RequestStand requestStand = new RequestStand(userTest.getUserName());
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestStand));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestStand));
 
         // we check stand was successful
         int successStand = responseProtocol2.getRequestSuccess();
@@ -837,15 +837,15 @@ public class CardGameServerTest {
     public void quitGame01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // QUIT GAME
         RequestQuitGame requestQuitGame = new RequestQuitGame(userTest.getUserName(), userTest.getUserName());
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestQuitGame));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestQuitGame));
 
         // we check the user quit the game successfully
         int successQuit = responseProtocol.getRequestSuccess();
@@ -860,11 +860,11 @@ public class CardGameServerTest {
     public void logOut01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseLogin = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseLogin = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // LOG OUT
         RequestLogOut requestLogOut = new RequestLogOut(this.userTest.getUserName());
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLogOut));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLogOut));
 
         // we check the user logged out successfully
         int successLogout = responseProtocol.getRequestSuccess();
@@ -880,19 +880,19 @@ public class CardGameServerTest {
     public void fold01_test() {
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // BET
         RequestBet requestBet = new RequestBet(10, userTest.getUserName());
-        ResponseProtocol responseBet = this.cardGameServerThread.handleInput(encodeRequest(requestBet));
+        ResponseProtocol responseBet = this.gameServerThread.handleInput(encodeRequest(requestBet));
 
         // FOLD
         RequestFold requestFold = new RequestFold(userTest.getUserName());
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestFold));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestFold));
 
         // we check the user quit the game successfully
         int successFold = responseProtocol2.getRequestSuccess();
@@ -908,22 +908,22 @@ public class CardGameServerTest {
 
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // SEND MESSAGE
         MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
         RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestSendMessage));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestSendMessage));
         ArrayList<MessageObject> expectedMsg = new ArrayList<>();
         expectedMsg.add(messageObject);
 
         // GET MESSAGE
         RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
-        ResponseProtocol responseProtocol3 = this.cardGameServerThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseProtocol responseProtocol3 = this.gameServerThread.handleInput(encodeRequest(requestGetMessages));
         ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
 
 
@@ -946,18 +946,18 @@ public class CardGameServerTest {
 
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // SEND MESSAGE
         ArrayList<MessageObject> expectedMsg = new ArrayList<>();
 
         // GET MESSAGE
         RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
-        ResponseProtocol responseProtocol3 = this.cardGameServerThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseProtocol responseProtocol3 = this.gameServerThread.handleInput(encodeRequest(requestGetMessages));
         ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
 
 
@@ -980,21 +980,21 @@ public class CardGameServerTest {
 
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // SEND MESSAGE
         MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
         RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestSendMessage));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestSendMessage));
         ArrayList<MessageObject> expectedMsg = new ArrayList<>();
 
         // GET MESSAGE
         RequestGetMessages requestGetMessages = new RequestGetMessages(2);
-        ResponseProtocol responseProtocol3 = this.cardGameServerThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseProtocol responseProtocol3 = this.gameServerThread.handleInput(encodeRequest(requestGetMessages));
         ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
 
 
@@ -1020,25 +1020,25 @@ public class CardGameServerTest {
 
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // CREATE GAME
         RequestCreateGame requestCreateGame = new RequestCreateGame(userTest.getUserName());
-        ResponseProtocol responseProtocol1 = this.cardGameServerThread.handleInput(encodeRequest(requestCreateGame));
+        ResponseProtocol responseProtocol1 = this.gameServerThread.handleInput(encodeRequest(requestCreateGame));
 
         // SEND MESSAGE
         MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
         RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestSendMessage));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestSendMessage));
         MessageObject messageObject1 = new MessageObject(userTest.getUserName(), "How are you?");
         RequestSendMessage requestSendMessage1 = new RequestSendMessage(messageObject1);
-        ResponseProtocol responseProtocol3 = this.cardGameServerThread.handleInput(encodeRequest(requestSendMessage1));
+        ResponseProtocol responseProtocol3 = this.gameServerThread.handleInput(encodeRequest(requestSendMessage1));
         ArrayList<MessageObject> expectedMsg = new ArrayList<>();
         expectedMsg.add(messageObject1);
 
         // GET MESSAGE
         RequestGetMessages requestGetMessages = new RequestGetMessages(0);
-        ResponseProtocol responseProtocol4 = this.cardGameServerThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseProtocol responseProtocol4 = this.gameServerThread.handleInput(encodeRequest(requestGetMessages));
         ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol4;
 
 
@@ -1061,16 +1061,16 @@ public class CardGameServerTest {
 
         // LOG IN
         RequestLoginUser requestLoginUser = new RequestLoginUser(userTest);
-        ResponseProtocol responseProtocol = this.cardGameServerThread.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol responseProtocol = this.gameServerThread.handleInput(encodeRequest(requestLoginUser));
 
         // SEND MESSAGE
         MessageObject messageObject = new MessageObject(userTest.getUserName(), "Hello world!.");
         RequestSendMessage requestSendMessage = new RequestSendMessage(messageObject);
-        ResponseProtocol responseProtocol2 = this.cardGameServerThread.handleInput(encodeRequest(requestSendMessage));
+        ResponseProtocol responseProtocol2 = this.gameServerThread.handleInput(encodeRequest(requestSendMessage));
 
         // GET MESSAGE
         RequestGetMessages requestGetMessages = new RequestGetMessages(-1);
-        ResponseProtocol responseProtocol3 = this.cardGameServerThread.handleInput(encodeRequest(requestGetMessages));
+        ResponseProtocol responseProtocol3 = this.gameServerThread.handleInput(encodeRequest(requestGetMessages));
         ResponseGetMessages responseGetMessages = (ResponseGetMessages) responseProtocol3;
 
         int successGetMsg = responseGetMessages.getRequestSuccess();

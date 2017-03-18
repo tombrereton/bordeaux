@@ -5,8 +5,6 @@ import CardGame.GameEngine.Deck;
 import CardGame.GameEngine.GameLobby;
 import CardGame.GameEngine.Player;
 
-import org.junit.Before;
-
 import org.junit.Test;
 
 import java.net.Socket;
@@ -19,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  *
  */
 public class GameLobbyTest {
-    CardGameServer server;
+    GameServer server;
 
     Socket s = new Socket();
     // SET UP
