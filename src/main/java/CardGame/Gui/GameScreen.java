@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+
 /**
  * gameScreen
  *
@@ -273,9 +274,9 @@ public class GameScreen extends JPanel implements Observer {
             public void actionPerformed(ActionEvent e) {
                 credits = credits - amountToBet;
                 ResponseProtocol response = client.requestBet(amountToBet);
-                if (response.getRequestSuccess() == 1){
+                if (response.getRequestSuccess() == 1) {
                     PushPlayerBudgets responseBudgets = client.requestGetPlayerBudgets();
-                    if(responseBudgets.getRequestSuccess() == 1){
+                    if (responseBudgets.getRequestSuccess() == 1) {
                         lblCredits.setText("Credits: £ " + responseBudgets.getPlayerBudgets().get(client.getLoggedInUser().getUserName()));
                     }
                 }
@@ -406,26 +407,26 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(lblCreditsBox);
 
-		/**
-		 * Bet Box
-		 */
-		try {
-			Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
-			lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblSubmitBetBox);
+        /**
+         * Bet Box
+         */
+        try {
+            Image imgSubmitBox = ImageIO.read(getClass().getResource("/gameHud/imageBoxBet.png"));
+            lblSubmitBetBox.setIcon(new ImageIcon(imgSubmitBox));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblSubmitBetBox);
 
 
-		//Hud background, lblBackHud, lblSideHud, lblSideFillHud
-		try {
-			Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
-			lblBackHud.setIcon(new ImageIcon(imgHud));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblBackHud);
+        //Hud background, lblBackHud, lblSideHud, lblSideFillHud
+        try {
+            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
+            lblBackHud.setIcon(new ImageIcon(imgHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblBackHud);
 
         lblSideFillHud.setOpaque(true);
         lblSideFillHud.setBackground(new Color(127, 37, 27));
@@ -441,21 +442,21 @@ public class GameScreen extends JPanel implements Observer {
 
 
         //Player positions and board images: lblDeck, playerGui1, playerGui2, playerGui3, playerGui4
-		try {
-			Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
-			lblDeck.setIcon(new ImageIcon(imgDeck));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-		add(lblDeck);}
+        try {
+            Image imgDeck = ImageIO.read(getClass().getResource("/cards/000.png"));
+            lblDeck.setIcon(new ImageIcon(imgDeck));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblDeck);
 
-		add(dealerGui);
-		add(playerGui1);
-		add(playerGui2);
-		add(playerGui3);
-		add(playerGui4);
+        add(dealerGui);
+        add(playerGui1);
+        add(playerGui2);
+        add(playerGui3);
+        add(playerGui4);
+    }
 
-	}
     public GameClient getClientModel() {
         return client;
     }
