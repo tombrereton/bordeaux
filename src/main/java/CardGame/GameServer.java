@@ -30,10 +30,10 @@ public class GameServer {
     private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
-    private volatile CopyOnWriteArrayList<String> gameNames;
+    private volatile ConcurrentLinkedDeque<String> gameNames;
 
     public GameServer() {
-        this.gameNames = new CopyOnWriteArrayList<>();
+        this.gameNames = new ConcurrentLinkedDeque<>();
         this.gson =  new Gson();
         this.messageQueue = new ConcurrentLinkedDeque<>();
         this.socketList = new ConcurrentLinkedDeque<>();

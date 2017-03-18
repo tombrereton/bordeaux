@@ -25,7 +25,7 @@ public class GameScreen extends JPanel implements Observer {
     private ScreenFactory screenFactory;
 
 	private JTextArea textArea;
-	private JList<String> listChat
+	private JList<String> listChat;
  	private JScrollPane scrollPane;
 	private JLabel lblChat;
 	private JButton btnSendMessage;

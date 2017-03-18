@@ -386,6 +386,7 @@ public class GameClient extends Observable {
         if (success == 1) {
             setCurrentScreen(LOBBYSCREEN);
             stopGettingMessages();
+            listOfGames.clear();
             startGettingGameNames();
             messages.clear();
             setChatOffset(-1);

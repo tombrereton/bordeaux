@@ -22,7 +22,6 @@ import static CardGame.Gui.Screens.HOMESCREEN;
  */
 public class LobbyScreen extends JPanel implements Observer {
     public ArrayList<String> listOfGames;
-    public DefaultListModel defaultListModel;
     private String gameName;
 
     private GameClient client;
@@ -50,7 +49,6 @@ public class LobbyScreen extends JPanel implements Observer {
 
         // gameList variables
         this.gameNameListModel = new DefaultListModel();
-//        addToList(new ArrayList<>(getClientModel().getListOfGames()));
         this.gameList = new JList(this.gameNameListModel);
         this.lobbyGamesOffset = 0;
 
@@ -94,15 +92,6 @@ public class LobbyScreen extends JPanel implements Observer {
         gameList.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
         gameList.setFont(new Font("Soho Std", Font.PLAIN, 18));
         gameList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        gameList.setModel(defaultListModel = new DefaultListModel() {
-//            public int getSize() {
-//				return listOfGames.size();
-//			}
-//			public Object getElementAt(int index) {
-//				return listOfGames.get(index);
-//			}
-//		});
-
 
         // add listener to gameList
         ListSelectionModel listSelectionModel = gameList.getSelectionModel();
@@ -183,6 +172,10 @@ public class LobbyScreen extends JPanel implements Observer {
 
     public void setListOfGames(ArrayList<String> listOfGames) {
         this.listOfGames = listOfGames;
+    }
+
+    public DefaultListModel getGameNameListModel() {
+        return gameNameListModel;
     }
 
     private void addToList(ArrayList<String> gamesNames) {

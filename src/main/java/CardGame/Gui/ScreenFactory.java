@@ -127,6 +127,10 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
             frame.add(centerPane);
             frame.repaint();
             frame.revalidate();
+
+//            if (panelAdd == this.lobbyScreen) {
+//                this.lobbyScreen.getGameNameListModel().clear();
+//            }
         }
     }
 
@@ -183,25 +187,6 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
         }
     }
 
-    /**
-     * main method with which to run the gui
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    GameClient client = new GameClient("localhost", 7654);
-                    frame = new ScreenFactory(client);
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
 
     /**
      * This update method will change the current jpanel
@@ -255,6 +240,26 @@ public class ScreenFactory extends JFrame implements Observer, ComponentListener
                     break;
             }
         }
+    }
 
+    /**
+     * main method with which to run the gui
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GameClient gameClient = null;
+                try {
+                    gameClient = new GameClient("localhost", 7654);
+                    frame = new ScreenFactory(gameClient);
+                    frame.setVisible(true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
