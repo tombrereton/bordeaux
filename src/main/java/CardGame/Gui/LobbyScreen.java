@@ -105,7 +105,7 @@ public class LobbyScreen extends JPanel implements Observer {
 
                 // we get the game name with the index
                 ArrayList<String> games = new ArrayList<>(getClientModel().getListOfGames());
-                if (games.size() != 0 && games.size() >= selectionIndex) {
+                if (games.size() != 0 && games.size() > selectionIndex) {
                     String gameNameSelected = games.get(selectionIndex);
 
                     // we set the game name to the game selected
