@@ -590,6 +590,11 @@ public class GameScreen extends JPanel implements Observer {
         this.credits = credits;
     }
 
+    /**
+     * A helper method to get the correct GUI of each player
+     * @param index
+     * @return
+     */
     public PlayerGui getplayerGui(int index){
         PlayerGui playerGui = new PlayerGui();
         if(index>=0 && index<5){
@@ -617,6 +622,58 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     /**
+     * A helper method to set each player's card
+     * @param gui
+     * @param index
+     * @param valuestr
+     */
+    public void setLbCards(PlayerGui gui,int index,String valuestr){
+        if(index>=0 && index<5){
+            switch (index){
+                case 0:
+                    gui.setLblCard1(valuestr);
+                    break;
+                case 1:
+                    gui.setLblCard2(valuestr);
+                    break;
+                case 2:
+                    gui.setLblCard3(valuestr);
+                    break;
+                case 3:
+                    gui.setLblCard4(valuestr);
+                    break;
+                case 4:
+                    gui.setLblCard5(valuestr);
+                    break;
+                case 5:
+                    gui.setLblCard6(valuestr);
+                    break;
+                case 6:
+                    gui.setLblCard7(valuestr);
+                    break;
+                case 7:
+                    gui.setLblCard8(valuestr);
+                    break;
+                case 8:
+                    gui.setLblCard9(valuestr);
+                    break;
+                case 9:
+                    gui.setLblCard10(valuestr);
+                    break;
+                case 10:
+                    gui.setLblCard11(valuestr);
+                    break;
+                case 11:
+                    gui.setLblCard12(valuestr);
+                    break;
+                default:
+                    break;
+
+            }
+        }
+    }
+
+    /**
      * This method is called when the observable class calls notifyObservers.
      *
      * @param observable
@@ -640,19 +697,20 @@ public class GameScreen extends JPanel implements Observer {
 
 //            playerGui1.setLblName(model.getPlayerNames().get(0));
 
-            // set cards to players
 
+            if(model.getDealerHand() != null){
+                for(int i = 0; i<model.getDealerHand().getHand().size();i++){
+                    setLbCards(dealerGui,i,model.getDealerHand().getCard(i).getImageID());
+                }
 
+            }
+            // set players' information and set cards to players
             if(model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()){
 
                 for(int i = 0; i< model.getPlayerNames().size();i++) {
-
                     String playerName = model.getPlayerNames().get(i);
-
-                    String playerCredit = model.getPlayerBudgets().get(i) + "";
-
-                    String playerBets = model.getPlayerBets().get(i) + "";
-
+                    String playerCredit = model.getPlayerBudgets().get(playerName) + "";
+                    String playerBets = model.getPlayerBets().get(playerName) + "";
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
@@ -663,11 +721,15 @@ public class GameScreen extends JPanel implements Observer {
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
 
+                    // set each player's card
                     ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
 
-                    for(Card card: playersCard){
-                        playerGui1.setLblCard1(card.getImageID());
-                    }
+                        for(int j = 0; j<playersCard.size();j++){
+                            setLbCards(getplayerGui(i),j, playersCard.get(j).getImageID());
+                            repaint();
+                            revalidate();
+                        }
+
 
                 }
 
