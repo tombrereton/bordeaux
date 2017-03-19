@@ -256,6 +256,7 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
         if (args.length == 1 && args[0].equals("-h")) {
             System.out.println("Enter: \'[host]\' or \'[host] [post]\' " +
                     "\nOr default is \'[localhost] [7654]\'");
+            return;
         } else if (args.length == 0) {
             host = "localhost";
             port = 7654;
@@ -272,6 +273,7 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
         }
 
         System.out.println("Host: " + host + ", Port: " + port);
+
 
         // set host and port to final
         String finalHost = host;

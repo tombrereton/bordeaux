@@ -99,6 +99,7 @@ public class GameServer {
             System.out.println("Enter: \'[port]\' or \'[port] [host]\' " +
                     "\nOr \'[port] [host] [max number of clients]\'" +
                     "\nOr default is \'[7654] [0.0.0.0] [20]\'");
+            return;
         } else if (args.length == 0) {
             port = 7654;
             host = "0.0.0.0";
