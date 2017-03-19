@@ -364,7 +364,12 @@ public class GameServerThread implements Runnable {
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
-        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
+            // return fail if user is bust
+            return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
+        }else if (getGame(gameJoined).isAllPlayersStand()){
+            return new ResponseHit(protocolId, FAIL, PLAYER_STAND);
+        }else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
             // return success if bet within budget
