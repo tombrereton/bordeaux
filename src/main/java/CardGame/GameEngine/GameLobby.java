@@ -344,7 +344,7 @@ public class GameLobby {
      */
     public synchronized void startGame() {
         // start the game
-
+        deck.shuffle();
         // shuffle the deck
         nextGame();
     }
@@ -446,12 +446,12 @@ public class GameLobby {
             playersBust.put(player.getUsername(),true);
         }
 
-        if(allPlayersStand){
+        if(isAllPlayersStand()){
             setDealerCardsFaceUp();
             setPlayersWon();
         }
 
-        return player.isBust();
+        return true;
     }
 
 
