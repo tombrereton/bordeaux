@@ -20,7 +20,7 @@ import static CardGame.Gui.Screens.*;
 public class HomeScreen extends JPanel implements Observer {
 
     private GameClient client;
-    private ScreenFactory screenFactory;
+    private BlackjackOnline blackjackOnline;
 
     private JButton btnLogout;
     private String username;
@@ -36,8 +36,8 @@ public class HomeScreen extends JPanel implements Observer {
     /**
      * Create the application.
      */
-    public HomeScreen(GameClient client, ScreenFactory screenFactory) {
-        this.screenFactory = screenFactory;
+    public HomeScreen(GameClient client, BlackjackOnline blackjackOnline) {
+        this.blackjackOnline = blackjackOnline;
 
         // we add this to list of observers
         this.client = client;
@@ -150,15 +150,15 @@ public class HomeScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        btnLogout.setBounds(screenFactory.getScreenWidthCurrent() - 130, 10, 100, 30);
-        lblWelcome.setBounds(screenFactory.getxOrigin() + 391, 10, 242, 34);
-        btnGoToLobby.setBounds(screenFactory.getxOrigin() + 148, screenFactory.getyOrigin() + 174, 165, 34);
-        btnStatistics.setBounds(screenFactory.getxOrigin() + 148, screenFactory.getyOrigin() + 271, 165, 34);
-        btnSettings.setBounds(screenFactory.getxOrigin() + 148, screenFactory.getyOrigin() + 368, 165, 34);
-        lblCredits.setBounds(screenFactory.getxOrigin() + 560, screenFactory.getyOrigin() + 191, 225, 34);
-        lblGamesWon.setBounds(screenFactory.getxOrigin() + 560, screenFactory.getyOrigin() + 300, 225, 34);
-        lblGamesLost.setBounds(screenFactory.getxOrigin() + 560, screenFactory.getyOrigin() + 352, 225, 34);
-        lblGamesPlayed.setBounds(screenFactory.getxOrigin() + 560, screenFactory.getyOrigin() + 243, 225, 34);
+        btnLogout.setBounds(blackjackOnline.getScreenWidthCurrent() - 130, 10, 100, 30);
+        lblWelcome.setBounds(blackjackOnline.getxOrigin() + 391, 10, 242, 34);
+        btnGoToLobby.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 174, 165, 34);
+        btnStatistics.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 271, 165, 34);
+        btnSettings.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 368, 165, 34);
+        lblCredits.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 191, 225, 34);
+        lblGamesWon.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 300, 225, 34);
+        lblGamesLost.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 352, 225, 34);
+        lblGamesPlayed.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 243, 225, 34);
     }
 
     public GameClient getClientModel() {

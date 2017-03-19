@@ -33,7 +33,7 @@ public class PlayerGui extends JPanel {
         setLblAvatar("0");
         setLblName("username");
         setLblBetAmount("to bet...");
-        setLblCredits("credits");
+        setLblBudget("credits");
         setPlayerBounds();
         addPlayerComponents();
         createCards();
@@ -57,7 +57,7 @@ public class PlayerGui extends JPanel {
             createPlayerComponents();
             setLblName("username");
             setLblBetAmount("amount to bet");
-            setLblCredits("credits");
+            setLblBudget("credits");
             setPlayerBounds();
             addPlayerComponents();
             createCards();
@@ -185,7 +185,7 @@ public class PlayerGui extends JPanel {
         lblName.setText(username);
     }
 
-    public void setLblCredits(String credits){
+    public void setLblBudget(String credits){
         lblCredits.setText(credits);
     }
 

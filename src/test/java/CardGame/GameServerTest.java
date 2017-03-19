@@ -43,7 +43,7 @@ public class GameServerTest {
     @Before
     public void setUp() throws Exception {
         functionDB = new FunctionDB();
-        server = new GameServer();
+        server = new GameServer(7654, "localhost", 20);
         cardGameServerThread = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
         cardGameServerThreadTwo = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
@@ -431,7 +431,7 @@ public class GameServerTest {
         int expected = 0;
 
         GameServerThread cardGameServerThreadEmpty = new GameServerThread(
-                new GameServer(),
+                new GameServer(7654, "localhost", 20),
                 new Socket(),
                 new ConcurrentLinkedDeque<MessageObject>(),
                 new ConcurrentLinkedDeque<Socket>(),

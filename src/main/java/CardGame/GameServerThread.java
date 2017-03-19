@@ -15,6 +15,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -31,7 +33,6 @@ import static CardGame.Responses.ResponseProtocol.encodeResponse;
  */
 public class GameServerThread implements Runnable {
     private Socket toClientSocket;
-    private DataOutputStream pushOutputStream;
     private boolean clientAlive;
     private long clientID;
     private User user;
@@ -96,9 +97,8 @@ public class GameServerThread implements Runnable {
                 }
             }
         } catch (EOFException e) {
-            System.out.println("GameClient disconnected.: " + e.toString());
+            System.out.println("GameClient disconnected.");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
             e.printStackTrace();
         } finally {
             // log user out of client and game on disconnect
@@ -131,7 +131,6 @@ public class GameServerThread implements Runnable {
             this.inputStream.close();
             this.outputStream.close();
             this.toClientSocket.close();
-            this.pushOutputStream.close();
         } catch (NullPointerException e) {
             System.out.println("Problem closing connection due to null pointer");
         } catch (IOException e) {
@@ -252,7 +251,7 @@ public class GameServerThread implements Runnable {
     }
 
     private ResponseProtocol handleGetPlayerNames(int protocolId) {
-        ArrayList<String> playerNames = this.getGame(gameJoined).getPlayerNames();
+        Set<String> playerNames = new TreeSet<>(this.getGame(gameJoined).getPlayerNames());
 
         return new PushPlayerNames(protocolId, SUCCESS, playerNames);
     }
@@ -391,6 +390,9 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
+        } else if (betAmount < 5){
+            // return fail if bet is less than 5 pounds
+            return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
@@ -644,42 +646,6 @@ public class GameServerThread implements Runnable {
         }
     }
 
-
-    /**
-     * This method takes in any PushProtocol subtype and
-     * pushes it to all the players in the game.
-     *
-     * @param push
-     * @param <T>
-     * @return True if push successful, false if not
-     */
-    private <T extends ResponseProtocol> boolean pushToPlayers(T push) {
-        pushOutputStream = null;
-        Map<String, Socket> playerSockets = this.getGame(gameJoined).getPlayerSockets();
-
-        if (this.socketList.isEmpty()) {
-            return false;
-        }
-
-        try {
-            for (Map.Entry<String, Socket> playerSocketEntry : playerSockets.entrySet()) {
-                // we get the output stream for player i
-                pushOutputStream = new DataOutputStream(playerSocketEntry.getValue().getOutputStream());
-
-                // we push to player i
-                pushOutputStream.writeUTF(encodeResponse(push));
-            }
-
-            // we print out the push
-            System.out.println(push);
-
-            // we return true if successful
-            return true;
-        } catch (IOException e) {
-            System.out.println("Failed to send out list of game names");
-            return false;
-        }
-    }
 
     private void joinGame(String lobbyname) {
         getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
@@ -988,8 +954,8 @@ public class GameServerThread implements Runnable {
         return games;
     }
 
-    public ArrayList<String> getGameNames() {
-        return new ArrayList<>(this.gameNames);
+    public Set<String> getGameNames() {
+        return new TreeSet<>(this.gameNames);
     }
 
     public String getGameJoined() {
