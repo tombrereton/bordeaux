@@ -121,6 +121,9 @@ public class GameServer {
                     "\nOr default is \'[7654] [0.0.0.0] [20]\'");
         }
 
+        System.out.println("Host: " + host + ", Port: " + port + ", Max number of client: " +maxNumberOfClients);
+
+
         // start server and connect to database
         GameServer server = new GameServer(port, host, maxNumberOfClients);
         server.connectToDatabase();
