@@ -52,10 +52,6 @@ public class GameLobby {
         this.dealerCardLeft = false;
         this.allPlayersFinished = false;
 
-        setAllPlayersBustToFalse();
-        setAllPlayersWonToFalse();
-        setAllPlayersStandToFalse();
-
         // Create a deck
         this.deck = new Deck();
 
@@ -65,6 +61,9 @@ public class GameLobby {
         this.playersWon = new HashMap<>();
         this.playersStand = new HashMap<>();
         this.dealerHand = new BlackjackHand();
+        setAllPlayersBustToFalse();
+        setAllPlayersWonToFalse();
+        setAllPlayersStandToFalse();
 
         // chat variables
         this.messageQueue = new ConcurrentLinkedDeque<>();
@@ -178,7 +177,7 @@ public class GameLobby {
     }
 
     private boolean isPlayerBust(Player player) {
-        return getPlayersBust().get(player.getUsername());
+        return getPlayer(player.getUsername()).isBust();
     }
 
     private void setBetToZero(Player player) {
@@ -283,9 +282,9 @@ public class GameLobby {
         return true;
     }
 
-    public synchronized boolean allPlayersFinished() {
+    public synchronized boolean setAllPlayersFinished() {
         for (Player p : players) {
-            if (!p.isFinishedRound()) {
+            if (!getPlayersWon().get(p.getUsername()) || !getPlayersStand().get(p.getUsername())) {
                 setAllPlayersFinished(false);
                 return false;
             }
@@ -337,24 +336,6 @@ public class GameLobby {
     }
 
     /**
-     * tells everyone to bet
-     * tells everyone who still has to bet
-     * once everyone has bet, calls startgame method
-     */
-    public synchronized void takeBets() {
-        // fill out
-
-        for (Player p : players) {
-            if (!p.isFinishedRound()) {
-                System.out.println(p.getUsername() + " needs to bet");
-            }
-        }
-        if (allPlayersFinished()) {
-            startGame();
-        }
-    }
-
-    /**
      * deals 2 cards to everyone, all cards face up
      * deals 2 card to dealer, 1 card face down, 1 card face up
      */
@@ -370,11 +351,6 @@ public class GameLobby {
             deck = new Deck();
             deck.shuffle();
         }
-
-        setAllPlayersBustToFalse();
-        setAllPlayersWonToFalse();
-        setAllPlayersStandToFalse();
-
 
         // remove the cards from each players
         for (Player p : players) {
@@ -431,6 +407,14 @@ public class GameLobby {
             if (wonAgainstDealer(player)) {
                 playersWon.put(player.getUsername(), true);
             }
+        }
+
+        setAllPlayersFinished();
+
+        if (isAllPlayersFinished()){
+            setAllPlayersBustToFalse();
+            setAllPlayersWonToFalse();
+            setAllPlayersStandToFalse();
         }
     }
 
@@ -576,6 +560,7 @@ public class GameLobby {
     public synchronized void setPlayerStand(String username) {
         for (Player player : players) {
             if (player.getUsername().equals(username)) {
+                player.setPlayerStand(true);
                 playersStand.put(username, true);
             }
         }

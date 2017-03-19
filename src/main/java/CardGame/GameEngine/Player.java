@@ -15,6 +15,7 @@ public class Player {
     private boolean isBetPlaced;
     private boolean isFinishedRound;
     private boolean isCardLeft;
+    private boolean isPlayerStand;
 
     public Player(User user) {
         this.username = user.getUserName();
@@ -97,7 +98,7 @@ public class Player {
     }
 
     public boolean isBust() {
-        return this.getPlayerHandValue() <= 21 && this.getPlayerHandValue() >= 1;
+        return this.getPlayerHandValue() > 21;
     }
 
     public boolean isBetPlaced() {
@@ -114,5 +115,13 @@ public class Player {
 
     public void setCardLeft(boolean cardLeft) {
         isCardLeft = cardLeft;
+    }
+
+    public boolean isPlayerStand() {
+        return isPlayerStand;
+    }
+
+    public void setPlayerStand(boolean playerStand) {
+        isPlayerStand = playerStand;
     }
 }

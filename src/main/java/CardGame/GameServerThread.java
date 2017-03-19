@@ -329,13 +329,13 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseStand(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseStand(protocolId, FAIL, NO_BET);
-        } else if (getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if player is already standing
             return new ResponseStand(protocolId, FAIL, ALREADY_STANDING);
-        } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if the player is not standing, make player stand
             getGame(gameJoined).setPlayerStand(getLoggedInUser().getUserName());
 
