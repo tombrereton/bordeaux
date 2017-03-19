@@ -305,7 +305,7 @@ public class GameServerThread implements Runnable {
             return new ResponseFold(protocolId, FAIL, ALREADY_STANDING);
         } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
             // if the player is not standing, make player fold
-            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
+//            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
 
             // return success if player is now standing
             return new ResponseFold(protocolId, SUCCESS);
@@ -368,7 +368,7 @@ public class GameServerThread implements Runnable {
             return new ResponseHit(protocolId, FAIL, NO_BET);
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
-            getGame(gameJoined).hit(getLoggedInUser());
+            getGame(gameJoined).hit(getLoggedInUser().getUserName());
             // return success if bet within budget
             return new ResponseHit(protocolId, SUCCESS);
         } else {
