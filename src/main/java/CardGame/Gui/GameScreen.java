@@ -115,10 +115,10 @@ public class GameScreen extends JPanel implements Observer {
 
         //board images and players
         lblDeck = new JLabel();
-        playerGui1 = new PlayerGui("14");
-        playerGui2 = new PlayerGui("31");
-        playerGui3 = new PlayerGui("5");
-        playerGui4 = new PlayerGui("3");
+        playerGui1 = new PlayerGui();
+        playerGui2 = new PlayerGui();
+        playerGui3 = new PlayerGui();
+        playerGui4 = new PlayerGui();
         dealerGui = new PlayerGui("1");
 
         // chat variables
