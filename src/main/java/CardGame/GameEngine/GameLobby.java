@@ -18,6 +18,7 @@ public class GameLobby {
     private Map<String, Socket> playerSockets;
     private Deck deck;
     private boolean allPlayersStand;
+    private boolean allPlayersBetPlaced;
 
     // variables that will be sent to client
     private Map<String, Integer> playerBudgets;
@@ -40,6 +41,7 @@ public class GameLobby {
         this.players = new ArrayList<>();
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
+        this.allPlayersBetPlaced = false;
         // Create a deck
         this.deck = new Deck();
 
@@ -52,6 +54,7 @@ public class GameLobby {
 
         // chat variables
         this.messageQueue = new ConcurrentLinkedDeque<>();
+
 
     }
 
@@ -228,12 +231,38 @@ public class GameLobby {
         }
     }
 
+    /**
+     * This method will check whether all cards are left on this deck
+     *
+     * @return If the player still has the cards, return false, else true
+     */
+    public synchronized boolean allPlayersNoCards(){
+        for(Player p:players){
+            // if the player still have cards
+            // return false
+            if(p.isCardLeft()){
+                return false;
+            }
+        }
+        return true;
+    }
     public synchronized boolean allPlayersFinished() {
         for (Player p : players) {
             if (!p.isFinishedRound()) {
                 return false;
             }
         }
+        return true;
+    }
+
+    public synchronized boolean allPlayersBetPlaced() {
+        for (Player p : players) {
+            if (!p.isBetPlaced()) {
+                allPlayersBetPlaced = false;
+                return false;
+            }
+        }
+        allPlayersBetPlaced = true;
         return true;
     }
 
@@ -285,15 +314,21 @@ public class GameLobby {
         }
     }
 
-
     /**
      * deals 2 cards to everyone, all cards face up
      * deals 2 card to dealer, 1 card face down, 1 card face up
      */
     public synchronized void startGame() {
-        // start the game and shuffle the deck
+        // start the game
+        // if all players still have cards left then remove the cards from all players
+        if(!allPlayersNoCards()){
+            for(Player p: players){
+                p.removeAllCards();
+            }
+            deck = new Deck();
+        }
+        // shuffle the deck
         deck.shuffle();
-
         nextGame();
     }
 
@@ -303,7 +338,6 @@ public class GameLobby {
             deck.shuffle();
         }
 
-        // remove all cards from players
 
         // For players:
         for (Player p : players) {
@@ -334,7 +368,7 @@ public class GameLobby {
         // set all players stand to false
 
         for (Player player : players) {
-            playersStand.put(player.getUsername(), false);
+//            playersStand.put(player.getUsername(), false);
             playersBust.put(player.getUsername(), false);
             player.setFinishedRound(false);
         }
@@ -508,4 +542,5 @@ public class GameLobby {
     public boolean isAllPlayersStand() {
         return allPlayersStand;
     }
+
 }

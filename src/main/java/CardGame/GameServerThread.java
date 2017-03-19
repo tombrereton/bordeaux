@@ -390,12 +390,15 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (betAmount < 5){
+        } else if (betAmount < 5) {
             // return fail if bet is less than 5 pounds
             return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetPlaced()) {
+            // return fail
+            return new ResponseBet(protocolId, FAIL, PLAYER_BET_PLACED);
         } else if (isBetWithinBudget(betAmount)) {
             // make bet and push it to all players
             makeBet(betAmount);
@@ -405,6 +408,7 @@ public class GameServerThread implements Runnable {
             // return fail for unknown error
             return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
         }
+
     }
 
     /**
@@ -416,6 +420,16 @@ public class GameServerThread implements Runnable {
      */
     private boolean isBetWithinBudget(int betAmount) {
         return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+    }
+
+    /**
+     * This method checks whether the players is bet
+     * Returns true if it is, false if not.
+     *
+     * @return
+     */
+    private boolean isBetPlaced() {
+        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced();
     }
 
     /**
@@ -451,11 +465,15 @@ public class GameServerThread implements Runnable {
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
         getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
 
+        // set player bet placed
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBetPlaced(true);
 
-        if (getGame(gameJoined).allPlayersFinished()) {
+
+        if (getGame(gameJoined).allPlayersFinished() && getGame(gameJoined).allPlayersBetPlaced()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
         }
+        // else return success response TODO
 
     }
 

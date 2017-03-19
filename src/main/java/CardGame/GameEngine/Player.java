@@ -10,13 +10,17 @@ public class Player {
     private BlackjackHand playerHand;
     private int budget;
     private int bet;
+    private boolean isBetPlaced;
     private boolean isFinishedRound;
+    private boolean isCardLeft;
 
     public Player(User user) {
         this.username = user.getUserName();
         this.playerHand = new BlackjackHand();
         this.budget = 100;
         this.isFinishedRound = false;
+        this.isBetPlaced = false;
+        this.isCardLeft = false;
     }
 
     public String getUsername() {
@@ -70,13 +74,39 @@ public class Player {
 
     public void addCardToPlayerHand(Card card) {
         this.playerHand.addCard(card);
+        // when add a card to the player
+        setCardLeft(true);
     }
 
+    /**
+     * This method will remove all cards from the player hand
+     */
+    public void removeAllCards(){
+        for(Card card: this.playerHand.getHand()) {
+            this.playerHand.removeCard(card);
+        }
+    }
     public boolean isBetWithinBudget(int bet) {
         return bet >= 0 && bet <= this.budget;
     }
 
     public boolean isBust() {
         return this.getPlayerHandValue() <= 21 && this.getPlayerHandValue() >= 1;
+    }
+
+    public boolean isBetPlaced() {
+        return isBetPlaced;
+    }
+
+    public void setBetPlaced(boolean betPlaced) {
+        isBetPlaced = betPlaced;
+    }
+
+    public boolean isCardLeft() {
+        return isCardLeft;
+    }
+
+    public void setCardLeft(boolean cardLeft) {
+        isCardLeft = cardLeft;
     }
 }
