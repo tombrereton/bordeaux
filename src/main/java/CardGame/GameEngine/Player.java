@@ -54,7 +54,6 @@ public class Player {
         }
 
         this.bet = bet;
-        setFinishedRound(true);
     }
 
     public void doubleBet() {

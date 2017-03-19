@@ -457,24 +457,24 @@ public class GameServerThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersStand()) {
+        if (getGame(gameJoined).isAllPlayersFinished()) {
             getGame(gameJoined).nextGame();
         }
 
         // set player bet
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
-        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
 
         // set player bet placed
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBetPlaced(true);
 
+        //check all bets are placed and set allbetplaced to true if so
+        getGame(gameJoined).allPlayersBetPlaced();
 
-        if (getGame(gameJoined).allPlayersFinished() && getGame(gameJoined).allPlayersBetPlaced()) {
+
+        if (getGame(gameJoined).isAllPlayersBetPlaced()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
         }
-        // else return success response TODO
-
     }
 
 
