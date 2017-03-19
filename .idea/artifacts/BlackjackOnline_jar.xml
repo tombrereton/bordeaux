@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/BlackjackOnline_jar</output-path>
     <root id="archive" name="bordeaux.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/main/java/BlackjackOnline/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/BlackjackOnline/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="bordeaux" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" path-in-jar="/" />
