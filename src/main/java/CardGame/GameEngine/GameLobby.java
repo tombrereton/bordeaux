@@ -179,6 +179,10 @@ public class GameLobby {
      * stand if > 17
      */
     public synchronized void dealToDealer() {
+        // set the dealer's card faced up
+        dealerHand.getHand().get(0).setFaceUp(true);
+        dealerHand.getHand().get(1).setFaceUp(true);
+
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = new Deck().dealCard();
             dealerHand.addCard(newCard);
@@ -326,9 +330,8 @@ public class GameLobby {
      */
     public synchronized void startGame() {
         // start the game
-
-        // shuffle the deck
         deck.shuffle();
+        // shuffle the deck
         nextGame();
     }
 
@@ -433,6 +436,30 @@ public class GameLobby {
 //
 //        return player.getPlayerHand().getBlackjackValue() <= 21;
 //    }
+    private void setDealerCardsFaceUp() {
+        for(Card card: getDealerHand().getHand()){
+            card.setFaceUp(true);
+        }
+    }
+
+    /**
+     * adds card to player hand
+     * returns true if below or equal 21
+     * sets player to finished round
+     *
+     * @param user //     * @return if the user is bet and than hit ,or return false
+     */
+    public synchronized boolean hit(User user) {
+        Player player = getPlayer(user);
+
+        Card newCard = deck.dealCard();
+        player.addCardToPlayerHand(newCard);
+
+        setPlayersWon();
+
+        return true;
+    }
+
 
     /**
      * adds card to player hand
@@ -443,12 +470,13 @@ public class GameLobby {
      */
     public synchronized boolean hit(String username) {
         Player player = getPlayer(username);
+
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
 
-        return player.getPlayerHand().getBlackjackValue() <= 21;
+        return true;
     }
 
 
