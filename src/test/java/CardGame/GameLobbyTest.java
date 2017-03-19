@@ -91,7 +91,7 @@ public class GameLobbyTest {
 
         player1.setFinishedRound(true);
         player2.setFinishedRound(true);
-        assertEquals(true,gameLobby.allPlayersFinished());
+        assertEquals(true,gameLobby.isAllPlayersFinished());
 
     }
     /**
@@ -108,7 +108,7 @@ public class GameLobbyTest {
 
         player1.setFinishedRound(true);
         player2.setFinishedRound(false);
-        assertEquals(false,gameLobby.allPlayersFinished());
+        assertEquals(false,gameLobby.isAllPlayersFinished());
 
     }
 
@@ -117,7 +117,7 @@ public class GameLobbyTest {
      */
     @Test
     public void allPlayerFinishedTest3(){
-        assertEquals(true,gameLobby.allPlayersFinished());
+        assertEquals(true,gameLobby.isAllPlayersStand());
     }
 
 
@@ -133,7 +133,6 @@ public class GameLobbyTest {
         player2.setBet(10);
         System.out.println("takeBetsTest1");
 
-        gameLobby.takeBets();
     }
     @Test
     public void takeBetsTest2(){
@@ -147,7 +146,6 @@ public class GameLobbyTest {
         player1.setBet(10);
 
         System.out.println("takeBetsTest2");
-        gameLobby.takeBets();
     }
 
     @Test
@@ -159,7 +157,6 @@ public class GameLobbyTest {
         gameLobby.addPlayer(user,s);
         gameLobby.addPlayer(user2,s);
         System.out.println("takeBetsTest3");
-        gameLobby.takeBets();
     }
 
     @Test
