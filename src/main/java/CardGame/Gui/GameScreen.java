@@ -2,6 +2,7 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
+import CardGame.GameEngine.Player;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseProtocol;
 
@@ -379,6 +380,11 @@ public class GameScreen extends JPanel implements Observer {
                     String errorMsg = response.getErrorMsg();
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
+
+                    // set bet amount to 0
+                    amountToBet = 0;
+                    lblSubmitBet.setText(Integer.toString(amountToBet));
+                    return;
                 }
 
                 // set bet amount to 0
@@ -387,6 +393,13 @@ public class GameScreen extends JPanel implements Observer {
 
                 // reset offsets to 0
                 resetHands();
+                for(int i = 0; i< 4;i++){
+                    setLbCards(getplayerGui(i),i,"400");
+                }
+
+                repaint();
+                revalidate();
+
             }
         });
         btnSubmitBet.setContentAreaFilled(false);
