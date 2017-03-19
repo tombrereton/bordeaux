@@ -188,7 +188,7 @@ public class GameLobby {
     }
 
     private void addBetToBudget(Player player) {
-        int amountWon = getPlayer(player.getUsername()).getBet();
+        int amountWon = getPlayer(player.getUsername()).getBet() * 2;
         int currentBudget = getPlayer(player.getUsername()).getBudget();
         getPlayer(player.getUsername()).setBudget(currentBudget + amountWon);
         getPlayer(player.getUsername()).setBet(0);
@@ -287,8 +287,10 @@ public class GameLobby {
     }
 
     public synchronized boolean setAllPlayersFinished() {
+        // change to check player.isfinishedround
+
         for (Player p : players) {
-            if (!getPlayersWon().get(p.getUsername()) || !getPlayersStand().get(p.getUsername())) {
+            if (!getPlayersWon().get(p.getUsername()) && !getPlayersStand().get(p.getUsername())) {
                 setAllPlayersFinished(false);
                 return false;
             }
@@ -420,6 +422,18 @@ public class GameLobby {
             setAllPlayersBustToFalse();
             setAllPlayersWonToFalse();
             setAllPlayersStandToFalse();
+            setAllPlayersBetPlaced(false);
+
+            resetPlayers();
+
+
+        }
+    }
+
+    private void resetPlayers() {
+        for (Player player : players){
+            player.setBetPlaced(false);
+            player.setPlayerStand(false);
         }
     }
 
