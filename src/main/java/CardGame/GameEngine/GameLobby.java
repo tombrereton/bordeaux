@@ -200,6 +200,10 @@ public class GameLobby {
      * stand if > 17
      */
     public synchronized void dealToDealer() {
+        // set the dealer's card faced up
+        dealerHand.getHand().get(0).setFaceUp(true);
+        dealerHand.getHand().get(1).setFaceUp(true);
+
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = new Deck().dealCard();
             dealerHand.addCard(newCard);
@@ -455,16 +459,7 @@ public class GameLobby {
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
-        player.setBetPlaced(false);
-
-        if(player.isBust()){
-            playersBust.put(player.getUsername(),true);
-        }
-
-        if(isAllPlayersStand()){
-            setDealerCardsFaceUp();
-            setPlayersWon();
-        }
+        setPlayersWon();
 
         return true;
     }
@@ -479,22 +474,13 @@ public class GameLobby {
      */
     public synchronized boolean hit(String username) {
         Player player = getPlayer(username);
+
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
-        player.setBetPlaced(false);
+        setPlayersWon();
 
-        if(player.isBust()){
-            playersBust.put(player.getUsername(),true);
-        }
-
-        if(allPlayersStand){
-            setDealerCardsFaceUp();
-            setPlayersWon();
-        }
-
-
-        return player.isBust();
+        return true;
     }
 
 
