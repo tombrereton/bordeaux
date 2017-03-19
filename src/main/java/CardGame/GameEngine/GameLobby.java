@@ -189,7 +189,8 @@ public class GameLobby {
 
     private void addBetToBudget(Player player) {
         int amountWon = getPlayer(player.getUsername()).getBet();
-        getPlayer(player.getUsername()).setBudget(amountWon);
+        int currentBudget = getPlayer(player.getUsername()).getBudget();
+        getPlayer(player.getUsername()).setBudget(currentBudget + amountWon);
         getPlayer(player.getUsername()).setBet(0);
     }
 
