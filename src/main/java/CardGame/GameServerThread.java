@@ -363,13 +363,12 @@ public class GameServerThread implements Runnable {
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // return fail if user has finished round
             return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
-        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-
             // return success if bet within budget
             return new ResponseHit(protocolId, SUCCESS);
         } else {
@@ -398,6 +397,9 @@ public class GameServerThread implements Runnable {
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetPlaced()) {
+            // return fail
+            return new ResponseBet(protocolId, FAIL, PLAYER_BET_PLACED);
         } else if (isBetWithinBudget(betAmount)) {
             // make bet and push it to all players
             makeBet(betAmount);
@@ -407,6 +409,7 @@ public class GameServerThread implements Runnable {
             // return fail for unknown error
             return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
         }
+
     }
 
     /**
@@ -418,6 +421,16 @@ public class GameServerThread implements Runnable {
      */
     private boolean isBetWithinBudget(int betAmount) {
         return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+    }
+
+    /**
+     * This method checks whether the players is bet
+     * Returns true if it is, false if not.
+     *
+     * @return
+     */
+    private boolean isBetPlaced() {
+        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced();
     }
 
     /**
@@ -445,20 +458,24 @@ public class GameServerThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersStand()) {
+        if (getGame(gameJoined).isAllPlayersFinished()) {
             getGame(gameJoined).nextGame();
         }
 
         // set player bet
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
-        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
+
+        // set player bet placed
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBetPlaced(true);
+
+        //check all bets are placed and set allbetplaced to true if so
+        getGame(gameJoined).allPlayersBetPlaced();
 
 
-        if (getGame(gameJoined).allPlayersFinished()) {
+        if (getGame(gameJoined).isAllPlayersBetPlaced()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
         }
-
     }
 
 
@@ -952,7 +969,7 @@ public class GameServerThread implements Runnable {
         return users;
     }
 
-    public CopyOnWriteArrayList<GameLobby> getGames() {
+    public synchronized CopyOnWriteArrayList<GameLobby> getGames() {
         return games;
     }
 
@@ -964,7 +981,7 @@ public class GameServerThread implements Runnable {
         return gameJoined;
     }
 
-    public GameLobby getGame(User user) {
+    public synchronized GameLobby getGame(User user) {
         for (GameLobby game : games) {
             if (game.getLobbyName().equals(user.getUserName())) {
                 return game;
@@ -973,7 +990,7 @@ public class GameServerThread implements Runnable {
         return null;
     }
 
-    public GameLobby getGame(String lobbyName) {
+    public synchronized GameLobby getGame(String lobbyName) {
         for (GameLobby game : games) {
             if (game.getLobbyName().equals(lobbyName)) {
                 return game;
