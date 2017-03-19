@@ -19,6 +19,7 @@ public class GameLobby {
     private Deck deck;
     private boolean allPlayersStand;
     private boolean allPlayersBetPlaced;
+    private boolean dealerCardLeft;
 
     // variables that will be sent to client
     private Map<String, Integer> playerBudgets;
@@ -42,6 +43,7 @@ public class GameLobby {
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
         this.allPlayersBetPlaced = false;
+        this.dealerCardLeft = false;
         // Create a deck
         this.deck = new Deck();
 
@@ -320,11 +322,18 @@ public class GameLobby {
      */
     public synchronized void startGame() {
         // start the game
-        // if all players still have cards left then remove the cards from all players
-        if(!allPlayersNoCards()){
+        // if all players still have cards left then remove the cards from all players and dealer
+        if(!allPlayersNoCards() || isDealerCardLeft()){
+            // remove the cards from each players
             for(Player p: players){
                 p.removeAllCards();
             }
+            // remove the cards from dealer
+            for(Card card: dealerHand.getHand()){
+                dealerHand.removeCard(card);
+            }
+
+            dealerCardLeft = false;
             deck = new Deck();
         }
         // shuffle the deck
@@ -364,6 +373,9 @@ public class GameLobby {
         Card dealerSecondCard = deck.dealCard();
         dealerSecondCard.setFaceUp(true);
         dealerHand.addCard(dealerSecondCard);
+
+        // set dealer has the card flag
+        setDealerCardLeft(true);
 
         // set all players stand to false
 
@@ -543,4 +555,11 @@ public class GameLobby {
         return allPlayersStand;
     }
 
+    public boolean isDealerCardLeft() {
+        return dealerCardLeft;
+    }
+
+    public void setDealerCardLeft(boolean dealerCardLeft) {
+        this.dealerCardLeft = dealerCardLeft;
+    }
 }
