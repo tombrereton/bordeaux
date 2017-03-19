@@ -667,6 +667,9 @@ public class GameServerThread implements Runnable {
             GameLobby newGame = createGame();
             String gameName = newGame.getLobbyName();
 
+            // set game joined to logged in user name
+            this.gameJoined = getLoggedInUser().getUserName();
+
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
         } else {

@@ -412,7 +412,19 @@ public class GameClient extends Observable {
         sendRequest(requestCreateGame);
 
         // get response from server and return it
-        return getResponse(ResponseCreateGame.class);
+        ResponseCreateGame responseCreateGame = getResponse(ResponseCreateGame.class);
+        int success = responseCreateGame.getRequestSuccess();
+        String gameJoinedFromRequest = responseCreateGame.getGameName();
+
+        if (success == 1) {
+            setCurrentScreen(GAMESCREEN);
+            stopGettingGameNames();
+            startGettingMessages();
+            startGettingGameData();
+            setGameJoined(gameJoinedFromRequest);
+        }
+
+        return responseCreateGame;
     }
 
     /**
