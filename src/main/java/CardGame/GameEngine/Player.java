@@ -2,6 +2,8 @@ package CardGame.GameEngine;
 
 import CardGame.User;
 
+import java.util.Iterator;
+
 /**
  * Created by tom on 09/03/17.
  */
@@ -80,11 +82,16 @@ public class Player {
     /**
      * This method will remove all cards from the player hand
      */
-    public void removeAllCards(){
-        for(Card card: this.playerHand.getHand()) {
-            this.playerHand.removeCard(card);
+    public synchronized void removeAllCards() {
+
+        Iterator<Card> iterator = playerHand.getHand().iterator();
+
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
         }
     }
+
     public boolean isBetWithinBudget(int bet) {
         return bet >= 0 && bet <= this.budget;
     }
