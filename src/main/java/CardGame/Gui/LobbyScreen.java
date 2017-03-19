@@ -207,6 +207,9 @@ public class LobbyScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            // show popup on server disconnect
+            showWarningWhenServerDown(model);
+
             // get clientGameOf
             int clientGameOffset = model.getListOfGames().size();
 
@@ -225,6 +228,19 @@ public class LobbyScreen extends JPanel implements Observer {
                 }
             }
 
+        }
+    }
+
+    private void showWarningWhenServerDown(GameClient model) {
+        if (model.getCurrentScreen() != Screens.LOBBYSCREEN) {
+            return;
+        }
+        if (model.isServerDown() && model.getReconnectAttempts() < 3) {
+            JOptionPane.showMessageDialog(null, "Server down. Trying to reconnect.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (model.isServerDown() && model.getReconnectAttempts() >= 3) {
+            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 }

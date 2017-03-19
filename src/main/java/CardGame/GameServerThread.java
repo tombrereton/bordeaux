@@ -76,6 +76,8 @@ public class GameServerThread implements Runnable {
 
     /**
      * This method runs when the clientSideThread starts.
+     * It handles the request received from the client and
+     * sends the appropriate response back.
      */
     @Override
     public void run() {
@@ -99,7 +101,7 @@ public class GameServerThread implements Runnable {
         } catch (EOFException e) {
             System.out.println("GameClient disconnected.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IO problem. GameClient disconnected.");
         } finally {
             // log user out of client and game on disconnect
             if (gameJoined != null) {
