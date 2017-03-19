@@ -259,14 +259,15 @@ public class GameClient extends Observable {
         sendRequest(requestLoginUser);
 
         ResponseLoginUser responseLoginUser = null;
+        int success = 0;
         try {
             // get the response from the server
             responseLoginUser = getResponse(ResponseLoginUser.class);
+            success = responseLoginUser.getRequestSuccess();
         } catch (NullPointerException e) {
             System.out.println("Cannot log in, trying to reconnect.");
             connectToServer();
         }
-        int success = responseLoginUser.getRequestSuccess();
 
         // log user in if successful
         if (success == 1) {
@@ -281,6 +282,7 @@ public class GameClient extends Observable {
 
     /**
      * This method sends a request to login after the server disconnects.
+     *
      * @param username
      * @param password
      * @return
@@ -760,27 +762,24 @@ public class GameClient extends Observable {
         // create the job
         Runnable getMessagesJob = () -> {
 
-            while (isGettingMessages) {
+            try {
+                while (isGettingMessages) {
 
-                try {
                     getMessagesAndAddToQueue();
 
 
                     Thread.sleep(200);
-                } catch (NullPointerException e) {
-
-                    System.out.println("Cannot get messages from server.");
-                    e.printStackTrace();
-                    // if interrupted, make it sleep for 3 seconds
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (InterruptedException e) {
-                    System.out.println("Getting messages has been interrupted");
-                    e.printStackTrace();
                 }
+            } catch (NullPointerException e) {
+                System.out.println("Can't get messages. Server down.");
+
+                this.isServerDown = true;
+
+                // try to reconnect
+                reconnectToServer();
+            } catch (InterruptedException e) {
+                System.out.println("Getting messages has been interrupted");
+                e.printStackTrace();
             }
         };
 
@@ -878,10 +877,13 @@ public class GameClient extends Observable {
                     Thread.sleep(1000);
                 } catch (NullPointerException e) {
                     System.out.println("Can't get game data. Server down.");
-                    this.isServerDown = true;
 
-                    // try to reconnect
-                    reconnectToServer();
+                    // sleep for 5 seconds
+                    try {
+                        TimeUnit.SECONDS.sleep(6);
+                    } catch (InterruptedException sleepE) {
+                        System.out.println("Sleep interrupted while getting game data.");
+                    }
                 } catch (InterruptedException e) {
                     System.out.println("Game data thread interrupted");
                 }

@@ -743,10 +743,7 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     private void showWarningWhenServerDown(GameClient model) {
-        if (model.isServerDown() && model.getReconnectAttempts() < 3) {
-            JOptionPane.showMessageDialog(null, "Server down. Trying to reconnect.", "Warning",
-                    JOptionPane.WARNING_MESSAGE);
-        } else if (model.isServerDown() && model.getReconnectAttempts() >= 3) {
+        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
             JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
                     JOptionPane.WARNING_MESSAGE);
         }
