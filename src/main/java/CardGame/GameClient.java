@@ -86,8 +86,8 @@ public class GameClient extends Observable {
         this.chatOffset = -1;
         this.listOfGames = new ConcurrentSkipListSet<>();
         playersFinished = new TreeMap<>();
-        dealerHand  = new Hand();
-        playerBets  = new TreeMap<>();
+        dealerHand = new Hand();
+        playerBets = new TreeMap<>();
         playerBudgets = new TreeMap<>();
         playerHands = new TreeMap<>();
         playerNames = new TreeSet<>();
@@ -666,19 +666,7 @@ public class GameClient extends Observable {
                 System.out.println("Can't get game names. Server down.");
             } catch (InterruptedException e) {
                 System.out.println("Polling for game list interrupted.");
-            } //finally {
-//                    while (socket.isClosed()){
-//                        connectToServer();
-//                        try {
-//                            requestLogin(getLoggedInUser().getUserName(), getLoggedInUser().getPassword());
-//                            Thread.sleep(2000);
-//                        } catch (NullPointerException e){
-//                            System.out.println("Still can't log in, server is down.");
-//                        } catch (InterruptedException e) {
-//                            System.out.println("Trying to reconnect");
-//                        }
-//                    }
-//                }
+            }
         };
 
         gameNamesThread = new Thread(gameNamesJob);
@@ -705,30 +693,23 @@ public class GameClient extends Observable {
 
             while (isGettingMessages) {
 
-                // get the client offset and send a request for the messages
-                int clientOffset = getChatOffset();
-                ResponseGetMessages responseGetMessages = requestGetMessages(clientOffset);
-
-                // if the response is successful and client offset is less than response offset
-                int success = responseGetMessages.getRequestSuccess();
-                int responseOffset = responseGetMessages.getOffset();
-                if (success == 1 && clientOffset < responseOffset) {
-
-                    // get message arrayList
-                    ArrayList<MessageObject> messages = responseGetMessages.getMessages();
-
-                    // add messages to message queue
-                    addMessages(messages);
-
-                    // set client offset to response offset to avoid getting old messages
-                    setChatOffset(responseOffset - 1);
-                }
-
                 try {
-                    Thread.sleep(100);
+                    getMessagesAndAddToQueue();
+
+
+                    Thread.sleep(200);
                 } catch (NullPointerException e) {
-                    System.out.println("Server down.");
+
+                    System.out.println("Cannot get messages from server.");
+                    e.printStackTrace();
+                    // if interrupted, make it sleep for 3 seconds
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 } catch (InterruptedException e) {
+                    System.out.println("Getting messages has been interrupted");
                     e.printStackTrace();
                 }
             }
@@ -739,6 +720,32 @@ public class GameClient extends Observable {
 
         // start the thread
         getMessagesThread.start();
+    }
+
+    /**
+     * This method sends a request to get the messages and
+     * if the response is successful, we add the returned message to the
+     * queue.
+     */
+    private synchronized void getMessagesAndAddToQueue() {
+        // get the client offset and send a request for the messages
+        int clientOffset = getChatOffset();
+        ResponseGetMessages responseGetMessages = requestGetMessages(clientOffset);
+
+        // if the response is successful and client offset is less than response offset
+        int success = responseGetMessages.getRequestSuccess();
+        int responseOffset = responseGetMessages.getOffset();
+        if (success == 1 && clientOffset < responseOffset) {
+
+            // get message arrayList
+            ArrayList<MessageObject> messages = responseGetMessages.getMessages();
+
+            // add messages to message queue
+            addMessages(messages);
+
+            // set client offset to response offset to avoid getting old messages
+            setChatOffset(responseOffset - 1);
+        }
     }
 
     public void stopGettingMessages() {
@@ -793,17 +800,17 @@ public class GameClient extends Observable {
 
             while (isGettingGameData) {
 
-                // get game data
-                getGameData();
-
-
-                // sleep thread for 1000
                 try {
+                    // get game data
+                    getGameData();
+
+
+                    // sleep thread for 1000
                     Thread.sleep(1000);
                 } catch (NullPointerException e) {
-                    System.out.println("Server down.");
+                    System.out.println("Cannot get game data from server.");
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Game data thread interrupted");
                 }
             }
         };

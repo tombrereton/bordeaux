@@ -65,7 +65,10 @@ public class GameScreen extends JPanel implements Observer {
 
     // game variables
     private int dealerHandOffset;
-    private int playerHandOffset;
+    private int player0HandOffset;
+    private int player1HandOffset;
+    private int player2HandOffset;
+    private int player3HandOffset;
 
     /**
      * Create the application.
@@ -77,6 +80,10 @@ public class GameScreen extends JPanel implements Observer {
 
         //game variables
         this.dealerHandOffset = 0;
+        this.player0HandOffset = 0;
+        this.player1HandOffset = 0;
+        this.player2HandOffset = 0;
+        this.player3HandOffset = 0;
 
         // chat variables
         this.blackjackOnline = blackjackOnline;
@@ -705,56 +712,96 @@ public class GameScreen extends JPanel implements Observer {
                 this.lblBudget.setText("Budget: £" + yourBudget);
             }
 
-            // set dealer cards
-            if (model.getDealerHand() != null) {
-                int dealerHandSize = model.getDealerHand().getHand().size();
-                while (dealerHandOffset < dealerHandSize) {
-                    // only iterate over new cards
-                    setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
-                    dealerHandOffset++;
-                }
-            }
+            // we update the dealer hand
+            updateDealerHand(model);
 
             // set players' information and set cards to players
             if (model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()) {
 
                 for (int i = 0; i < model.getPlayerNames().size(); i++) {
                     String playerName = model.getPlayerNames().get(i);
-                    String playerCredit = model.getPlayerBudgets().get(playerName) + "";
+                    String playerBudget = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
 
                     // set each player's credit
-                    getplayerGui(i).setLblCredits(playerCredit);
+                    getplayerGui(i).setLblBudget(playerBudget);
 
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
 
                     // set each player's card
                     updatePlayerHand(model, playerName, i);
-//                    ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
-//
-//                    for (int j = 0; j < playersCard.size(); j++) {
-//                        setLbCards(getplayerGui(i), j, playersCard.get(j).getImageID());
-//                        repaint();
-//                        revalidate();
-//                    }
-
-
                 }
-
-
             }
         }
     }
 
-    private void updatePlayerHand(GameClient model, String playerName, int i) {
+    private synchronized void updateDealerHand(GameClient model) {
+        // set dealer cards
+        if (model.getDealerHand() != null) {
+            int dealerHandSize = model.getDealerHand().getHand().size();
+            while (dealerHandOffset < dealerHandSize) {
+                // only iterate over new cards
+                setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
+                dealerHandOffset++;
+            }
+        }
+    }
+
+    /**
+     * This is a helper function to get the
+     * respective player hand offset.
+     *
+     * @param player
+     * @return
+     */
+    private synchronized int getPlayerHandOffset(int player) {
+        switch (player) {
+            case 0:
+                return player0HandOffset;
+            case 1:
+                return player1HandOffset;
+            case 2:
+                return player2HandOffset;
+            case 3:
+                return player3HandOffset;
+            default:
+                break;
+        }
+        return 0;
+    }
+
+    /**
+     * This method sets the relevant player hand offset.
+     *
+     * @param player
+     * @param offset
+     */
+    private synchronized void setPlayerHandOffset(int player, int offset) {
+        switch (player) {
+            case 0:
+                this.player0HandOffset = offset;
+            case 1:
+                this.player1HandOffset = offset;
+            case 2:
+                this.player2HandOffset = offset;
+            case 3:
+                this.player3HandOffset = offset;
+        }
+
+    }
+
+    private synchronized void updatePlayerHand(GameClient model, String playerName, int i) {
 
         // set each player's card
         ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
         int playerHandSize = model.getPlayerHands().get(playerName).getHand().size();
+
+        //get this player's hand offset
+        int playerHandOffset = getPlayerHandOffset(i);
 
         while (playerHandOffset < playerHandSize) {
             setLbCards(getplayerGui(i), playerHandOffset, playersCard.get(playerHandOffset).getImageID());
@@ -762,14 +809,21 @@ public class GameScreen extends JPanel implements Observer {
             repaint();
             revalidate();
         }
+
+        // we set the playerHandOffset after iterating
+        setPlayerHandOffset(i, playerHandOffset);
     }
 
-    private void resetHands() {
+    private synchronized void resetHands() {
         dealerHandOffset = 0;
-        playerHandOffset = 0;
+
+        // we reset all the player hand offsets to 0
+        for (int i = 0; i < 4; i++) {
+            this.setPlayerHandOffset(i, 0);
+        }
     }
 
-    private void updateMessageList(GameClient model) {
+    private synchronized void updateMessageList(GameClient model) {
         // get clientGameOf
         int clientMsgOffset = model.getMessages().size();
 

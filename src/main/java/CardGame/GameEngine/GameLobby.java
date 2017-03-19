@@ -303,12 +303,19 @@ public class GameLobby {
             deck.shuffle();
         }
 
-        // For players:
+        // remove all cards from players
 
+        // For players:
         for (Player p : players) {
+
+            // deal cards to all players and make them face up
+
+            // first card
             Card firstCard = deck.dealCard();
             firstCard.setFaceUp(true);
             p.addCardToPlayerHand(firstCard);
+
+            // second card
             Card secondCard = deck.dealCard();
             secondCard.setFaceUp(true);
             p.addCardToPlayerHand(secondCard);
