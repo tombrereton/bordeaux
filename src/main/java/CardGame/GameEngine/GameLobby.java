@@ -44,6 +44,9 @@ public class GameLobby {
     public GameLobby(User user, Socket socket) {
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
+
+        this.players.add(new Player(user));
+
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
 
