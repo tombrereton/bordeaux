@@ -248,17 +248,48 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
      * @param args
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GameClient gameClient = null;
-                try {
-                    gameClient = new GameClient("localhost", 7654);
-                    frame = new BlackjackOnline(gameClient);
-                    frame.setVisible(true);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        // parse command line arguments
+        int port = 0;
+        String host = "";
+
+        if (args.length == 1 && args[0].equals("-h")) {
+            System.out.println("Enter: \'[host]\' or \'[host] [post]\' " +
+                    "\nOr default is \'[localhost] [7654]\'");
+        } else if (args.length == 0) {
+            host = "localhost";
+            port = 7654;
+        } else if (args.length == 1) {
+            host = args[0];
+            port = 7654;
+        } else if (args.length == 2) {
+            host = args[0];
+            port = Integer.parseInt(args[1]);
+        } else {
+            System.out.println("Enter: \'[port]\' or \'[port] [host]\' " +
+                    "\nOr \'[port] [host] [max number of clients]\'" +
+                    "\nOr default is \'[7654] [0.0.0.0] [20]\'");
+        }
+
+        System.out.println("Host: " + host + ", Port: " + port);
+
+        // set host and port to final
+        String finalHost = host;
+        int finalPort = port;
+
+
+        // start gui thread
+        EventQueue.invokeLater(() -> {
+            GameClient gameClient = null;
+
+            try {
+                gameClient = new GameClient(finalHost, finalPort);
+                frame = new BlackjackOnline(gameClient);
+                frame.setVisible(true);
+
+            } catch (Exception e) {
+                System.out.println("problem in main gui thread.");
+                e.printStackTrace();
             }
         });
     }

@@ -94,7 +94,12 @@ public class GameServer {
         int port = 0;
         String host = "";
         int maxNumberOfClients = 0;
-        if (args.length == 0) {
+
+        if (args.length == 1 && args[0].equals("-h")) {
+            System.out.println("Enter: \'[port]\' or \'[port] [host]\' " +
+                    "\nOr \'[port] [host] [max number of clients]\'" +
+                    "\nOr default is \'[7654] [0.0.0.0] [20]\'");
+        } else if (args.length == 0) {
             port = 7654;
             host = "0.0.0.0";
             maxNumberOfClients = 20;
