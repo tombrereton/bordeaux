@@ -370,11 +370,16 @@ public class GameServerThread implements Runnable {
             // return fail if user is bust
             return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
         }else if (getGame(gameJoined).isAllPlayersStand()){
-            return new ResponseHit(protocolId, FAIL, PLAYER_STAND);
+            // return fail if all players standing
+            return new ResponseHit(protocolId, FAIL, ALREADY_STANDING);
         }else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-            // return success if bet within budget
+            // if player bust after hitting, tell him
+            if(!getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
+                return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
+            }
+            // return success
             return new ResponseHit(protocolId, SUCCESS);
         } else {
             // return fail for unknown error

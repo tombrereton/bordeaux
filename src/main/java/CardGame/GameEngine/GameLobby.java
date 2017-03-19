@@ -362,7 +362,6 @@ public class GameLobby {
         // start the game
 
         // shuffle the deck
-        deck.shuffle();
         nextGame();
     }
 
@@ -435,6 +434,12 @@ public class GameLobby {
         }
     }
 
+    private void setDealerCardsFaceUp() {
+        for(Card card: getDealerHand().getHand()){
+            card.setFaceUp(true);
+        }
+    }
+
     /**
      * adds card to player hand
      * returns true if below or equal 21
@@ -448,10 +453,20 @@ public class GameLobby {
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
-        setPlayersWon();
+        player.setBetPlaced(false);
 
-        return player.getPlayerHand().getBlackjackValue() <= 21;
+        if(player.isBust()){
+            playersBust.put(player.getUsername(),true);
+        }
+
+        if(allPlayersStand){
+            setDealerCardsFaceUp();
+            setPlayersWon();
+        }
+
+        return player.isBust();
     }
+
 
     /**
      * adds card to player hand
@@ -465,9 +480,19 @@ public class GameLobby {
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
-        setPlayersWon();
+        player.setBetPlaced(false);
 
-        return player.getPlayerHand().getBlackjackValue() <= 21;
+        if(player.isBust()){
+            playersBust.put(player.getUsername(),true);
+        }
+
+        if(allPlayersStand){
+            setDealerCardsFaceUp();
+            setPlayersWon();
+        }
+
+
+        return player.isBust();
     }
 
 
