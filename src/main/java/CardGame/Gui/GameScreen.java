@@ -703,6 +703,9 @@ public class GameScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            // display popup when server down
+            showWarningWhenServerDown(model);
+
             // update message box with messages
             updateMessageList(model);
 
@@ -736,6 +739,16 @@ public class GameScreen extends JPanel implements Observer {
                     updatePlayerHand(model, playerName, i);
                 }
             }
+        }
+    }
+
+    private void showWarningWhenServerDown(GameClient model) {
+        if (model.isServerDown() && model.getReconnectAttempts() < 3) {
+            JOptionPane.showMessageDialog(null, "Server down. Trying to reconnect.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (model.isServerDown() && model.getReconnectAttempts() >= 3) {
+            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 

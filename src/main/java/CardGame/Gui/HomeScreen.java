@@ -73,19 +73,23 @@ public class HomeScreen extends JPanel implements Observer {
         btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
         btnLogout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ResponseProtocol responseProtocol = getClientModel().requestLogOut();
+                try {
+                    ResponseProtocol responseProtocol = getClientModel().requestLogOut();
 
 
-                if (responseProtocol == null){
-                    return;
-                }
+                    if (responseProtocol == null) {
+                        return;
+                    }
 
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
+                    // We display the error if not successful
+                    int success = responseProtocol.getRequestSuccess();
+                    String errorMsg = responseProtocol.getErrorMsg();
+                    if (success == 0) {
+                        JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
+                } catch (NullPointerException ne) {
+                    System.out.println("Wait for reconnect.");
                 }
             }
         });
@@ -174,10 +178,23 @@ public class HomeScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            showWarningWhenServerDown(model);
+
             if (model.getLoggedInUser() != null) {
                 setWelcomeLabel(model.getLoggedInUser().getUserName());
             }
 
+        }
+    }
+
+
+    private void showWarningWhenServerDown(GameClient model) {
+        if (model.isServerDown() && model.getReconnectAttempts() < 3) {
+            JOptionPane.showMessageDialog(null, "Server down. Trying to reconnect.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (model.isServerDown() && model.getReconnectAttempts() >= 3) {
+            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 

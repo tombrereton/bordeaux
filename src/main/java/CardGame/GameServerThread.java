@@ -76,6 +76,8 @@ public class GameServerThread implements Runnable {
 
     /**
      * This method runs when the clientSideThread starts.
+     * It handles the request received from the client and
+     * sends the appropriate response back.
      */
     @Override
     public void run() {
@@ -390,7 +392,7 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (betAmount < 5){
+        } else if (betAmount < 5) {
             // return fail if bet is less than 5 pounds
             return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
         } else if (!isBetWithinBudget(betAmount)) {
