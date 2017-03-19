@@ -92,9 +92,13 @@ public class GameLobby {
         if (playerValue > 21) {
             // lost - set bet to zero
             playersBust.put(player.getUsername(), true);
+            playersStand.put(player.getUsername(), true);
             setBetToZero(player);
             return false;
         }
+
+        // check if all players have finished or stand
+        setAllPlayersStand();
 
         if (allPlayersStand) {
 
@@ -119,7 +123,7 @@ public class GameLobby {
                 return true;
             } else if (playerValue > 0 && playerValue <= 21 &&
                     !isDealerBust() && dealerHand.getBlackjackValue() >= 17 &&
-                    !isPlayerBust(player)) {
+                    !isPlayerBust(player) && playerValue > dealerHand.getBlackjackValue()) {
                 // won - add bet to budget
                 addBetToBudget(player);
                 return true;
@@ -128,6 +132,7 @@ public class GameLobby {
                 setBetToZero(player);
                 return false;
             }
+
         }
 
         return false;
@@ -355,7 +360,6 @@ public class GameLobby {
         Player player = getPlayer(user);
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
-        player.setFinishedRound(true);
 
         setPlayersWon();
 
@@ -374,7 +378,6 @@ public class GameLobby {
         Player player = getPlayer(username);
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
-        player.setFinishedRound(true);
 
         setPlayersWon();
 

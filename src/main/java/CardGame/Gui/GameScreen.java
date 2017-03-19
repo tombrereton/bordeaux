@@ -63,6 +63,10 @@ public class GameScreen extends JPanel implements Observer {
     public DefaultListModel<String> chatMessageModel;
     public int gameScreenChatOffset;
 
+    // game variables
+    private int dealerHandOffset;
+    private int playerHandOffset;
+
     /**
      * Create the application.
      */
@@ -71,11 +75,13 @@ public class GameScreen extends JPanel implements Observer {
         this.client = gameClient;
         gameClient.addObserver(this);
 
-        // chat variables
+        //game variables
+        this.dealerHandOffset = 0;
 
+        // chat variables
         this.blackjackOnline = blackjackOnline;
         this.amountToBet = amountToBet;
-        this.credits = 1000;
+        this.credits = 100;
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
@@ -251,6 +257,7 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
+
                 if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
@@ -370,6 +377,9 @@ public class GameScreen extends JPanel implements Observer {
                 // set bet amount to 0
                 amountToBet = 0;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
+
+                // reset offsets to 0
+                resetHands();
             }
         });
         btnSubmitBet.setContentAreaFilled(false);
@@ -543,29 +553,29 @@ public class GameScreen extends JPanel implements Observer {
         return chatMessageModel;
     }
 
-	public void updateBounds(){
-		scrollPane.setBounds(blackjackOnline.getxOrigin()+850, 50,blackjackOnline.getxOrigin()+150, blackjackOnline.getScreenHeightCurrent()-230);
-		textArea.setBounds(blackjackOnline.getxOrigin()+850, blackjackOnline.getScreenHeightCurrent()-170, blackjackOnline.getxOrigin()+150, 60);
-        lblChat.setBounds(blackjackOnline.getxOrigin()+850, 10, 205, 35);
-        lblSideHud.setBounds(blackjackOnline.getxOrigin()+800, blackjackOnline.getScreenHeightCurrent()-1500, 66, 1434);
-        lblSideFillHud.setBounds(blackjackOnline.getxOrigin()+850, 0,blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyOrigin()+800);
-        btnSendMessage.setBounds(845+(int)(blackjackOnline.getxOrigin()*1.5), blackjackOnline.getScreenHeightCurrent()-105, 159, 60);
-		btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent()-120, 10, 100, 30);
-		btnDoubleDown.setBounds(740, blackjackOnline.getScreenHeightCurrent()-100, 98, 55);
-		btnStand.setBounds(640, blackjackOnline.getScreenHeightCurrent()-100, 98, 55);
-		btnHit.setBounds(540, blackjackOnline.getScreenHeightCurrent()-100, 98, 55);
-		btnFold.setBounds(440, blackjackOnline.getScreenHeightCurrent()-100, 98, 55);
-		lblBudget.setBounds(30, blackjackOnline.getScreenHeightCurrent()-81, 200, 35);
-		lblSubmitBet.setBounds(30, blackjackOnline.getScreenHeightCurrent()-121, 92, 35);
-        btnSubmitBet.setBounds(5, blackjackOnline.getScreenHeightCurrent()-226, 98, 91);
-		btnBet1.setBounds(105, blackjackOnline.getScreenHeightCurrent()-206, 81, 81);
-		btnBet2.setBounds(186, blackjackOnline.getScreenHeightCurrent()-166, 81, 81);
-		btnBet3.setBounds(267, blackjackOnline.getScreenHeightCurrent()-136, 81, 81);
-		btnBet4.setBounds(353, blackjackOnline.getScreenHeightCurrent()-126, 81, 81);
-		lblCreditsBox.setBounds(10, blackjackOnline.getScreenHeightCurrent()-86, 241, 42);
-		lblSubmitBetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent()-126, 144, 45);
-		lblBackHud.setBounds(-20, blackjackOnline.getScreenHeightCurrent()-176, 2590, 204);
-        lblDeck.setBounds(blackjackOnline.getxOrigin()+650, 20, 64, 93);
+    public void updateBounds() {
+        scrollPane.setBounds(blackjackOnline.getxOrigin() + 850, 50, blackjackOnline.getxOrigin() + 150, blackjackOnline.getScreenHeightCurrent() - 230);
+        textArea.setBounds(blackjackOnline.getxOrigin() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxOrigin() + 150, 60);
+        lblChat.setBounds(blackjackOnline.getxOrigin() + 850, 10, 205, 35);
+        lblSideHud.setBounds(blackjackOnline.getxOrigin() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
+        lblSideFillHud.setBounds(blackjackOnline.getxOrigin() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyOrigin() + 800);
+        btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxOrigin() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
+        btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 120, 10, 100, 30);
+        btnDoubleDown.setBounds(740, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnStand.setBounds(640, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnHit.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnFold.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        lblBudget.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 81, 200, 35);
+        lblSubmitBet.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 121, 92, 35);
+        btnSubmitBet.setBounds(5, blackjackOnline.getScreenHeightCurrent() - 226, 98, 91);
+        btnBet1.setBounds(105, blackjackOnline.getScreenHeightCurrent() - 206, 81, 81);
+        btnBet2.setBounds(186, blackjackOnline.getScreenHeightCurrent() - 166, 81, 81);
+        btnBet3.setBounds(267, blackjackOnline.getScreenHeightCurrent() - 136, 81, 81);
+        btnBet4.setBounds(353, blackjackOnline.getScreenHeightCurrent() - 126, 81, 81);
+        lblCreditsBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
+        lblSubmitBetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 126, 144, 45);
+        lblBackHud.setBounds(-20, blackjackOnline.getScreenHeightCurrent() - 176, 2590, 204);
+        lblDeck.setBounds(blackjackOnline.getxOrigin() + 650, 20, 64, 93);
 
         dealerGui.setBounds((int) (blackjackOnline.getxOrigin() * 0.5) + 320, 20, 200, 200);
         playerGui1.setBounds(20, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
@@ -592,44 +602,46 @@ public class GameScreen extends JPanel implements Observer {
 
     /**
      * A helper method to get the correct GUI of each player
+     *
      * @param index
      * @return
      */
-    public PlayerGui getplayerGui(int index){
+    public PlayerGui getplayerGui(int index) {
         PlayerGui playerGui = new PlayerGui();
-        if(index>=0 && index<5){
-            switch (index){
-	           case 0:
-	               playerGui = playerGui1;
-	               break;
-               case 1:
-                   playerGui = playerGui2;
-                   break;
-               case 2:
-                   playerGui = playerGui3;
-                   break;
-               case 3:
-                   playerGui = playerGui4;
-                   break;
+        if (index >= 0 && index < 5) {
+            switch (index) {
+                case 0:
+                    playerGui = playerGui1;
+                    break;
+                case 1:
+                    playerGui = playerGui2;
+                    break;
+                case 2:
+                    playerGui = playerGui3;
+                    break;
+                case 3:
+                    playerGui = playerGui4;
+                    break;
 
-               default:
-                   playerGui = new PlayerGui();
-                   break;
+                default:
+                    playerGui = new PlayerGui();
+                    break;
 
-           }
+            }
         }
         return playerGui;
     }
 
     /**
      * A helper method to set each player's card
+     *
      * @param gui
      * @param index
      * @param valuestr
      */
-    public void setLbCards(PlayerGui gui,int index,String valuestr){
-        if(index>=0 && index<5){
-            switch (index){
+    public void setLbCards(PlayerGui gui, int index, String valuestr) {
+        if (index >= 0 && index < 5) {
+            switch (index) {
                 case 0:
                     gui.setLblCard1(valuestr);
                     break;
@@ -687,27 +699,26 @@ public class GameScreen extends JPanel implements Observer {
             // update message box with messages
             updateMessageList(model);
 
-
             // update your budget
             if (model.getPlayerBudgets() != null && !model.getPlayerBudgets().isEmpty()) {
                 int yourBudget = model.getPlayerBudgets().get(model.getLoggedInUser().getUserName());
                 this.lblBudget.setText("Budget: £" + yourBudget);
             }
-            // set names to players
 
-//            playerGui1.setLblName(model.getPlayerNames().get(0));
-
-
-            if(model.getDealerHand() != null){
-                for(int i = 0; i<model.getDealerHand().getHand().size();i++){
-                    setLbCards(dealerGui,i,model.getDealerHand().getCard(i).getImageID());
+            // set dealer cards
+            if (model.getDealerHand() != null) {
+                int dealerHandSize = model.getDealerHand().getHand().size();
+                while (dealerHandOffset < dealerHandSize) {
+                    // only iterate over new cards
+                    setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
+                    dealerHandOffset++;
                 }
-
             }
-            // set players' information and set cards to players
-            if(model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()){
 
-                for(int i = 0; i< model.getPlayerNames().size();i++) {
+            // set players' information and set cards to players
+            if (model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()) {
+
+                for (int i = 0; i < model.getPlayerNames().size(); i++) {
                     String playerName = model.getPlayerNames().get(i);
                     String playerCredit = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
@@ -722,34 +733,40 @@ public class GameScreen extends JPanel implements Observer {
                     getplayerGui(i).setLblBetAmount(playerBets);
 
                     // set each player's card
-                    ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
-
-                        for(int j = 0; j<playersCard.size();j++){
-                            setLbCards(getplayerGui(i),j, playersCard.get(j).getImageID());
-                            repaint();
-                            revalidate();
-                        }
+                    updatePlayerHand(model, playerName, i);
+//                    ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
+//
+//                    for (int j = 0; j < playersCard.size(); j++) {
+//                        setLbCards(getplayerGui(i), j, playersCard.get(j).getImageID());
+//                        repaint();
+//                        revalidate();
+//                    }
 
 
                 }
 
 
             }
-//            if(model.getPlayerNames().size()>0){
-//                for(String playerName: model.getPlayerNames()) {
-//
-//                    playerGui1.setLblName(playerName);
-//                    ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
-//
-//                    for(Card card: playersCard){
-//                        player
-//                    }
-//
-//                }
-//            }
-
-
         }
+    }
+
+    private void updatePlayerHand(GameClient model, String playerName, int i) {
+
+        // set each player's card
+        ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
+        int playerHandSize = model.getPlayerHands().get(playerName).getHand().size();
+
+        while (playerHandOffset < playerHandSize) {
+            setLbCards(getplayerGui(i), playerHandOffset, playersCard.get(playerHandOffset).getImageID());
+            playerHandOffset++;
+            repaint();
+            revalidate();
+        }
+    }
+
+    private void resetHands() {
+        dealerHandOffset = 0;
+        playerHandOffset = 0;
     }
 
     private void updateMessageList(GameClient model) {

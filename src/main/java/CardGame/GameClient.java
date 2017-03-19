@@ -508,7 +508,7 @@ public class GameClient extends Observable {
         RequestGetDealerHand requestGetDealerHand = new RequestGetDealerHand();
         sendRequest(requestGetDealerHand);
 
-        // get response from server and returnit
+        // get response from server and return it
         PushDealerHand pushDealerHand = getResponse(PushDealerHand.class);
         this.dealerHand = pushDealerHand.getDealerHand();
 
