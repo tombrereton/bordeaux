@@ -101,7 +101,7 @@ public class GameServerThread implements Runnable {
         } catch (EOFException e) {
             System.out.println("GameClient disconnected.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IO problem. GameClient disconnected.");
         } finally {
             // log user out of client and game on disconnect
             if (gameJoined != null) {

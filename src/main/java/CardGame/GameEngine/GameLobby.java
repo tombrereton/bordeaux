@@ -444,19 +444,13 @@ public class GameLobby {
      */
     public synchronized boolean hit(User user) {
         Player player = getPlayer(user);
-//        if(!player.isBetPlaced()){
 
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
-        player.setBetPlaced(false);
-
 
         return player.getPlayerHand().getBlackjackValue() <= 21;
-//        }else{
-//
-//        }
     }
 
     /**
@@ -468,17 +462,12 @@ public class GameLobby {
      */
     public synchronized boolean hit(String username) {
         Player player = getPlayer(username);
-//        if(!player.isBetPlaced()){
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
-        player.setBetPlaced(false);
 
         return player.getPlayerHand().getBlackjackValue() <= 21;
-//        }else{
-//
-//        }
     }
 
 
