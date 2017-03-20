@@ -88,26 +88,26 @@ public class GameLobbyTest {
         assertEquals(false,gameLobby.removePlayer(user2));
     }
 
-//    /**
-//     * Test if all player is finished round
-//     */
-//    @Test
-//    public void allPlayerFinishedTest1(){
-//        GameLobby gameLobby = new GameLobby(user,s);
-//
-//        Player player1 = new Player(user);
-//        Player player2 = new Player(user2);
-//
-//        gameLobby.addPlayer(user2,s);
-//
-//        gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
-//        gameLobby.getPlayer(user2.getUserName()).setFinishedRound(true);
-//
-//        gameLobby.setAllPlayersFinished();
-//
-//        assertEquals(true,gameLobby.isAllPlayersFinished());
-//
-//    }
+    /**
+     * Test if all player is finished round
+     */
+    @Test
+    public void allPlayerFinishedTest1(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
+        Player player1 = new Player(user);
+        Player player2 = new Player(user2);
+
+        gameLobby.addPlayer(user2,s);
+
+        gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
+        gameLobby.getPlayer(user2.getUserName()).setFinishedRound(true);
+
+        gameLobby.setAllPlayersFinished();
+        gameLobby.setAllPlayersFinished(true);
+        assertEquals(true,gameLobby.isAllPlayersFinished());
+
+    }
     /**
      * Test if all player is finished round
      */
@@ -125,6 +125,7 @@ public class GameLobbyTest {
         gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
         gameLobby.getPlayer(user2.getUserName()).setFinishedRound(false);
 
+        gameLobby.setAllPlayersFinished();
         assertEquals(false,gameLobby.isAllPlayersFinished());
 
     }
