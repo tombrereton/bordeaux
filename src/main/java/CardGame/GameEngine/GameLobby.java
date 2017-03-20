@@ -184,7 +184,7 @@ public class GameLobby {
         dealerHand.getHand().get(1).setFaceUp(true);
 
         if (dealerHand.getBlackjackValue() < 17) {
-            Card newCard = new Deck().dealCard();
+            Card newCard = deck.dealCard();
             dealerHand.addCard(newCard);
         }
     }

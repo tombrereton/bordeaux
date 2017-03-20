@@ -7,6 +7,7 @@ import CardGame.GameEngine.Player;
 import org.junit.Test;
 
 import java.net.Socket;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,19 +22,22 @@ public class GameLobbyTest {
     Socket s = new Socket();
     // SET UP
     User user = new User("TestUser1");
+    User user2 = new User("TestUser2");
 
-    GameLobby gameLobby = new GameLobby(user,s);
 
 
     @Test
     public void getLobbyNameTest(){
-        assertEquals("TestUser1",gameLobby.getLobbyName());
+
+        GameLobby gameLobby = new GameLobby(user,s);
+        assertEquals(user.getUserName(),gameLobby.getLobbyName());
     }
     /**
      * get user
      */
     @Test
     public void getPlayerTest1(){
+        GameLobby gameLobby = new GameLobby(user,s);
         gameLobby.addPlayer(user,s);
         assertEquals("TestUser1",gameLobby.getPlayer(user).getUsername());
     }
@@ -43,6 +47,8 @@ public class GameLobbyTest {
      */
     @Test
     public void getPlayerTest2(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         User user2 = new User("TestUser2");
         gameLobby.addPlayer(user,s);
         assertEquals(null,gameLobby.getPlayer(user2));
@@ -53,9 +59,10 @@ public class GameLobbyTest {
      */
     @Test
     public void addPlayerTest(){
-        User user2 = new User("TestUser2");
-        gameLobby.addPlayer(user2,s);
-        assertEquals("TestUser2",gameLobby.getPlayer(user2).getUsername());
+        GameLobby gameLobby = new GameLobby(user,s);
+
+        gameLobby.addPlayer(user,s);
+        assertEquals(user.getUserName(),gameLobby.getPlayer(user).getUsername());
     }
 
     /**
@@ -63,6 +70,8 @@ public class GameLobbyTest {
      */
     @Test
     public void removePlayerTest1(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         User user2 = new User("TestUser2");
         gameLobby.addPlayer(user2,s);
         assertEquals(true,gameLobby.removePlayer(user2));
@@ -73,32 +82,39 @@ public class GameLobbyTest {
      */
     @Test
     public void removePlayerTest2(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         User user2 = new User("TestUser2");
         assertEquals(false,gameLobby.removePlayer(user2));
     }
 
-    /**
-     * Test if all player is finished round
-     */
-    @Test
-    public void allPlayerFinishedTest1(){
-        Player player1 = new Player(user);
-        User user2 = new User("TestUser2");
-        Player player2 = new Player(user2);
-
-        gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
-
-        player1.setFinishedRound(true);
-        player2.setFinishedRound(true);
-        assertEquals(true,gameLobby.isAllPlayersFinished());
-
-    }
+//    /**
+//     * Test if all player is finished round
+//     */
+//    @Test
+//    public void allPlayerFinishedTest1(){
+//        GameLobby gameLobby = new GameLobby(user,s);
+//
+//        Player player1 = new Player(user);
+//        Player player2 = new Player(user2);
+//
+//        gameLobby.addPlayer(user2,s);
+//
+//        gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
+//        gameLobby.getPlayer(user2.getUserName()).setFinishedRound(true);
+//
+//        gameLobby.setAllPlayersFinished();
+//
+//        assertEquals(true,gameLobby.isAllPlayersFinished());
+//
+//    }
     /**
      * Test if all player is finished round
      */
     @Test
     public void allPlayerFinishedTest2(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
@@ -106,8 +122,9 @@ public class GameLobbyTest {
         gameLobby.addPlayer(user,s);
         gameLobby.addPlayer(user2,s);
 
-        player1.setFinishedRound(true);
-        player2.setFinishedRound(false);
+        gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
+        gameLobby.getPlayer(user2.getUserName()).setFinishedRound(false);
+
         assertEquals(false,gameLobby.isAllPlayersFinished());
 
     }
@@ -117,25 +134,34 @@ public class GameLobbyTest {
      */
     @Test
     public void allPlayerFinishedTest3(){
-        assertEquals(true,gameLobby.isAllPlayersStand());
+        GameLobby gameLobby = new GameLobby(user,s);
+
+        assertEquals(false,gameLobby.isAllPlayersFinished());
     }
 
 
     @Test
     public void takeBetsTest1(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
         gameLobby.addPlayer(user,s);
         gameLobby.addPlayer(user2,s);
-        player1.setBet(10);
-        player2.setBet(10);
-        System.out.println("takeBetsTest1");
+
+        gameLobby.getPlayer("TestUser1").setBet(10);
+        gameLobby.getPlayer("TestUser2").setBet(20);
+
+        assertEquals(20,gameLobby.getPlayer("TestUser2").getBet());
+
 
     }
     @Test
     public void takeBetsTest2(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
@@ -143,53 +169,50 @@ public class GameLobbyTest {
         gameLobby.addPlayer(user,s);
         gameLobby.addPlayer(user2,s);
 
-        player1.setBet(10);
+        gameLobby.getPlayer("TestUser1").setBet(10);
+        assertEquals(10,gameLobby.getPlayer("TestUser1").getBet());
 
-        System.out.println("takeBetsTest2");
+
     }
-
     @Test
     public void takeBetsTest3(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
         gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
-        System.out.println("takeBetsTest3");
+
+        assertEquals(0,gameLobby.getPlayer("TestUser1").getBet());
+
+
     }
 
     @Test
     public void dealtoDealerTest1(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         gameLobby.startGame();
 
-        Card dealerFirstCard = new Deck().dealCard();
-        gameLobby.getDealerHand().addCard(dealerFirstCard);
-        gameLobby.getDealerHand().getCard(0).setFaceUp(false);
-        Card dealerSecondCard = new Deck().dealCard();
-        gameLobby.getDealerHand().addCard(dealerSecondCard);
+        System.out.println("Dealer: " + gameLobby.getDealerHand().getCard(0).getValue());
+        System.out.println("Dealer: " + gameLobby.getDealerHand().getCard(1).getValue());
 
-        System.out.println("The dealer now has " +gameLobby.getDealerHand().getBlackjackValue());
-        System.out.println("Dealer: " + gameLobby.getDealerHand().getCard(0).getValue());
-        gameLobby.dealToDealer();
-        System.out.println("Dealer: " + gameLobby.getDealerHand().getCard(0).getValue());
 
     }
     @Test
     public void playerTest(){
+        GameLobby gameLobby = new GameLobby(user,s);
+
         Player player1 = new Player(user);
-        Deck deck =  new Deck();
+        Deck deck = new Deck();
         deck.shuffle();
-        gameLobby.addPlayer(user,s);
-        System.out.println("Player 1: " +player1.getPlayerHandValue());
         player1.addCardToPlayerHand(deck.dealCard());
-        System.out.println("Player 1: " +player1.getPlayerHandValue());
         player1.addCardToPlayerHand(deck.dealCard());
-        System.out.println("Player 1: " +player1.getPlayerHandValue());
-        player1.addCardToPlayerHand(deck.dealCard());
-        System.out.println("Player 1: " +player1.getPlayerHandValue());
-        player1.addCardToPlayerHand(deck.dealCard());
-        System.out.println("Player 1: " +player1.getPlayerHandValue());
+
+        System.out.println("Player 1: " +player1.getPlayerHand().getHand().get(0).getValue());
+        System.out.println("Player 1: " +player1.getPlayerHand().getHand().get(1).getValue());
+
     }
 
 
