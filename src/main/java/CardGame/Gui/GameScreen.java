@@ -835,15 +835,32 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     private synchronized void resetHands() {
+        // we reset the client dealer hand
+        getClientModel().resetDealerAndPlayerHands();
+//        for (int i = 0; i < dealerHandOffset; i++) {
+//            getClientModel().getDealerHand().removeCard(i);
+//        }
+
+        // reset the dealer hand offset
         dealerHandOffset = 0;
+
+        // we reset the dealer gui hand
+        for (int i = 0; i < 12; i++) {
+            setLbCards(dealerGui, i, "400");
+        }
+
+        // we reset the client player hands
+
+        // we reset the player cards to a blank image
+        for(int i = 0; i< 4;i++){
+            for (int j = 0; j < 12; j++){
+                setLbCards(getplayerGui(i),j,"400");
+            }
+        }
 
         // we reset all the player hand offsets to 0
         for (int i = 0; i < 4; i++) {
             this.setPlayerHandOffset(i, 0);
-        }
-
-        for(int i = 0; i< 4;i++){
-            setLbCards(getplayerGui(i),i,"400");
         }
 
         repaint();
