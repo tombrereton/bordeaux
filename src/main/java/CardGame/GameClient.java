@@ -968,6 +968,19 @@ public class GameClient extends Observable {
     public int getReconnectAttempts() {
         return reconnectAttempts;
     }
+
+    public synchronized void resetGameData() {
+        this.chatOffset = -1;
+        this.playersFinished = new TreeMap<>();
+        this.dealerHand = new Hand();
+        this.playerBets = new TreeMap<>();
+        this.playerBudgets = new TreeMap<>();
+        this.playerHands = new TreeMap<>();
+        this.playerNames = new TreeSet<>();
+        this.playersBust = new TreeMap<>();
+        this.playersStand = new TreeMap<>();
+        this.playersWon = new TreeMap<>();
+    }
 }
 
 

@@ -2,7 +2,6 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
-import CardGame.GameEngine.Player;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseProtocol;
 
@@ -370,38 +369,33 @@ public class GameScreen extends JPanel implements Observer {
          *
          * And display the error if not successful
          */
-        btnSubmitBet.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // we send the request to bet
-                ResponseProtocol response = client.requestBet(amountToBet);
+        btnSubmitBet.addActionListener(e -> {
 
-                if (response.getRequestSuccess() == 0) {
-                    // display error msg if not successful
-                    String errorMsg = response.getErrorMsg();
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
+            // we send the request to bet
+            ResponseProtocol response = client.requestBet(amountToBet);
 
-                    // set bet amount to 0
-                    amountToBet = 0;
-                    lblSubmitBet.setText(Integer.toString(amountToBet));
-                    return;
-                }
+            if (response.getRequestSuccess() == 0) {
+                // display error msg if not successful
+                String errorMsg = response.getErrorMsg();
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
 
                 // set bet amount to 0
                 amountToBet = 0;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-
-                // reset offsets to 0
-                resetHands();
-                for(int i = 0; i< 4;i++){
-                    setLbCards(getplayerGui(i),i,"400");
-                }
-
-                repaint();
-                revalidate();
-
+                return;
             }
+
+            // set bet amount to 0
+            amountToBet = 0;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
+
+            // reset offsets to 0
+            resetHands();
+
         });
+
+        // set image for bet
         btnSubmitBet.setContentAreaFilled(false);
         btnSubmitBet.setBorderPainted(false);
         try {
@@ -484,23 +478,26 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-
+        // LEAVE BUTTON
         /**
          * leave game button
          */
-        btnLeaveGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+        btnLeaveGame.addActionListener(e -> {
+            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
 
-                if (leaveGame.getRequestSuccess() == 1) {
-                    chatMessageModel.clear();
-                    gameScreenChatOffset = 0;
-                }
+            if (leaveGame.getRequestSuccess() == 1) {
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
+
+                // reset all game data on the client
+                getClientModel().resetGameData();
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
         btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
         add(btnLeaveGame);
+
+        // END LEAVE BUTTON
 
 
         /**
@@ -844,6 +841,13 @@ public class GameScreen extends JPanel implements Observer {
         for (int i = 0; i < 4; i++) {
             this.setPlayerHandOffset(i, 0);
         }
+
+        for(int i = 0; i< 4;i++){
+            setLbCards(getplayerGui(i),i,"400");
+        }
+
+        repaint();
+        revalidate();
     }
 
     private synchronized void updateMessageList(GameClient model) {
