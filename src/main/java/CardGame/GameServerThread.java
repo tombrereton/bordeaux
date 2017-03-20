@@ -207,7 +207,10 @@ public class GameServerThread implements Runnable {
     }
 
     private ResponseProtocol handleGetDealerhand(int protocolId) {
-        Hand dealerHand = this.getGame(gameJoined).getDealerHand();
+        Hand dealerHand = null;
+        if (this.getGame(gameJoined).isAllPlayersBetPlaced()) {
+            dealerHand = this.getGame(gameJoined).getDealerHand();
+        }
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);
     }
@@ -404,6 +407,9 @@ public class GameServerThread implements Runnable {
         } else if (betAmount < 5) {
             // return fail if bet is less than 5 pounds
             return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
+        } else if (gameJoined == null || gameJoined.equals("")){
+            // return fail if not joined a game
+            return new ResponseBet(protocolId, FAIL, NO_GAME_JOINED);
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
@@ -680,7 +686,7 @@ public class GameServerThread implements Runnable {
 
 
     private void joinGame(String lobbyname) {
-        getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
+        getGame(lobbyname).addPlayer(this.getLoggedInUser());
     }
 
     /**
@@ -691,7 +697,7 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private GameLobby createGame() {
-        GameLobby newGame = new GameLobby(getLoggedInUser(), this.toClientSocket);
+        GameLobby newGame = new GameLobby(getLoggedInUser());
 
         this.getGames().add(newGame);
 
