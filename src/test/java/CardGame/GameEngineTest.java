@@ -7,16 +7,17 @@ import CardGame.GameEngine.Player;
 import org.junit.Test;
 
 import java.net.Socket;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * This class tests the GameLobby.
+ * This class tests the GameEngine.
  * Created by Yifan on 11/03/17.
  *
+ * This part is include the all classes in the GameEngine package
+ *
  */
-public class GameLobbyTest {
+public class GameEngineTest {
     GameServer server;
 
     Socket s = new Socket();
@@ -33,7 +34,7 @@ public class GameLobbyTest {
         assertEquals(user.getUserName(),gameLobby.getLobbyName());
     }
     /**
-     * get user
+     * Test get user part
      */
     @Test
     public void getPlayerTest1(){
@@ -55,7 +56,7 @@ public class GameLobbyTest {
     }
 
     /**
-     * add player
+     * Test add player part
      */
     @Test
     public void addPlayerTest(){
@@ -66,7 +67,7 @@ public class GameLobbyTest {
     }
 
     /**
-     * remove player
+     * Test remove player part
      */
     @Test
     public void removePlayerTest1(){
