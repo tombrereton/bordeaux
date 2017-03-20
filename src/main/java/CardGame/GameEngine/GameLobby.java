@@ -6,6 +6,7 @@ import CardGame.User;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -17,7 +18,12 @@ public class GameLobby {
     private ArrayList<Player> players;
     private Map<String, Socket> playerSockets;
     private Deck deck;
+
+    // boolean flags
     private boolean allPlayersStand;
+    private boolean allPlayersBetPlaced;
+    private boolean dealerCardLeft;
+    private boolean allPlayersFinished;
 
     // variables that will be sent to client
     private Map<String, Integer> playerBudgets;
@@ -38,8 +44,17 @@ public class GameLobby {
     public GameLobby(User user, Socket socket) {
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
+
+        this.players.add(new Player(user));
+
         this.playerSockets = new HashMap<>();
         this.playerSockets.put(user.getUserName(), socket);
+
+        // boolean flags
+        this.allPlayersBetPlaced = false;
+        this.dealerCardLeft = false;
+        this.allPlayersFinished = false;
+
         // Create a deck
         this.deck = new Deck();
 
@@ -49,10 +64,32 @@ public class GameLobby {
         this.playersWon = new HashMap<>();
         this.playersStand = new HashMap<>();
         this.dealerHand = new BlackjackHand();
+        setAllPlayersBustToFalse();
+        setAllPlayersWonToFalse();
+        setAllPlayersStandToFalse();
 
         // chat variables
         this.messageQueue = new ConcurrentLinkedDeque<>();
 
+
+    }
+
+    private void setAllPlayersStandToFalse() {
+        for (Player p: players){
+            getPlayersStand().put(p.getUsername(), false);
+        }
+    }
+
+    private void setAllPlayersWonToFalse() {
+        for (Player p : players) {
+            getPlayersWon().put(p.getUsername(), false);
+        }
+    }
+
+    private void setAllPlayersBustToFalse() {
+        for (Player p : players) {
+            getPlayersBust().put(p.getUsername(), false);
+        }
     }
 
     /**
@@ -61,27 +98,6 @@ public class GameLobby {
     public synchronized boolean isDealerBust() {
         return dealerHand.getBlackjackValue() > 21;
 
-    }
-
-    /**
-     * return true if player has hand greater than dealer but player is not bust
-     * return false if player has value less than dealer but dealer is not bust
-     *
-     * @param player
-     * @return
-     */
-    public synchronized boolean compareHandWithDealer(Player player) {
-        int playerValue = player.getPlayerHand().getBlackjackValue();
-        if (playerValue > 0 && playerValue <= 21) {
-            return playerValue > dealerHand.getBlackjackValue();
-        }
-        return false;
-    }
-
-    public synchronized void setPlayerFold(String username) {
-        getPlayersBust().put(username, true);
-        setPlayerStand(username);
-        setPlayersWon();
     }
 
 
@@ -104,6 +120,8 @@ public class GameLobby {
 
             // deal cards to dealer while hand value is less than 17
             setDealerHandFaceUp();
+
+
             while (getDealerHand().getBlackjackValue() < 17) {
                 dealToDealer();
             }
@@ -113,17 +131,19 @@ public class GameLobby {
                 // lost - set bet to zero
                 setBetToZero(player);
                 return false;
-            } else if (dealerHand.getBlackjackValue() < 21 && playerValue == 21 && !isPlayerBust(player)) {
+            } else if (isPlayerBust(player)) {
+                // lost - set bet to zero
+                setBetToZero(player);
+                return false;
+            } else if (dealerHand.getBlackjackValue() < 21 && playerValue == 21) {
                 // won - add bet to budget
                 addBetToBudget(player);
                 return true;
-            } else if (isDealerBust() && playerValue <= 21 && !isPlayerBust(player)) {
+            } else if (isDealerBust() && !isPlayerBust(player)) {
                 // won - add bet to budget
                 addBetToBudget(player);
                 return true;
-            } else if (playerValue > 0 && playerValue <= 21 &&
-                    !isDealerBust() && dealerHand.getBlackjackValue() >= 17 &&
-                    !isPlayerBust(player) && playerValue > dealerHand.getBlackjackValue()) {
+            } else if (!isDealerBust() && playerValue > dealerHand.getBlackjackValue()) {
                 // won - add bet to budget
                 addBetToBudget(player);
                 return true;
@@ -138,8 +158,8 @@ public class GameLobby {
         return false;
     }
 
-    private Boolean isPlayerBust(Player player) {
-        return getPlayersBust().get(player.getUsername());
+    private boolean isPlayerBust(Player player) {
+        return getPlayer(player.getUsername()).isBust();
     }
 
     private void setBetToZero(Player player) {
@@ -147,8 +167,9 @@ public class GameLobby {
     }
 
     private void addBetToBudget(Player player) {
-        int amountWon = getPlayer(player.getUsername()).getBet();
-        getPlayer(player.getUsername()).setBudget(amountWon);
+        int amountWon = getPlayer(player.getUsername()).getBet() * 2;
+        int currentBudget = getPlayer(player.getUsername()).getBudget();
+        getPlayer(player.getUsername()).setBudget(currentBudget + amountWon);
         getPlayer(player.getUsername()).setBet(0);
     }
 
@@ -158,6 +179,10 @@ public class GameLobby {
      * stand if > 17
      */
     public synchronized void dealToDealer() {
+        // set the dealer's card faced up
+        dealerHand.getHand().get(0).setFaceUp(true);
+        dealerHand.getHand().get(1).setFaceUp(true);
+
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = new Deck().dealCard();
             dealerHand.addCard(newCard);
@@ -228,12 +253,44 @@ public class GameLobby {
         }
     }
 
-    public synchronized boolean allPlayersFinished() {
+//    /**
+//     * This method will check whether all cards are left on this deck
+//     *
+//     * @return If the player still has the cards, return false, else true
+//     */
+//    public synchronized boolean allPlayersNoCards() {
+//        for (Player p : players) {
+//            // if the player still have cards
+//            // return false
+//            if (p.isCardLeft()) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+
+    public synchronized boolean setAllPlayersFinished() {
+        // change to check player.isfinishedround
+
         for (Player p : players) {
-            if (!p.isFinishedRound()) {
+            if (!getPlayersWon().get(p.getUsername()) && !getPlayersStand().get(p.getUsername())) {
+                setAllPlayersFinished(false);
                 return false;
             }
         }
+        setAllPlayersFinished(true);
+        return true;
+    }
+
+
+    public synchronized boolean allPlayersBetPlaced() {
+        for (Player p : players) {
+            if (!p.isBetPlaced()) {
+                setAllPlayersBetPlaced(false);
+                return false;
+            }
+        }
+        setAllPlayersBetPlaced(true);
         return true;
     }
 
@@ -252,48 +309,29 @@ public class GameLobby {
         return playerBets;
     }
 
-    /**
-     * This method returns a map of all players and their isFinishedRound status.
-     *
-     * @return
-     */
-    public synchronized Map<String, Boolean> getPlayersFinished() {
-        Map<String, Boolean> playersFinished = new HashMap<>();
-
-        for (Player player : players) {
-            playersFinished.put(player.getUsername(), player.isFinishedRound());
-        }
-
-        return playersFinished;
-    }
-
-    /**
-     * tells everyone to bet
-     * tells everyone who still has to bet
-     * once everyone has bet, calls startgame method
-     */
-    public synchronized void takeBets() {
-        // fill out
-
-        for (Player p : players) {
-            if (!p.isFinishedRound()) {
-                System.out.println(p.getUsername() + " needs to bet");
-            }
-        }
-        if (allPlayersFinished()) {
-            startGame();
-        }
-    }
-
+//    /**
+//     * This method returns a map of all players and their isFinishedRound status.
+//     *
+//     * @return
+//     */
+//    public synchronized Map<String, Boolean> getPlayersFinished() {
+//        Map<String, Boolean> playersFinished = new HashMap<>();
+//
+//        for (Player player : players) {
+//            playersFinished.put(player.getUsername(), player.isFinishedRound());
+//        }
+//
+//        return playersFinished;
+//    }
 
     /**
      * deals 2 cards to everyone, all cards face up
      * deals 2 card to dealer, 1 card face down, 1 card face up
      */
     public synchronized void startGame() {
-        // start the game and shuffle the deck
+        // start the game
         deck.shuffle();
-
+        // shuffle the deck
         nextGame();
     }
 
@@ -303,7 +341,12 @@ public class GameLobby {
             deck.shuffle();
         }
 
-        // remove all cards from players
+        // remove the cards from each players
+        for (Player p : players) {
+            p.removeAllCards();
+        }
+        // remove the cards from dealer
+        removeDealerCards();
 
         // For players:
         for (Player p : players) {
@@ -331,14 +374,15 @@ public class GameLobby {
         dealerSecondCard.setFaceUp(true);
         dealerHand.addCard(dealerSecondCard);
 
-        // set all players stand to false
+    }
 
-        for (Player player : players) {
-            playersStand.put(player.getUsername(), false);
-            playersBust.put(player.getUsername(), false);
-            player.setFinishedRound(false);
+    private void removeDealerCards() {
+        Iterator<Card> iterator = dealerHand.getHand().iterator();
+
+        while(iterator.hasNext()){
+            iterator.next();
+            iterator.remove();
         }
-
     }
 
     public synchronized void setDealerHandFaceUp() {
@@ -353,6 +397,49 @@ public class GameLobby {
                 playersWon.put(player.getUsername(), true);
             }
         }
+
+        setAllPlayersFinished();
+
+        if (isAllPlayersFinished()){
+            setAllPlayersBustToFalse();
+            setAllPlayersWonToFalse();
+            setAllPlayersStandToFalse();
+            setAllPlayersBetPlaced(false);
+
+            resetPlayers();
+
+
+        }
+    }
+
+    private void resetPlayers() {
+        for (Player player : players){
+            player.setBetPlaced(false);
+            player.setPlayerStand(false);
+        }
+    }
+
+//    /**
+//     * adds card to player hand
+//     * returns true if below or equal 21
+//     * sets player to finished round
+//     *
+//     * @param user //     * @return if the user is bet and than hit ,or return false
+//     */
+//    public synchronized boolean hit(User user) {
+//        Player player = getPlayer(user);
+//
+//        Card newCard = deck.dealCard();
+//        player.addCardToPlayerHand(newCard);
+//
+//        setPlayersWon();
+//
+//        return player.getPlayerHand().getBlackjackValue() <= 21;
+//    }
+    private void setDealerCardsFaceUp() {
+        for(Card card: getDealerHand().getHand()){
+            card.setFaceUp(true);
+        }
     }
 
     /**
@@ -360,52 +447,47 @@ public class GameLobby {
      * returns true if below or equal 21
      * sets player to finished round
      *
-     * @param user
-     * @return
+     * @param user //     * @return if the user is bet and than hit ,or return false
      */
     public synchronized boolean hit(User user) {
         Player player = getPlayer(user);
+
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
 
-        return player.getPlayerHand().getBlackjackValue() <= 21;
+        return true;
     }
+
 
     /**
      * adds card to player hand
      * returns true if below or equal 21
      * sets player to finished round
      *
-     * @param username
-     * @return
+     * @param username //     * @return if the user is bet and than hit ,or return false
      */
     public synchronized boolean hit(String username) {
         Player player = getPlayer(username);
+
         Card newCard = deck.dealCard();
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
 
-        return player.getPlayerHand().getBlackjackValue() <= 21;
-    }
-
-    public synchronized boolean stand(User user) {
-        // does nothing
-        // sets player to finished round
-        Player player = getPlayer(user);
-        player.setFinishedRound(true);
         return true;
     }
 
-    public synchronized boolean doubleBet(User user) {
-        // doubles bet
-        // sets player to finished round
-        Player player = getPlayer(user);
-        player.setBet(player.getBet() * 2);
-        return hit(user);
-    }
+
+//    public synchronized boolean stand(User user) {
+//        // does nothing
+//        // sets player to finished round
+//        Player player = getPlayer(user);
+//        player.setFinishedRound(true);
+//        return true;
+//    }
+
 
     public String getLobbyName() {
         return lobbyName;
@@ -447,10 +529,6 @@ public class GameLobby {
         return playerNames;
     }
 
-    public Map<String, Socket> getPlayerSockets() {
-        return playerSockets;
-    }
-
     public Map<String, Boolean> getPlayersBust() {
         return playersBust;
     }
@@ -463,14 +541,10 @@ public class GameLobby {
         return this.getLobbyName().equals(gameLobby.getLobbyName());
     }
 
-    @Override
-    public int hashCode() {
-        return getLobbyName() != null ? getLobbyName().hashCode() : 0;
-    }
-
     public synchronized void setPlayerStand(String username) {
         for (Player player : players) {
             if (player.getUsername().equals(username)) {
+                player.setPlayerStand(true);
                 playersStand.put(username, true);
             }
         }
@@ -483,6 +557,7 @@ public class GameLobby {
         for (Map.Entry<String, Boolean> playerStand : playersStand.entrySet()) {
             if (!playerStand.getValue()) {
                 allPlayersStand = false;
+                return;
             }
         }
 
@@ -493,9 +568,9 @@ public class GameLobby {
         return messageQueue;
     }
 
-    public void setMessageQueue(ConcurrentLinkedDeque<MessageObject> messageQueue) {
-        this.messageQueue = messageQueue;
-    }
+//    public void setMessageQueue(ConcurrentLinkedDeque<MessageObject> messageQueue) {
+//        this.messageQueue = messageQueue;
+//    }
 
     public Map<String, Boolean> getPlayersWon() {
         return playersWon;
@@ -507,5 +582,29 @@ public class GameLobby {
 
     public boolean isAllPlayersStand() {
         return allPlayersStand;
+    }
+
+//    public boolean isDealerCardLeft() {
+//        return dealerCardLeft;
+//    }
+
+//    public void setDealerCardLeft(boolean dealerCardLeft) {
+//        this.dealerCardLeft = dealerCardLeft;
+//    }
+
+    public boolean isAllPlayersBetPlaced() {
+        return allPlayersBetPlaced;
+    }
+
+    public void setAllPlayersBetPlaced(boolean allPlayersBetPlaced) {
+        this.allPlayersBetPlaced = allPlayersBetPlaced;
+    }
+
+    public boolean isAllPlayersFinished() {
+        return allPlayersFinished;
+    }
+
+    public void setAllPlayersFinished(boolean allPlayersFinished) {
+        this.allPlayersFinished = allPlayersFinished;
     }
 }

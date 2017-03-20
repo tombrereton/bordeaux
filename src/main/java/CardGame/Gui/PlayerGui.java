@@ -204,7 +204,7 @@ public class PlayerGui extends JPanel {
         add(lblAvatar);
     }
 
-    public void setLblCard1(String cardID) {
+    public void setLblCard1(String cardID){
         remove(lblCard1);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));

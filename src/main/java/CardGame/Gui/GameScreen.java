@@ -2,6 +2,7 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
+import CardGame.GameEngine.Player;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseProtocol;
 
@@ -379,6 +380,11 @@ public class GameScreen extends JPanel implements Observer {
                     String errorMsg = response.getErrorMsg();
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
+
+                    // set bet amount to 0
+                    amountToBet = 0;
+                    lblSubmitBet.setText(Integer.toString(amountToBet));
+                    return;
                 }
 
                 // set bet amount to 0
@@ -387,6 +393,13 @@ public class GameScreen extends JPanel implements Observer {
 
                 // reset offsets to 0
                 resetHands();
+                for(int i = 0; i< 4;i++){
+                    setLbCards(getplayerGui(i),i,"400");
+                }
+
+                repaint();
+                revalidate();
+
             }
         });
         btnSubmitBet.setContentAreaFilled(false);
@@ -703,6 +716,9 @@ public class GameScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            // display popup when server down
+            showWarningWhenServerDown(model);
+
             // update message box with messages
             updateMessageList(model);
 
@@ -736,6 +752,13 @@ public class GameScreen extends JPanel implements Observer {
                     updatePlayerHand(model, playerName, i);
                 }
             }
+        }
+    }
+
+    private void showWarningWhenServerDown(GameClient model) {
+        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
+            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 

@@ -31,8 +31,6 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
     public LoginScreen loginScreen;
     public HomeScreen homeScreen;
     public CreateAccountScreen createAccountScreen;
-    public SettingsScreen settingsScreen;
-    public StatisticsScreen statisticsScreen;
     public LobbyScreen lobbyScreen;
     public GameScreen gameScreen;
     private GameClient client;
@@ -178,12 +176,6 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
             case 4:
                 gameScreen.updateBounds();
                 break;
-            case 5:
-                statisticsScreen.updateBounds();
-                break;
-            case 6:
-                settingsScreen.updateBounds();
-                break;
         }
     }
 
@@ -225,18 +217,6 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
                         this.gameScreen = new GameScreen(model, this);
                     }
                     setPane(this.gameScreen);
-                    break;
-                case STATISTICSSCREEN:
-                    if (this.statisticsScreen == null) {
-                        this.statisticsScreen = new StatisticsScreen(model, this);
-                    }
-                    setPane(this.statisticsScreen);
-                    break;
-                case SETTINGSSCREEN:
-                    if (this.settingsScreen == null) {
-                        this.settingsScreen = new SettingsScreen(model, this);
-                    }
-                    setPane(this.settingsScreen);
                     break;
             }
         }

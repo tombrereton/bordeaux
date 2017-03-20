@@ -145,19 +145,13 @@ public class LobbyScreen extends JPanel implements Observer {
 
                 // send request to create a game
                 ResponseProtocol responseProtocol = getClientModel().requestCreateGame();
-                ResponseProtocol responseProtocol1 = getClientModel().requestJoinGame(getClientModel().getLoggedInUser().getUserName());
 
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
-                int success2 = responseProtocol1.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-                String errorMsg1 = responseProtocol1.getErrorMsg();
 
                 if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                } else if (success2 == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg1, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
 
@@ -207,6 +201,9 @@ public class LobbyScreen extends JPanel implements Observer {
         if (observable instanceof GameClient) {
             GameClient model = (GameClient) observable;
 
+            // show popup on server disconnect
+            showWarningWhenServerDown(model);
+
             // get clientGameOf
             int clientGameOffset = model.getListOfGames().size();
 
@@ -225,6 +222,19 @@ public class LobbyScreen extends JPanel implements Observer {
                 }
             }
 
+        }
+    }
+
+    private void showWarningWhenServerDown(GameClient model) {
+        if (model.getCurrentScreen() != Screens.LOBBYSCREEN) {
+            return;
+        }
+        if (model.isServerDown() && model.getReconnectAttempts() < 3) {
+            JOptionPane.showMessageDialog(null, "Server down. Trying to reconnect.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (model.isServerDown() && model.getReconnectAttempts() >= 3) {
+            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 }

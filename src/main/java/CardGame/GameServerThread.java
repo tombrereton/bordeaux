@@ -76,6 +76,8 @@ public class GameServerThread implements Runnable {
 
     /**
      * This method runs when the clientSideThread starts.
+     * It handles the request received from the client and
+     * sends the appropriate response back.
      */
     @Override
     public void run() {
@@ -99,7 +101,7 @@ public class GameServerThread implements Runnable {
         } catch (EOFException e) {
             System.out.println("GameClient disconnected.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IO problem. GameClient disconnected.");
         } finally {
             // log user out of client and game on disconnect
             if (gameJoined != null) {
@@ -303,7 +305,7 @@ public class GameServerThread implements Runnable {
             return new ResponseFold(protocolId, FAIL, ALREADY_STANDING);
         } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
             // if the player is not standing, make player fold
-            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
+//            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
 
             // return success if player is now standing
             return new ResponseFold(protocolId, SUCCESS);
@@ -327,13 +329,13 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseStand(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseStand(protocolId, FAIL, NO_BET);
-        } else if (getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if player is already standing
             return new ResponseStand(protocolId, FAIL, ALREADY_STANDING);
-        } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if the player is not standing, make player stand
             getGame(gameJoined).setPlayerStand(getLoggedInUser().getUserName());
 
@@ -361,14 +363,23 @@ public class GameServerThread implements Runnable {
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // return fail if user has finished round
             return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
-        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).getBet() == 0) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
-        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
+            // return fail if user is bust
+            return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
+        }else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()){
+            // return fail if all players standing
+            return new ResponseHit(protocolId, FAIL, ALREADY_STANDING);
+        }else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-
-            // return success if bet within budget
+            // if player bust after hitting, tell him
+//            if(getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
+//                return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
+//            }
+            // return success
             return new ResponseHit(protocolId, SUCCESS);
         } else {
             // return fail for unknown error
@@ -390,12 +401,15 @@ public class GameServerThread implements Runnable {
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (betAmount < 5){
+        } else if (betAmount < 5) {
             // return fail if bet is less than 5 pounds
             return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+        } else if (isBetPlaced()) {
+            // return fail
+            return new ResponseBet(protocolId, FAIL, PLAYER_BET_PLACED);
         } else if (isBetWithinBudget(betAmount)) {
             // make bet and push it to all players
             makeBet(betAmount);
@@ -405,6 +419,7 @@ public class GameServerThread implements Runnable {
             // return fail for unknown error
             return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
         }
+
     }
 
     /**
@@ -416,6 +431,16 @@ public class GameServerThread implements Runnable {
      */
     private boolean isBetWithinBudget(int betAmount) {
         return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+    }
+
+    /**
+     * This method checks whether the players is bet
+     * Returns true if it is, false if not.
+     *
+     * @return
+     */
+    private boolean isBetPlaced() {
+        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced();
     }
 
     /**
@@ -443,20 +468,24 @@ public class GameServerThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersStand()) {
+        if (getGame(gameJoined).isAllPlayersFinished()) {
             getGame(gameJoined).nextGame();
         }
 
         // set player bet
         getGame(gameJoined).getPlayer(getLoggedInUser()).setBet(betAmount);
-        getGame(gameJoined).getPlayer(getLoggedInUser()).setFinishedRound(true);
+
+        // set player bet placed
+        getGame(gameJoined).getPlayer(getLoggedInUser()).setBetPlaced(true);
+
+        //check all bets are placed and set allbetplaced to true if so
+        getGame(gameJoined).allPlayersBetPlaced();
 
 
-        if (getGame(gameJoined).allPlayersFinished()) {
+        if (getGame(gameJoined).isAllPlayersBetPlaced()) {
             // if all players finished deal cards to players and dealer i.e. start game
             getGame(gameJoined).startGame();
         }
-
     }
 
 
@@ -637,6 +666,9 @@ public class GameServerThread implements Runnable {
             // create game if game does not exist
             GameLobby newGame = createGame();
             String gameName = newGame.getLobbyName();
+
+            // set game joined to logged in user name
+            this.gameJoined = getLoggedInUser().getUserName();
 
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
@@ -950,7 +982,7 @@ public class GameServerThread implements Runnable {
         return users;
     }
 
-    public CopyOnWriteArrayList<GameLobby> getGames() {
+    public synchronized CopyOnWriteArrayList<GameLobby> getGames() {
         return games;
     }
 
@@ -962,7 +994,7 @@ public class GameServerThread implements Runnable {
         return gameJoined;
     }
 
-    public GameLobby getGame(User user) {
+    public synchronized GameLobby getGame(User user) {
         for (GameLobby game : games) {
             if (game.getLobbyName().equals(user.getUserName())) {
                 return game;
@@ -971,7 +1003,7 @@ public class GameServerThread implements Runnable {
         return null;
     }
 
-    public GameLobby getGame(String lobbyName) {
+    public synchronized GameLobby getGame(String lobbyName) {
         for (GameLobby game : games) {
             if (game.getLobbyName().equals(lobbyName)) {
                 return game;

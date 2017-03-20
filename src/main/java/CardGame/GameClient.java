@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 
 import static CardGame.Gui.Screens.*;
 
@@ -69,6 +70,8 @@ public class GameClient extends Observable {
     private volatile boolean isGettingGames;
     private volatile boolean isGettingMessages;
     private volatile boolean isGettingGameData;
+    private boolean isServerDown;
+    private int reconnectAttempts;
 
 
     public GameClient(String HOST, int PORT) {
@@ -108,6 +111,8 @@ public class GameClient extends Observable {
             this.socket = new Socket(this.HOST, this.PORT);
             System.out.println("Connected to server.");
             connectDataStreams();
+            this.isServerDown = false;
+            this.reconnectAttempts = 0;
         } catch (ConnectException e) {
             System.out.println("Cannot connect to server. Ensure server is up.");
         } catch (UnknownHostException e) {
@@ -254,6 +259,42 @@ public class GameClient extends Observable {
         sendRequest(requestLoginUser);
 
         ResponseLoginUser responseLoginUser = null;
+        int success = 0;
+        try {
+            // get the response from the server
+            responseLoginUser = getResponse(ResponseLoginUser.class);
+            success = responseLoginUser.getRequestSuccess();
+        } catch (NullPointerException e) {
+            System.out.println("Cannot log in, trying to reconnect.");
+            connectToServer();
+        }
+
+        // log user in if successful
+        if (success == 1) {
+            setLoggedInUser(responseLoginUser.getUser());
+            setCurrentScreen(HOMESCREEN);
+            startGettingGameNames();
+        }
+
+        // return response
+        return responseLoginUser;
+    }
+
+    /**
+     * This method sends a request to login after the server disconnects.
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    public synchronized ResponseLoginUser requestReLogin(String username, String password) {
+        User user = new User(username, password);
+
+        // create and send login request
+        RequestLoginUser requestLoginUser = new RequestLoginUser(user);
+        sendRequest(requestLoginUser);
+
+        ResponseLoginUser responseLoginUser = null;
         try {
             // get the response from the server
             responseLoginUser = getResponse(ResponseLoginUser.class);
@@ -273,6 +314,7 @@ public class GameClient extends Observable {
         // return response
         return responseLoginUser;
     }
+
 
     /**
      * This method send a request and returns a response for register user.
@@ -309,7 +351,7 @@ public class GameClient extends Observable {
      *
      * @return
      */
-    public synchronized ResponseLogOut requestLogOut() {
+    public synchronized ResponseLogOut requestLogOut() throws NullPointerException {
         // create request and send request
         RequestLogOut requestLogOut = new RequestLogOut(getLoggedInUser().getUserName());
         sendRequest(requestLogOut);
@@ -370,7 +412,19 @@ public class GameClient extends Observable {
         sendRequest(requestCreateGame);
 
         // get response from server and return it
-        return getResponse(ResponseCreateGame.class);
+        ResponseCreateGame responseCreateGame = getResponse(ResponseCreateGame.class);
+        int success = responseCreateGame.getRequestSuccess();
+        String gameJoinedFromRequest = responseCreateGame.getGameName();
+
+        if (success == 1) {
+            setCurrentScreen(GAMESCREEN);
+            stopGettingGameNames();
+            startGettingMessages();
+            startGettingGameData();
+            setGameJoined(gameJoinedFromRequest);
+        }
+
+        return responseCreateGame;
     }
 
     /**
@@ -424,8 +478,6 @@ public class GameClient extends Observable {
             messages.clear();
             setChatOffset(-1);
 
-//            setChanged();
-//            notifyObservers();
         }
 
         return responseQuitGame;
@@ -664,6 +716,10 @@ public class GameClient extends Observable {
                 }
             } catch (NullPointerException e) {
                 System.out.println("Can't get game names. Server down.");
+                this.isServerDown = true;
+
+                // try to reconnect
+                reconnectToServer();
             } catch (InterruptedException e) {
                 System.out.println("Polling for game list interrupted.");
             }
@@ -673,6 +729,33 @@ public class GameClient extends Observable {
 
         // start the thread
         gameNamesThread.start();
+    }
+
+    public void reconnectToServer() {
+
+        while (isServerDown && reconnectAttempts < 3) {
+            // tell observers about reconnection attempts
+
+            System.out.println("Will try to reconnect to server in 5 seconds");
+
+            // sleep for 5 seconds
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // try to reconnect
+            connectToServer();
+
+            // send login request if connected to server
+            if (!isServerDown()) {
+                requestReLogin(loggedInUser.getUserName(), loggedInUser.getPassword());
+                break;
+            }
+            reconnectAttempts++;
+            notifyObservers();
+        }
     }
 
     public void stopGettingGameNames() {
@@ -691,27 +774,24 @@ public class GameClient extends Observable {
         // create the job
         Runnable getMessagesJob = () -> {
 
-            while (isGettingMessages) {
+            try {
+                while (isGettingMessages) {
 
-                try {
                     getMessagesAndAddToQueue();
 
 
                     Thread.sleep(200);
-                } catch (NullPointerException e) {
-
-                    System.out.println("Cannot get messages from server.");
-                    e.printStackTrace();
-                    // if interrupted, make it sleep for 3 seconds
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (InterruptedException e) {
-                    System.out.println("Getting messages has been interrupted");
-                    e.printStackTrace();
                 }
+            } catch (NullPointerException e) {
+                System.out.println("Can't get messages. Server down.");
+
+                this.isServerDown = true;
+
+                // try to reconnect
+                reconnectToServer();
+            } catch (InterruptedException e) {
+                System.out.println("Getting messages has been interrupted");
+                e.printStackTrace();
             }
         };
 
@@ -808,7 +888,14 @@ public class GameClient extends Observable {
                     // sleep thread for 1000
                     Thread.sleep(1000);
                 } catch (NullPointerException e) {
-                    System.out.println("Cannot get game data from server.");
+                    System.out.println("Can't get game data. Server down.");
+
+                    // sleep for 5 seconds
+                    try {
+                        TimeUnit.SECONDS.sleep(6);
+                    } catch (InterruptedException sleepE) {
+                        System.out.println("Sleep interrupted while getting game data.");
+                    }
                 } catch (InterruptedException e) {
                     System.out.println("Game data thread interrupted");
                 }
@@ -874,6 +961,13 @@ public class GameClient extends Observable {
         return playersStand;
     }
 
+    public boolean isServerDown() {
+        return isServerDown;
+    }
+
+    public int getReconnectAttempts() {
+        return reconnectAttempts;
+    }
 }
 
 

@@ -2,6 +2,8 @@ package CardGame.GameEngine;
 
 import CardGame.User;
 
+import java.util.Iterator;
+
 /**
  * Created by tom on 09/03/17.
  */
@@ -10,13 +12,18 @@ public class Player {
     private BlackjackHand playerHand;
     private int budget;
     private int bet;
+    private boolean isBetPlaced;
     private boolean isFinishedRound;
+    private boolean isCardLeft;
+    private boolean isPlayerStand;
 
     public Player(User user) {
         this.username = user.getUserName();
         this.playerHand = new BlackjackHand();
         this.budget = 100;
         this.isFinishedRound = false;
+        this.isBetPlaced = false;
+        this.isCardLeft = false;
     }
 
     public String getUsername() {
@@ -50,7 +57,6 @@ public class Player {
         }
 
         this.bet = bet;
-        setFinishedRound(true);
     }
 
     public void doubleBet() {
@@ -70,6 +76,21 @@ public class Player {
 
     public void addCardToPlayerHand(Card card) {
         this.playerHand.addCard(card);
+        // when add a card to the player
+        setCardLeft(true);
+    }
+
+    /**
+     * This method will remove all cards from the player hand
+     */
+    public synchronized void removeAllCards() {
+
+        Iterator<Card> iterator = playerHand.getHand().iterator();
+
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
+        }
     }
 
     public boolean isBetWithinBudget(int bet) {
@@ -77,6 +98,30 @@ public class Player {
     }
 
     public boolean isBust() {
-        return this.getPlayerHandValue() <= 21 && this.getPlayerHandValue() >= 1;
+        return this.getPlayerHandValue() > 21;
+    }
+
+    public boolean isBetPlaced() {
+        return isBetPlaced;
+    }
+
+    public void setBetPlaced(boolean betPlaced) {
+        isBetPlaced = betPlaced;
+    }
+
+    public boolean isCardLeft() {
+        return isCardLeft;
+    }
+
+    public void setCardLeft(boolean cardLeft) {
+        isCardLeft = cardLeft;
+    }
+
+    public boolean isPlayerStand() {
+        return isPlayerStand;
+    }
+
+    public void setPlayerStand(boolean playerStand) {
+        isPlayerStand = playerStand;
     }
 }
