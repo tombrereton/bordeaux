@@ -30,7 +30,7 @@ public class GameEngineTest {
     @Test
     public void getLobbyNameTest(){
 
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
         assertEquals(user.getUserName(),gameLobby.getLobbyName());
     }
     /**
@@ -38,8 +38,8 @@ public class GameEngineTest {
      */
     @Test
     public void getPlayerTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
-        gameLobby.addPlayer(user,s);
+        GameLobby gameLobby = new GameLobby(user);
+        gameLobby.addPlayer(user);
         assertEquals("TestUser1",gameLobby.getPlayer(user).getUsername());
     }
 
@@ -48,10 +48,10 @@ public class GameEngineTest {
      */
     @Test
     public void getPlayerTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         User user2 = new User("TestUser2");
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
         assertEquals(null,gameLobby.getPlayer(user2));
     }
 
@@ -60,9 +60,9 @@ public class GameEngineTest {
      */
     @Test
     public void addPlayerTest(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
         assertEquals(user.getUserName(),gameLobby.getPlayer(user).getUsername());
     }
 
@@ -71,10 +71,10 @@ public class GameEngineTest {
      */
     @Test
     public void removePlayerTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         User user2 = new User("TestUser2");
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user2);
         assertEquals(true,gameLobby.removePlayer(user2));
     }
 
@@ -83,7 +83,7 @@ public class GameEngineTest {
      */
     @Test
     public void removePlayerTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         User user2 = new User("TestUser2");
         assertEquals(false,gameLobby.removePlayer(user2));
@@ -94,12 +94,12 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayerFinishedTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
         gameLobby.getPlayer(user2.getUserName()).setFinishedRound(true);
@@ -114,14 +114,14 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayerFinishedTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer(user.getUserName()).setFinishedRound(true);
         gameLobby.getPlayer(user2.getUserName()).setFinishedRound(false);
@@ -136,7 +136,7 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayerFinishedTest3(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         assertEquals(false,gameLobby.isAllPlayersFinished());
     }
@@ -148,12 +148,12 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayersBetPlacedTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer(user.getUserName()).setBetPlaced(true);
         gameLobby.getPlayer(user2.getUserName()).setBetPlaced(true);
@@ -167,14 +167,14 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayersBetPlacedTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer(user.getUserName()).setBetPlaced(true);
         gameLobby.getPlayer(user2.getUserName()).setBetPlaced(false);
@@ -188,7 +188,7 @@ public class GameEngineTest {
      */
     @Test
     public void allPlayersBetPlacedTest3(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         assertEquals(false,gameLobby.isAllPlayersBetPlaced());
     }
@@ -200,14 +200,14 @@ public class GameEngineTest {
      */
     @Test
     public void takeBetsTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer("TestUser1").setBet(10);
         gameLobby.getPlayer("TestUser2").setBet(20);
@@ -220,14 +220,14 @@ public class GameEngineTest {
      */
     @Test
     public void takeBetsTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
-        gameLobby.addPlayer(user2,s);
+        gameLobby.addPlayer(user);
+        gameLobby.addPlayer(user2);
 
         gameLobby.getPlayer("TestUser1").setBet(10);
         assertEquals(10,gameLobby.getPlayer("TestUser1").getBet());
@@ -240,13 +240,13 @@ public class GameEngineTest {
      */
     @Test
     public void takeBetsTest3(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
 
         assertEquals(0,gameLobby.getPlayer("TestUser1").getBet());
 
@@ -259,13 +259,13 @@ public class GameEngineTest {
      */
     @Test
     public void takeDoubleBetsTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         User user2 = new User("TestUser2");
         Player player2 = new Player(user2);
 
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
 
         gameLobby.getPlayer("TestUser1").setBet(10);
         gameLobby.getPlayer("TestUser1").doubleBet();
@@ -278,11 +278,11 @@ public class GameEngineTest {
      */
     @Test
     public void takeDoubleBetsTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
 
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
 
         gameLobby.getPlayer("TestUser1").doubleBet();
 
@@ -297,7 +297,7 @@ public class GameEngineTest {
      */
     @Test
     public void dealtoDealerTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         gameLobby.startGame();
 
@@ -311,7 +311,7 @@ public class GameEngineTest {
      */
     @Test
     public void playerTest(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
         Deck deck = new Deck();
@@ -329,10 +329,10 @@ public class GameEngineTest {
      */
     @Test
     public void playerBudgetTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
 
         Player player1 = new Player(user);
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
         gameLobby.getPlayers().get(0).setBudget(200);
 
         assertEquals(200,gameLobby.getPlayers().get(0).getBudget());
@@ -343,9 +343,9 @@ public class GameEngineTest {
      */
     @Test
     public void playerBudgetTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
         Player player1 = new Player(user);
-        gameLobby.addPlayer(user,s);
+        gameLobby.addPlayer(user);
 
         assertEquals(100,gameLobby.getPlayers().get(0).getBudget());
     }
@@ -355,7 +355,7 @@ public class GameEngineTest {
      */
     @Test
     public void playerBustTest1(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
         Player player1 = new Player(user);
 
         Deck deck = new Deck();
@@ -379,7 +379,7 @@ public class GameEngineTest {
      */
     @Test
     public void playerBustTest2(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
         Player player1 = new Player(user);
 
         Deck deck = new Deck();
@@ -403,7 +403,7 @@ public class GameEngineTest {
      */
     @Test
     public void playerBustTest3(){
-        GameLobby gameLobby = new GameLobby(user,s);
+        GameLobby gameLobby = new GameLobby(user);
         Player player1 = new Player(user);
 
         assertEquals(false,gameLobby.getPlayers().get(0).isBust());
