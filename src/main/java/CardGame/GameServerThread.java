@@ -207,6 +207,7 @@ public class GameServerThread implements Runnable {
     }
 
     private ResponseProtocol handleGetDealerhand(int protocolId) {
+        // TODO: i think a multiplayer error is here
         Hand dealerHand = this.getGame(gameJoined).getDealerHand();
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);
