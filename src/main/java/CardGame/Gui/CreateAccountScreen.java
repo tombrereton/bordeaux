@@ -10,18 +10,25 @@ import java.awt.event.ActionListener;
 
 import static CardGame.Gui.Screens.LOGINSCREEN;
 
+/**
+ * Class for the create account screen
+ * @author Alex
+ */
+
 public class CreateAccountScreen extends JPanel {
 
+    //Client and main GUI class
     private GameClient client;
     private BlackjackOnline blackjackOnline;
 
+    //JTextFields
     private JTextField firstnameField;
     private JTextField lastnameField;
     private JTextField usernameField;
     private JTextField passwordField;
     private JTextField emailField;
 
-
+    //JButtons and JLabels
     private JButton btnSignUp = new JButton("Sign Up");
     private JButton btnBack = new JButton("Back");
     private JLabel lblEmail = new JLabel("email:");
@@ -32,7 +39,7 @@ public class CreateAccountScreen extends JPanel {
     private JLabel lblCreateNewAccount = new JLabel("Create new account");
 
     /**
-     * Create the application.
+     * Instantiates the client and GUI, sets the background and initialises the components
      */
     public CreateAccountScreen(GameClient client, BlackjackOnline blackjackOnline) {
         this.client = client;
@@ -41,12 +48,12 @@ public class CreateAccountScreen extends JPanel {
         initialize();
     }
 
-
     /**
-     * Initialize the contents of the frame.
+     * Initialise the components of the panel for labels, text fields and buttons.
      */
     private void initialize() {
 
+        //INITIALISE LABELS
         lblCreateNewAccount.setHorizontalAlignment(SwingConstants.CENTER);
         lblCreateNewAccount.setFont(new Font("Soho Std", Font.PLAIN, 20));
         lblCreateNewAccount.setForeground(new Color(255, 255, 255));
@@ -77,6 +84,7 @@ public class CreateAccountScreen extends JPanel {
         lblEmail.setForeground(new Color(255, 255, 255));
         add(lblEmail);
 
+        //INITIALISE FIELDS
         firstnameField = new JTextField();
         add(firstnameField);
         firstnameField.setColumns(10);
@@ -97,9 +105,9 @@ public class CreateAccountScreen extends JPanel {
         emailField.setColumns(10);
         add(emailField);
 
-        /**
-         * back button events
-         */
+        //INITIALISE BUTTONS
+
+        //BACK BUTTON
         btnBack.setBackground(new Color(255, 255, 255));
         btnBack.setFont(new Font("Soho Std", Font.PLAIN, 16));
         btnBack.addActionListener(new ActionListener() {
@@ -109,14 +117,11 @@ public class CreateAccountScreen extends JPanel {
         });
         add(btnBack);
 
-        /**
-         * sign up button events
-         */
+        //SIGN UP BUTTON
         btnSignUp.setBackground(new Color(255, 255, 255));
         btnSignUp.setFont(new Font("Soho Std", Font.PLAIN, 16));
         btnSignUp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 // get user details
                 String username = usernameField.getText();
                 String password = passwordField.getText();
@@ -131,29 +136,38 @@ public class CreateAccountScreen extends JPanel {
                 String errorMsg = responseRegisterUser.getErrorMsg();
                 JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                         JOptionPane.WARNING_MESSAGE);
-
-
             }
         });
         add(btnSignUp);
     }
 
+    /**
+     * Update Bounds method
+     * All component positions except the back button are updated to be positioned relative to the screen center.
+     * The back button is fixed to the bottom left side of the panel
+     */
 	public void updateBounds(){
-		btnSignUp.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+392, 146, 23);
+	    //UPDATE LABELS
+        lblEmail.setBounds(blackjackOnline.getxScreenDiff()+391, blackjackOnline.getyScreenDiff()+338, 83, 14);
+        lblPassword.setBounds(blackjackOnline.getxScreenDiff()+391, blackjackOnline.getyScreenDiff()+308, 83, 14);
+        lblUsername.setBounds(blackjackOnline.getxScreenDiff()+391, blackjackOnline.getyScreenDiff()+278, 83, 14);
+        lblLastName.setBounds(blackjackOnline.getxScreenDiff()+391, blackjackOnline.getyScreenDiff()+248, 83, 14);
+        lblFirstName.setBounds(blackjackOnline.getxScreenDiff()+374, blackjackOnline.getyScreenDiff()+218, 100, 14);
+        lblCreateNewAccount.setBounds(blackjackOnline.getxScreenDiff()+408, blackjackOnline.getyScreenDiff()+121, 207, 23);
+
+        //UPDATE FIELDS
+        emailField.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+338, 146, 20);
+        passwordField.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+308, 146, 20);
+        usernameField.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+278, 146, 20);
+        lastnameField.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+248, 146, 20);
+        firstnameField.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+218, 146, 20);
+
+        //UPDATE BUTTONS
+		btnSignUp.setBounds(blackjackOnline.getxScreenDiff()+501, blackjackOnline.getyScreenDiff()+392, 146, 23);
 		btnBack.setBounds(10, blackjackOnline.getScreenHeightCurrent()-80, 100, 30);
-		emailField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+338, 146, 20);
-		passwordField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+308, 146, 20);
-		usernameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+278, 146, 20);
-		lastnameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+248, 146, 20);
-		firstnameField.setBounds(blackjackOnline.getxOrigin()+501, blackjackOnline.getyOrigin()+218, 146, 20);
-		lblEmail.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+338, 83, 14);
-		lblPassword.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+308, 83, 14);
-		lblUsername.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+278, 83, 14);
-		lblLastName.setBounds(blackjackOnline.getxOrigin()+391, blackjackOnline.getyOrigin()+248, 83, 14);
-		lblFirstName.setBounds(blackjackOnline.getxOrigin()+374, blackjackOnline.getyOrigin()+218, 100, 14);
-		lblCreateNewAccount.setBounds(blackjackOnline.getxOrigin()+408, blackjackOnline.getyOrigin()+121, 207, 23);
 	}
 
+	//GETTERS AND SETTERS
     public GameClient getClientModel() {
         return client;
     }

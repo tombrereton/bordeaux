@@ -500,12 +500,12 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        scrollPane.setBounds(blackjackOnline.getxOrigin() + 850, 50, blackjackOnline.getxOrigin() + 150, blackjackOnline.getScreenHeightCurrent() - 230);
-        textArea.setBounds(blackjackOnline.getxOrigin() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxOrigin() + 150, 60);
-        lblChat.setBounds(blackjackOnline.getxOrigin() + 850, 10, 205, 35);
-        lblSideHud.setBounds(blackjackOnline.getxOrigin() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
-        lblSideFillHud.setBounds(blackjackOnline.getxOrigin() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyOrigin() + 800);
-        btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxOrigin() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
+        scrollPane.setBounds(blackjackOnline.getxScreenDiff() + 850, 50, blackjackOnline.getxScreenDiff() + 150, blackjackOnline.getScreenHeightCurrent() - 230);
+        textArea.setBounds(blackjackOnline.getxScreenDiff() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxScreenDiff() + 150, 60);
+        lblChat.setBounds(blackjackOnline.getxScreenDiff() + 850, 10, 205, 35);
+        lblSideHud.setBounds(blackjackOnline.getxScreenDiff() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
+        lblSideFillHud.setBounds(blackjackOnline.getxScreenDiff() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyScreenDiff() + 800);
+        btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxScreenDiff() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
         btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 120, 10, 100, 30);
         btnStand.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
         btnHit.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
@@ -519,13 +519,13 @@ public class GameScreen extends JPanel implements Observer {
         lblCreditsBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
         lblSubmitBetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 126, 144, 45);
         lblBackHud.setBounds(-20, blackjackOnline.getScreenHeightCurrent() - 176, 2590, 204);
-        lblDeck.setBounds(blackjackOnline.getxOrigin() + 650, 20, 64, 93);
+        lblDeck.setBounds(blackjackOnline.getxScreenDiff() + 650, 20, 64, 93);
 
-        dealerGui.setBounds((int) (blackjackOnline.getxOrigin() * 0.5) + 320, 20, 200, 200);
+        dealerGui.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.5) + 320, 20, 200, 200);
         playerGui1.setBounds(20, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
-        playerGui2.setBounds((int) (blackjackOnline.getxOrigin() * 0.3) + 220, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
-        playerGui3.setBounds((int) (blackjackOnline.getxOrigin() * 0.7) + 420, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
-        playerGui4.setBounds(blackjackOnline.getxOrigin() + 620, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
+        playerGui2.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.3) + 220, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui3.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.7) + 420, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui4.setBounds(blackjackOnline.getxScreenDiff() + 620, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
     }
 
     public int getAmountToBet() {

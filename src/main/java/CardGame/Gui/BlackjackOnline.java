@@ -14,17 +14,14 @@ import static CardGame.Gui.Screens.*;
 
 /**
  * Class that creates and controls the frame and the panels to be displayed
- *
  * @author Alex
  */
 public class BlackjackOnline extends JFrame implements Observer, ComponentListener {
 
-//	private ImageIcon icon;
-//	private JLabel label;
-
     /**
-     * sets up the screen guis
-     * screen ratio 16:9
+     * Sets up the frame and panel on the GUI
+     * Variables for the different GUI screens are created
+     * Client variable is created
      */
     public static JPanel centerPane;
     public static BlackjackOnline frame = null;
@@ -37,18 +34,23 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
 
 
     /**
-     * screen size variables
-     * smallest screen resolution
+     * Sets the minimum screen resolution allowed for the frame
+     * Creates variables for the frame width and height
+     * Creates variables for the xScreenDiff and yScreenDiff that are used to
+     * offset components for changes in frame size between the minimum frame and new size
      */
     public static final int screenWidthMin = 1024;
     public static final int screenHeightMin = 576;
     private int screenWidthCurrent;
     private int screenHeightCurrent;
-    private int xOrigin;
-    private int yOrigin;
+    private int xScreenDiff;
+    private int yScreenDiff;
 
     /**
-     * Constructor for the frame
+     * Constructor
+     * Initialises client, adds the observer pattern
+     * Instantiates the login and create account screens
+     * Sets the current width and height and sets the x and y screen differences
      */
     public BlackjackOnline(GameClient client) {
         // add to observer list for notify all
@@ -61,8 +63,8 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
 
         screenWidthCurrent = screenWidthMin;
         screenHeightCurrent = screenHeightMin;
-        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
-        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
+        xScreenDiff = ((screenWidthCurrent - screenWidthMin) / 2);
+        yScreenDiff = ((screenHeightCurrent - screenHeightMin) / 2);
 
         // this screen should be created at run time so it can access the
         // logged in user after the user has logged in
@@ -72,8 +74,12 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
         initialiseLoginScreen();
     }
 
+    /**
+     * Sets the variables for the frame, resizability, minimum size, position,
+     * and adds the component listener. This method is run as part of the constructor
+     */
     private void frameSetup() {
-        setTitle("CardGame");
+        setTitle("BlackJack Online");
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(0, 0, screenWidthCurrent, screenHeightCurrent);
@@ -81,10 +87,12 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
         setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         addComponentListener(this);
-
     }
 
-
+    /**
+     * Sets the panel of the frame to login screen
+     * run in the constructor to make the login screen appear initially
+     */
     private void initialiseLoginScreen() {
         centerPane = loginScreen;
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
@@ -93,12 +101,12 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
         add(centerPane);
     }
 
-    public int getxOrigin() {
-        return xOrigin;
+    public int getxScreenDiff() {
+        return xScreenDiff;
     }
 
-    public int getyOrigin() {
-        return yOrigin;
+    public int getyScreenDiff() {
+        return yScreenDiff;
     }
 
     public int getScreenWidthCurrent() {
@@ -110,8 +118,8 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
     }
 
     /**
-     * method for changing between panels
-     *
+     * Method for changing between panels
+     * current panel is removed, new panel is added with updated frame variables
      * @param panelAdd Panel to add
      */
     public void setPane(JPanel panelAdd) {
@@ -125,19 +133,22 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
             frame.add(centerPane);
             frame.repaint();
             frame.revalidate();
-
-//            if (panelAdd == this.lobbyScreen) {
-//                this.lobbyScreen.getGameNameListModel().clear();
-//            }
         }
     }
 
+    /**
+     * Method to listen out for frame resizing. When the frame is resized this method is called.
+     * The current width, height x and y screen differences are all updated.
+     * The panel is reset to fit the new size of the frame and the positions of the components
+     * for that panel are updated using the updatePanelBounds method.
+     * @param e The component event
+     */
     @Override
     public void componentResized(ComponentEvent e) {
         screenWidthCurrent = frame.getWidth();
         screenHeightCurrent = frame.getHeight();
-        xOrigin = ((screenWidthCurrent - screenWidthMin) / 2);
-        yOrigin = ((screenHeightCurrent - screenHeightMin) / 2);
+        xScreenDiff = ((screenWidthCurrent - screenWidthMin) / 2);
+        yScreenDiff = ((screenHeightCurrent - screenHeightMin) / 2);
         centerPane.setPreferredSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setMinimumSize(new Dimension(screenWidthCurrent, screenHeightCurrent));
         centerPane.setLayout(null);
@@ -147,17 +158,18 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
     }
 
     @Override
-    public void componentMoved(ComponentEvent e) {
-    }
+    public void componentMoved(ComponentEvent e) {}
 
     @Override
-    public void componentShown(ComponentEvent e) {
-    }
+    public void componentShown(ComponentEvent e) {}
 
     @Override
-    public void componentHidden(ComponentEvent e) {
-    }
+    public void componentHidden(ComponentEvent e) {}
 
+    /**
+     * Method which calls the updateBounds method for a specific screen class
+     * dependent on which screen is currently being displayed
+     */
     public void updatePanelBounds() {
         int currentScreen = client.getCurrentScreen();
         switch (currentScreen) {
@@ -182,10 +194,9 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
 
     /**
      * This update method will change the current jpanel
-     * and repaint it as per ClientModel.currentScreen.
-     *
-     * @param observable
-     * @param o
+     * and repaint it as per ClientModel.currentScreen
+     * @param observable The observable
+     * @param o The object to observe
      */
     @Override
     public void update(Observable observable, Object o) {
@@ -224,7 +235,6 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
 
     /**
      * main method with which to run the gui
-     *
      * @param args
      */
     public static void main(String[] args) {
@@ -251,14 +261,11 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
                     "\nOr \'[port] [host] [max number of clients]\'" +
                     "\nOr default is \'[7654] [0.0.0.0] [20]\'");
         }
-
         System.out.println("Host: " + host + ", Port: " + port);
-
 
         // set host and port to final
         String finalHost = host;
         int finalPort = port;
-
 
         // start gui thread
         EventQueue.invokeLater(() -> {

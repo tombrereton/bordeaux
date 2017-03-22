@@ -162,11 +162,11 @@ public class LobbyScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        lblLobby.setBounds(blackjackOnline.getxOrigin() + 391, 10, 242, 34);
+        lblLobby.setBounds(blackjackOnline.getxScreenDiff() + 391, 10, 242, 34);
         btnBack.setBounds(50, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
         gameJList.setBounds(50, 50, blackjackOnline.getScreenWidthCurrent() - 120, blackjackOnline.getScreenHeightCurrent() - 160);
         btnJoinGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 370, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
-        btnCreateGame.setBounds(blackjackOnline.getxOrigin() + 352, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
+        btnCreateGame.setBounds(blackjackOnline.getxScreenDiff() + 352, blackjackOnline.getScreenHeightCurrent() - 100, 300, 50);
     }
 
     public GameClient getClientModel() {
