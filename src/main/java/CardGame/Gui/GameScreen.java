@@ -673,11 +673,13 @@ public class GameScreen extends JPanel implements Observer {
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
 
+                    // set each player's card
+                    updatePlayerHand(model, playerName, i);
+
                     //set each player's avatar
                     getplayerGui(i).setLblAvatar(playerAvatar);
 
-                    // set each player's card
-                    updatePlayerHand(model, playerName, i);
+
                 }
             }
         }
@@ -698,6 +700,8 @@ public class GameScreen extends JPanel implements Observer {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                repaint();
+                revalidate();
             }
         }
     }
