@@ -41,30 +41,29 @@ public class GameServerThread implements Runnable {
     private DataOutputStream outputStream;
     private FunctionDB functionDB;
     private Gson gson;
-    private GameServer server;
     private String gameJoined;
 
-    // Shared data structures
-    private volatile ConcurrentLinkedDeque<MessageObject> messageQueue;
-    private volatile ConcurrentLinkedDeque<Socket> socketList;
     private volatile CopyOnWriteArrayList<User> users;
     private volatile CopyOnWriteArrayList<GameLobby> games;
     private volatile ConcurrentLinkedDeque<String> gameNames;
 
 
-    public GameServerThread(GameServer server,
-                            Socket toClientSocket,
-                            ConcurrentLinkedDeque<MessageObject> messageQueue,
-                            ConcurrentLinkedDeque<Socket> socketList,
+    /**
+     * The constructor for the server thread.
+     *
+     * @param toClientSocket socket for the connected client.
+     * @param users          The list of users joined.
+     * @param functionsDB    The class which gives the thread access the database.
+     * @param games          The list of games
+     * @param gameNames      The list of game names.
+     */
+    public GameServerThread(Socket toClientSocket,
                             CopyOnWriteArrayList<User> users,
                             FunctionDB functionsDB,
                             CopyOnWriteArrayList<GameLobby> games,
                             ConcurrentLinkedDeque<String> gameNames) {
-        this.server = server;
         this.toClientSocket = toClientSocket;
         this.clientID = Thread.currentThread().getId();
-        this.messageQueue = messageQueue;
-        this.socketList = socketList;
         this.users = users;
         this.functionDB = functionsDB;
         this.games = games;
@@ -341,24 +340,29 @@ public class GameServerThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if logged in user is null
             return new ResponseStand(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (userFromRequest == null) {
             // return fail if request user is null
             return new ResponseStand(protocolId, FAIL, EMPTY);
+
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseStand(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseStand(protocolId, FAIL, NO_BET);
+
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if player is already standing
             return new ResponseStand(protocolId, FAIL, ALREADY_STANDING);
+
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if the player is not standing, make player stand
             getGame(gameJoined).setPlayerStand(getLoggedInUser().getUserName());
-
             // return success if player is now standing
             return new ResponseStand(protocolId, SUCCESS);
+
         } else {
             // return fail for unknown error
             return new ResponseStand(protocolId, FAIL, UNKNOWN_ERROR);
@@ -380,30 +384,37 @@ public class GameServerThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if logged in user is null
             return new ResponseHit(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (userFromRequest == null) {
             // return fail if request user is null
             return new ResponseHit(protocolId, FAIL, EMPTY);
+
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseHit(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isFinishedRound()) {
             // return fail if user has finished round
             return new ResponseHit(protocolId, FAIL, FINISHED_ROUND);
+
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()) {
             // return fail if user is bust
             return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
+
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
+
         } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if all players standing
             return new ResponseHit(protocolId, FAIL, ALREADY_STANDING);
+
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-
             // return success
             return new ResponseHit(protocolId, SUCCESS);
+
         } else {
             // return fail for unknown error
             return new ResponseHit(protocolId, FAIL, UNKNOWN_ERROR);
@@ -426,26 +437,33 @@ public class GameServerThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if logged in user is null
             return new ResponseBet(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (userFromRequest == null) {
             // return fail if request user is null
             return new ResponseBet(protocolId, FAIL, EMPTY);
+
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseBet(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (betAmount < 5) {
             // return fail if bet is less than 5 pounds
             return new ResponseBet(protocolId, FAIL, BET_TOO_SMALL);
+
         } else if (!isBetWithinBudget(betAmount)) {
             // return fail if bet amount is not within budget
             return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
+
         } else if (isBetPlaced()) {
             // return fail
             return new ResponseBet(protocolId, FAIL, PLAYER_BET_PLACED);
+
         } else if (isBetWithinBudget(betAmount)) {
             // make bet and push it to all players
             makeBet(betAmount);
             // return success if bet within budget
             return new ResponseBet(protocolId, SUCCESS);
+
         } else {
             // return fail for unknown error
             return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
@@ -539,17 +557,21 @@ public class GameServerThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if logged in user is null
             return new ResponseLogOut(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (userFromRequest == null) {
             // return fail if request user is null
             return new ResponseLogOut(protocolId, FAIL, EMPTY);
+
         } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
             // return fail if request user does not match logged in user
             return new ResponseLogOut(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (getLoggedInUser().getUserName().equals(userFromRequest)) {
             // log user out
             logUserOut();
             // return success if request user matches logged in user
             return new ResponseLogOut(protocolId, SUCCESS);
+
         } else {
             // return fail for unknown error
             return new ResponseLogOut(protocolId, FAIL, UNKNOWN_ERROR);
@@ -587,15 +609,19 @@ public class GameServerThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseQuitGame(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseQuitGame(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAMES);
+
         } else if (getGame(gameToQuit) == null) {
             // return fail if game to quit does not exist
             return new ResponseQuitGame(protocolId, FAIL, NO_GAME);
+
         } else {
             quitGame(gameToQuit, requestUsername);
             return new ResponseQuitGame(protocolId, SUCCESS);
@@ -626,6 +652,11 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method removes games from the list, 'games'.
+     *
+     * @param gameToRemove The name of the game to remove.
+     */
     public void removeGame(String gameToRemove) {
         int gameIndex = 0;
         for (GameLobby game : games) {
@@ -654,18 +685,23 @@ public class GameServerThread implements Runnable {
         if (this.getLoggedInUser() == null) {
             // return fail if no one logged in
             return new ResponseJoinGame(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (!getLoggedInUser().getUserName().equals(requestUsername)) {
             // return fail if log in user does not match request user
             return new ResponseJoinGame(protocolId, FAIL, USERNAME_MISMATCH);
+
         } else if (this.getGames().size() == 0) {
             // return fail if no games exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAMES);
+
         } else if (getGame(gameToJoin) == null) {
             // return fail if game to join does not exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAME);
+
         } else if (getGame(gameToJoin).getPlayers().size() >= 4) {
             // return fail if game full (more than 4 players)
             return new ResponseJoinGame(protocolId, FAIL, GAME_FULL);
+
         } else {
             this.gameJoined = gameToJoin;
             joinGame(gameToJoin);
@@ -687,30 +723,34 @@ public class GameServerThread implements Runnable {
         if (isLoggedInUserNull()) {
             // return fail if not logged in
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
+
         } else if (requestUsername == null) {
             // return fail if request user is null
             return new ResponseCreateGame(protocolId, FAIL, null, EMPTY);
+
         } else if (!requestUsername.equals(getLoggedInUser().getUserName())) {
             // return fail if request user does not match logged in user
             return new ResponseCreateGame(protocolId, FAIL, null, NOT_LOGGED_IN);
+
         } else if (getGame(requestUsername) != null) {
             // return fail if game with request game name already exists
             return new ResponseCreateGame(protocolId, FAIL,
                     getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
+
         } else if (gameJoined != null) {
             // return fail if already in a game
             return new ResponseCreateGame(protocolId, FAIL,
                     getGame(requestUsername).getLobbyName(), GAME_ALREADY_EXISTS);
+
         } else if (getGame(requestUsername) == null) {
             // create game if game does not exist
             GameLobby newGame = createGame();
             String gameName = newGame.getLobbyName();
-
             // set game joined to logged in user name
             this.gameJoined = getLoggedInUser().getUserName();
-
             // return success
             return new ResponseCreateGame(protocolId, SUCCESS, gameName);
+
         } else {
             // return fail for unknown error
             return new ResponseCreateGame(protocolId, FAIL, null);
@@ -756,21 +796,23 @@ public class GameServerThread implements Runnable {
         if (getLoggedInUser() == null) {
             // return fail if user not logged in
             return new ResponseGetMessages(protocolId, FAIL, null, NOT_LOGGED_IN);
+
         } else if (gameJoined == null) {
             // return fail if user has not joined a game
             return new ResponseGetMessages(protocolId, FAIL, null, NO_GAME_JOINED);
+
         } else if (offset < -1) {
             // return fail for wrong index
             return new ResponseGetMessages(protocolId, FAIL, null, WRONG_OFFSET);
+
         } else if (offset >= -1) {
             // get messages from queue as per the offset
             ArrayList<MessageObject> messagesToClient = getMessages(requestGetMessages);
-
             // get offset
             int offsetFromQueue = getGame(gameJoined).getMessageQueue().size();
-
             // return success if offset greater than -2
             return new ResponseGetMessages(protocolId, SUCCESS, messagesToClient, offsetFromQueue);
+
         } else {
             // return fail for unknown error
             return new ResponseGetMessages(protocolId, FAIL, null, UNKNOWN_ERROR);
@@ -816,17 +858,21 @@ public class GameServerThread implements Runnable {
         if (getLoggedInUser() == null) {
             // return fail if user not logged in
             return new ResponseSendMessage(protocolId, FAIL, NOT_LOGGED_IN);
+
         } else if (gameJoined == null) {
             // return fail if user has not joined a game
             return new ResponseSendMessage(protocolId, FAIL, NO_GAME_JOINED);
+
         } else if (messageFromRequest.isEmpty()) {
             // return fail for empty message
             return new ResponseSendMessage(protocolId, FAIL, EMPTY_MSG);
+
         } else if (!messageFromRequest.isEmpty()) {
             // add message from request to message queue
             addToMessageQueue(messageFromRequest);
             // return success if message is not empty
             return new ResponseSendMessage(protocolId, SUCCESS);
+
         } else {
             // return fail for unknown error
             return new ResponseSendMessage(protocolId, FAIL, UNKNOWN_ERROR);

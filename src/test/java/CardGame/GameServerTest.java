@@ -62,16 +62,16 @@ public class GameServerTest {
         server = new GameServer(7654, "localhost", 20);
 
         // threads
-        serverThread1 = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        serverThread2 = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        serverThread3 = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        serverThread4 = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
-        serverThread5 = new GameServerThread(server, new Socket(), new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(), users, functionDB, games, gameNames);
+        serverThread1 = new GameServerThread(new Socket(),
+                users, functionDB, games, gameNames);
+        serverThread2 = new GameServerThread(new Socket(),
+                users, functionDB, games, gameNames);
+        serverThread3 = new GameServerThread(new Socket(),
+                users, functionDB, games, gameNames);
+        serverThread4 = new GameServerThread(new Socket(),
+                users, functionDB, games, gameNames);
+        serverThread5 = new GameServerThread(new Socket(),
+                users, functionDB, games, gameNames);
 
     }
 
@@ -456,10 +456,7 @@ public class GameServerTest {
         int expected = 0;
 
         GameServerThread cardGameServerThreadEmpty = new GameServerThread(
-                new GameServer(7654, "localhost", 20),
                 new Socket(),
-                new ConcurrentLinkedDeque<MessageObject>(),
-                new ConcurrentLinkedDeque<Socket>(),
                 new CopyOnWriteArrayList<User>(),
                 new FunctionDB(),
                 new CopyOnWriteArrayList<GameLobby>(),
@@ -866,7 +863,6 @@ public class GameServerTest {
     }
 
 
-
     /**
      * We test a hit request while not in a game
      */
@@ -1004,33 +1000,6 @@ public class GameServerTest {
     }
 
     /**
-     * We test a double bet request for the blackjack game
-     */
-    @Test
-    public void double01_test() {
-        // LOG IN
-        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest1);
-        ResponseProtocol responseProtocol = this.serverThread1.handleInput(encodeRequest(requestLoginUser));
-
-        // CREATE GAME
-        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest1.getUserName());
-        ResponseProtocol responseProtocol1 = this.serverThread1.handleInput(encodeRequest(requestCreateGame));
-
-        // BET
-        RequestBet requestBet = new RequestBet(10, userTest1.getUserName());
-        ResponseProtocol responseBet = this.serverThread1.handleInput(encodeRequest(requestBet));
-
-        // DOUBLE BET
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(userTest1.getUserName());
-        ResponseProtocol responseProtocol2 = this.serverThread1.handleInput(encodeRequest(requestDoubleBet));
-
-        // we check the double bet was successful
-        int successDouble = responseProtocol2.getRequestSuccess();
-        assertEquals("Should return successful double response matching success ", SUCCESS, successDouble);
-
-    }
-
-    /**
      * We test a stand request for the blackjack game
      */
     @Test
@@ -1099,33 +1068,6 @@ public class GameServerTest {
         assertEquals("Should return successful logOut response matching success ", SUCCESS, successLogout);
     }
 
-
-    /**
-     * We test a fold game request for a user in a blackjack game.
-     */
-    @Test
-    public void fold01_test() {
-        // LOG IN
-        RequestLoginUser requestLoginUser = new RequestLoginUser(userTest1);
-        ResponseProtocol responseProtocol = this.serverThread1.handleInput(encodeRequest(requestLoginUser));
-
-        // CREATE GAME
-        RequestCreateGame requestCreateGame = new RequestCreateGame(userTest1.getUserName());
-        ResponseProtocol responseProtocol1 = this.serverThread1.handleInput(encodeRequest(requestCreateGame));
-
-        // BET
-        RequestBet requestBet = new RequestBet(10, userTest1.getUserName());
-        ResponseProtocol responseBet = this.serverThread1.handleInput(encodeRequest(requestBet));
-
-        // FOLD
-        RequestFold requestFold = new RequestFold(userTest1.getUserName());
-        ResponseProtocol responseProtocol2 = this.serverThread1.handleInput(encodeRequest(requestFold));
-
-        // we check the user quit the game successfully
-        int successFold = responseProtocol2.getRequestSuccess();
-
-        assertEquals("Should return successful quitGame response matching success ", SUCCESS, successFold);
-    }
 
     /**
      * We test getting a message while in a game.

@@ -87,8 +87,8 @@ public class GameServer {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new GameServerThread(this, socket, this.messageQueue,
-                        this.socketList, this.users, this.functionDB, this.games, this.gameNames));
+                threadPool.execute(new GameServerThread(socket,
+                        this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
             System.out.println("Cannot open server socket, host likely already in use.");
