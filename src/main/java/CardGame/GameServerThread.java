@@ -114,6 +114,9 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method connects the input and output data stream to the client socket.
+     */
     private void connectStreams() {
         try {
             this.inputStream = new DataInputStream(this.toClientSocket.getInputStream());
@@ -145,8 +148,8 @@ public class GameServerThread implements Runnable {
      * This method handles the input from the client and
      * returns a response as per the request sent.
      *
-     * @param JSONInput
-     * @return
+     * @param JSONInput The strings of text read in from the client socket.
+     * @return ResponseProtocol which is sent to the client through the socket.
      */
     public ResponseProtocol handleInput(String JSONInput) {
 
@@ -180,10 +183,6 @@ public class GameServerThread implements Runnable {
                 return handleHit(JSONInput, protocolId);
             case STAND:
                 return handleStand(JSONInput, protocolId);
-            case FOLD:
-                return handleFold(JSONInput, protocolId);
-            case DOUBLE:
-                return handleDouble(JSONInput, protocolId);
             case PUSH_GAME_NAMES:
                 return handleGetGameNames(protocolId);
             case PUSH_PLAYER_NAMES:
@@ -209,121 +208,131 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method handles requests for the AllPlayersFinished variable.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetAllPlayersFinished(int protocolId) {
         boolean allPlayersFinished = this.getGame(gameJoined).isAllPlayersFinished();
 
         return new PushAreAllPlayersFinished(protocolId, SUCCESS, allPlayersFinished);
     }
 
+    /**
+     * This method handles request for the dealer hand.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetDealerhand(int protocolId) {
         Hand dealerHand = this.getGame(gameJoined).getDealerHand();
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);
     }
 
+    /**
+     * This method handles requests for which players are bust.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayersBust(int protocolId) {
         Map<String, Boolean> playersBust = this.getGame(gameJoined).getPlayersBust();
 
         return new PushPlayersBust(protocolId, SUCCESS, playersBust);
     }
 
+    /**
+     * This method handles request for which players have won.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayersWon(int protocolId) {
         Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
 
         return new PushPlayersWon(protocolId, SUCCESS, playersWon);
     }
 
+    /**
+     * This method handles requests for which players are standing.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayersStand(int protocolId) {
         Map<String, Boolean> playersStand = this.getGame(gameJoined).getPlayersStand();
 
         return new PushPlayersStand(protocolId, SUCCESS, playersStand);
     }
 
+    /**
+     * This method handles requests for the player budgets.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayerBudgets(int protocolId) {
         Map<String, Integer> playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
 
         return new PushPlayerBudgets(protocolId, SUCCESS, playerBudgets);
     }
 
+    /**
+     * This method handles requests for the player bets.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayerBets(int protocolId) {
         Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
 
         return new PushPlayerBets(protocolId, SUCCESS, playerBets);
     }
 
+    /**
+     * This method handles requests for the player hands (cards).
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayerHands(int protocolId) {
         Map<String, Hand> playerHands = this.getGame(gameJoined).getPlayerHands();
 
         return new PushPlayerHands(protocolId, SUCCESS, playerHands);
     }
 
+    /**
+     * This method handles requests for the list of names of games created.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetGameNames(int protocolId) {
         return new PushGameNames(protocolId, SUCCESS, getGameNames());
     }
 
+    /**
+     * This method handles requests for the player names in a game.
+     *
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleGetPlayerNames(int protocolId) {
         Set<String> playerNames = new TreeSet<>(this.getGame(gameJoined).getPlayerNames());
 
         return new PushPlayerNames(protocolId, SUCCESS, playerNames);
     }
 
-    private ResponseProtocol handleDouble(String jsonInput, int protocolId) {
-        RequestDoubleBet requestDoubleBet = gson.fromJson(jsonInput, RequestDoubleBet.class);
-        String userFromRequest = requestDoubleBet.getUsername();
-        int betAmountToAdd = getGame(gameJoined).getPlayer(getLoggedInUser()).getBet();
-
-        if (isLoggedInUserNull()) {
-            // return fail if logged in user is null
-            return new ResponseDoubleBet(protocolId, FAIL, NOT_LOGGED_IN);
-        } else if (userFromRequest == null) {
-            // return fail if request user is null
-            return new ResponseDoubleBet(protocolId, FAIL, EMPTY);
-        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
-            // return fail if request user does not match logged in user
-            return new ResponseDoubleBet(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (!isBetWithinBudget(betAmountToAdd)) {
-            // return fail if bet amount is not within budget
-            return new ResponseBet(protocolId, FAIL, BET_NOT_IN_BUDGET);
-        } else if (isBetWithinBudget(betAmountToAdd)) {
-            // make a double bet and deal a card to player
-            doubleBet(betAmountToAdd);
-
-            // return success if bet within budget
-            return new ResponseBet(protocolId, SUCCESS);
-        } else {
-            // return fail for unknown error
-            return new ResponseBet(protocolId, FAIL, UNKNOWN_ERROR);
-        }
-    }
-
-    private ResponseProtocol handleFold(String jsonInput, int protocolId) {
-        RequestFold requestFold = gson.fromJson(jsonInput, RequestFold.class);
-        String userFromRequest = requestFold.getUsername();
-
-        if (isLoggedInUserNull()) {
-            // return fail if logged in user is null
-            return new ResponseFold(protocolId, FAIL, NOT_LOGGED_IN);
-        } else if (userFromRequest == null) {
-            // return fail if request user is null
-            return new ResponseFold(protocolId, FAIL, EMPTY);
-        } else if (!getLoggedInUser().getUserName().equals(userFromRequest)) {
-            // return fail if request user does not match logged in user
-            return new ResponseFold(protocolId, FAIL, USERNAME_MISMATCH);
-        } else if (getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
-            // return fail if player is already standing
-            return new ResponseFold(protocolId, FAIL, ALREADY_STANDING);
-        } else if (!getGame(gameJoined).getPlayersStand().get(getLoggedInUser().getUserName())) {
-            // if the player is not standing, make player fold
-//            getGame(gameJoined).setPlayerFold(getLoggedInUser().getUserName());
-
-            // return success if player is now standing
-            return new ResponseFold(protocolId, SUCCESS);
-        } else {
-            // return fail for unknown error
-            return new ResponseFold(protocolId, FAIL, UNKNOWN_ERROR);
-        }
-    }
-
+    /**
+     * This method handles requests for making a player stand.
+     *
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleStand(String jsonInput, int protocolId) {
         RequestStand requestStand = gson.fromJson(jsonInput, RequestStand.class);
         String userFromRequest = requestStand.getUsername();
@@ -356,6 +365,14 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method handles requests for 'Hit', which means giving another
+     * card to the player.
+     *
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleHit(String jsonInput, int protocolId) {
         RequestHit requestHit = gson.fromJson(jsonInput, RequestHit.class);
         String userFromRequest = requestHit.getUsername();
@@ -378,7 +395,7 @@ public class GameServerThread implements Runnable {
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
-        }  else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if all players standing
             return new ResponseHit(protocolId, FAIL, ALREADY_STANDING);
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
@@ -393,6 +410,14 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method handles requests for 'Bet', which places a bet for a player
+     * in a game.
+     *
+     * @param jsonInput
+     * @param protocolId
+     * @return
+     */
     private ResponseProtocol handleBet(String jsonInput, int protocolId) {
         RequestBet requestBet = gson.fromJson(jsonInput, RequestBet.class);
         String userFromRequest = requestBet.getUsername();
@@ -861,6 +886,12 @@ public class GameServerThread implements Runnable {
         }
     }
 
+    /**
+     * This method checks if a user is logged in.
+     *
+     * @param userFromRequest The user to check
+     * @return true if logged in, false if not
+     */
     private boolean isUserLoggedIn(User userFromRequest) {
         for (User user : users) {
             if (userFromRequest.getUserName().equals(user.getUserName())) {
@@ -945,6 +976,7 @@ public class GameServerThread implements Runnable {
         getGame(gameJoined).getMessageQueue().add(msg);
     }
 
+    // HELPER METHODS BELOW
 
     public synchronized void addUsertoUsers(User user) {
         this.users.add(user);
@@ -952,20 +984,6 @@ public class GameServerThread implements Runnable {
 
     public synchronized void removeUserFromUsers(User user) {
         this.users.remove(user);
-    }
-
-    public synchronized int getSizeOfUsers() {
-        return users.size();
-    }
-
-    public synchronized User getUserFromUsers(int i) {
-        return users.get(i);
-    }
-
-    public synchronized User getUserFromUsers(User user) {
-        int index = users.indexOf(user);
-        return users.get(index);
-
     }
 
     public User getLoggedInUser() {
@@ -976,20 +994,8 @@ public class GameServerThread implements Runnable {
         return user == null;
     }
 
-    public boolean isLoggedInUserEmpty() {
-        return user.isEmpty();
-    }
-
     public User getUser() {
         return user;
-    }
-
-    public void setLoggedInUser(User user) {
-        this.user = user;
-    }
-
-    public ConcurrentLinkedDeque<Socket> getSocketList() {
-        return socketList;
     }
 
     public CopyOnWriteArrayList<User> getUsers() {
