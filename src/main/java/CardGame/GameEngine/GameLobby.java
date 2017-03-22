@@ -292,7 +292,7 @@ public class GameLobby {
         return playerBets;
     }
 
-    public synchronized void startGameForTesting(){
+    public synchronized void startGameForTesting() {
         // shuffles deck with random seed = 1
         deck.shuffleForTests();
 
@@ -394,23 +394,6 @@ public class GameLobby {
         }
     }
 
-    //    /**
-//     * adds card to player hand
-//     * returns true if below or equal 21
-//     * sets player to finished round
-//     *
-//     * @param user //     * @return if the user is bet and than hit ,or return false
-//     */
-//    public synchronized boolean hit(User user) {
-//        Player player = getPlayer(user);
-//
-//        Card newCard = deck.dealCard();
-//        player.addCardToPlayerHand(newCard);
-//
-//        setPlayersWon();
-//
-//        return player.getPlayerHand().getBlackjackValue() <= 21;
-//    }
     private void setDealerCardsFaceUp() {
         for (Card card : getDealerHand().getHand()) {
             card.setFaceUp(true);

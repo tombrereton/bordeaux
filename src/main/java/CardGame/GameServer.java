@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
  */
 public class GameServer {
 
+    // connection variables
     private final int PORT;
     private final String HOST;
     private final int NUMBER_OF_THREADS;
@@ -35,6 +36,13 @@ public class GameServer {
     private volatile CopyOnWriteArrayList<GameLobby> games;
     private volatile ConcurrentLinkedDeque<String> gameNames;
 
+    /**
+     * Constructor for the GameServer class.
+     *
+     * @param port               the port the server socket listens for connections.
+     * @param host               the host (ip address) where the server socket listens for connections.
+     * @param maxNumberOfClients the maximum number of clients which can connect to the server.
+     */
     public GameServer(int port, String host, int maxNumberOfClients) {
         this.HOST = host;
         this.gameNames = new ConcurrentLinkedDeque<>();
@@ -47,10 +55,19 @@ public class GameServer {
         this.NUMBER_OF_THREADS = maxNumberOfClients;
     }
 
+    /**
+     * This method connects the server to the database.
+     */
     public void connectToDatabase() {
         this.functionDB = new FunctionDB();
     }
 
+    /**
+     * This method starts and thread pool of size as denoted by NUMBER_OF_THREADS.
+     * It then opens a server socket and waits for clients to connect. Upon
+     * connection, the socket is passed into a thread, which now handles the
+     * communication for that client.
+     */
     public void connectToClients() {
         ExecutorService threadPool = Executors.newFixedThreadPool(this.NUMBER_OF_THREADS);
 
@@ -70,8 +87,8 @@ public class GameServer {
 
 
                 // pass the socket to a new clientSideThread
-                threadPool.execute(new GameServerThread(this, socket, this.messageQueue,
-                        this.socketList, this.users, this.functionDB, this.games, this.gameNames));
+                threadPool.execute(new GameServerThread(socket,
+                        this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
             System.out.println("Cannot open server socket, host likely already in use.");
@@ -88,6 +105,11 @@ public class GameServer {
     }
 
 
+    /**
+     * This method is run first when running the server through the command line.
+     *
+     * @param args first argument is the port, second is the host, 3rd is maxNumber of clients. All optional.
+     */
     public static void main(String[] args) {
 
         // parse command line arguments
@@ -122,7 +144,7 @@ public class GameServer {
                     "\nOr default is \'[7654] [0.0.0.0] [20]\'");
         }
 
-        System.out.println("Host: " + host + ", Port: " + port + ", Max number of client: " +maxNumberOfClients);
+        System.out.println("Host: " + host + ", Port: " + port + ", Max number of client: " + maxNumberOfClients);
 
 
         // start server and connect to database

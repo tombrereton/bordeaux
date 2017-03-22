@@ -3,13 +3,10 @@ package CardGame.Gui;
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
 import CardGame.MessageObject;
-import CardGame.Pushes.PushPlayersWon;
-import CardGame.Responses.ResponseHit;
 import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.xml.ws.Response;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -76,6 +73,7 @@ public class GameScreen extends JPanel implements Observer {
     private int player1HandOffset;
     private int player2HandOffset;
     private int player3HandOffset;
+    private boolean gameScreenChatOffsetAllPlayerFinished;
 
     /**
      * Instantiates the client and GUI, sets the background and initialises the components
@@ -91,6 +89,7 @@ public class GameScreen extends JPanel implements Observer {
         this.player1HandOffset = 0;
         this.player2HandOffset = 0;
         this.player3HandOffset = 0;
+        this.gameScreenChatOffsetAllPlayerFinished = true;
 
         // chat variables
         this.blackjackOnline = blackjackOnline;
@@ -338,11 +337,9 @@ public class GameScreen extends JPanel implements Observer {
          * Bet Buttons
          */
         //Bet 1: small
-        btnBet1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 5;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet1.addActionListener(e -> {
+            amountToBet += 5;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet1.setContentAreaFilled(false);
         btnBet1.setBorderPainted(false);
@@ -356,11 +353,9 @@ public class GameScreen extends JPanel implements Observer {
 
 
         //Bet 2: medium
-        btnBet2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 10;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet2.addActionListener(e -> {
+            amountToBet += 10;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet2.setContentAreaFilled(false);
         btnBet2.setBorderPainted(false);
@@ -691,7 +686,12 @@ public class GameScreen extends JPanel implements Observer {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
-            if (model.getDealerHand().getHand().size() > 0 && model.isAllPlayersFinished()) {
+
+//            if (model.isAllPlayersFinished() && gameScreenChatOffsetAllPlayerFinished){
+//                dealerHandOffset = 0;
+//                gameScreenChatOffsetAllPlayerFinished = false;
+//            }
+            if (dealerHandSize >= 2 && model.isAllPlayersFinished()) {
                 dealerHandOffset = 0;
             }
             while (dealerHandOffset < dealerHandSize) {
