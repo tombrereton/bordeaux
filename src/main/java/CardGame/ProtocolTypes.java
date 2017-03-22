@@ -31,5 +31,6 @@ public class ProtocolTypes {
     public static final int PUSH_PLAYERS_WON = 57;
     public static final int PUSH_PLAYERS_BUST = 58;
     public static final int PUSH_PLAYERS_STAND = 59;
+    public static final int PUSH_ARE_PLAYERS_FINISHED = 60;
     public static final int UNKNOWN_TYPE = 99;
 }
