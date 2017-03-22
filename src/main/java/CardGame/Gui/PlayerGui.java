@@ -335,4 +335,33 @@ public class PlayerGui extends JPanel {
         add(lblCard12);
     }
 
+    public void refreshPlayerGui(){
+        remove(lblAvatar);
+        remove(lblCard1);
+        remove(lblCard2);
+        remove(lblCard3);
+        remove(lblCard4);
+        remove(lblCard5);
+        remove(lblCard6);
+        remove(lblCard7);
+        remove(lblCard8);
+        remove(lblCard9);
+        remove(lblCard10);
+        remove(lblCard11);
+        remove(lblCard12);
+        add(lblAvatar);
+        add(lblCard12);
+        add(lblCard11);
+        add(lblCard10);
+        add(lblCard9);
+        add(lblCard8);
+        add(lblCard7);
+        add(lblCard6);
+        add(lblCard5);
+        add(lblCard4);
+        add(lblCard4);
+        add(lblCard3);
+        add(lblCard2);
+        add(lblCard1);
+    }
 }
