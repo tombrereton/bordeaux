@@ -950,6 +950,10 @@ public class GameClient extends Observable {
         return playersStand;
     }
 
+    public Map<String, Boolean> getPlayersWon() {
+        return playersWon;
+    }
+
     public boolean isServerDown() {
         return isServerDown;
     }

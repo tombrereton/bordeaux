@@ -9,10 +9,12 @@ import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.ws.Response;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -257,7 +259,6 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-
                 if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
@@ -552,6 +553,10 @@ public class GameScreen extends JPanel implements Observer {
         return playerGui;
     }
 
+    public PlayerGui getDealerGui(){
+        return dealerGui;
+    }
+
     /**
      * A helper method to set each player's card
      *
@@ -653,11 +658,23 @@ public class GameScreen extends JPanel implements Observer {
                     // set each player's card
                     updatePlayerHand(model, playerName, i);
 
-                    //set each player's avatar
+                    // set each player's avatar
                     getplayerGui(i).setLblAvatar(playerAvatar);
 
+                    // check if the player is win or lose
+                    checkwin(model);
 
                 }
+            }
+        }
+    }
+
+    private void checkwin(GameClient model) {
+        Map<String, Boolean> playerWon = model.getPlayersWon();
+        if(model.isAllPlayersFinished()){
+            if(playerWon != null && playerWon.size()>0 && playerWon.get(model.getLoggedInUser().getUserName())){
+                JOptionPane.showMessageDialog(null, "Congratulations, you win the game!", "Congratulations",
+                        JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -681,10 +698,10 @@ public class GameScreen extends JPanel implements Observer {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                getDealerGui().refreshPlayerGui();
+                repaint();
+                revalidate();
             }
-            repaint();
-            revalidate();
-
         }
     }
 
