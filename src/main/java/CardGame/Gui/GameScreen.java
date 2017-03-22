@@ -3,6 +3,8 @@ package CardGame.Gui;
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
 import CardGame.MessageObject;
+import CardGame.Pushes.PushPlayersWon;
+import CardGame.Responses.ResponseHit;
 import CardGame.Responses.ResponseProtocol;
 
 import javax.imageio.ImageIO;
@@ -66,7 +68,6 @@ public class GameScreen extends JPanel implements Observer {
     private int player1HandOffset;
     private int player2HandOffset;
     private int player3HandOffset;
-    private boolean dealerFacedUp;
 
     /**
      * Create the application.
@@ -117,7 +118,6 @@ public class GameScreen extends JPanel implements Observer {
         playerGui3 = new PlayerGui();
         playerGui4 = new PlayerGui();
         dealerGui = new PlayerGui("1");
-        dealerFacedUp = true;
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -259,10 +259,12 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
+
                 if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
+
 
             }
         });
@@ -819,7 +821,5 @@ public class GameScreen extends JPanel implements Observer {
         }
     }
 
-    public void setDealerFacedUp(boolean dealerFacedUp) {
-        this.dealerFacedUp = dealerFacedUp;
-    }
+
 }
