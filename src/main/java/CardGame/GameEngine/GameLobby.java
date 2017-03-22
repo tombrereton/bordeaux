@@ -187,6 +187,7 @@ public class GameLobby {
     public synchronized void addPlayer(User user) {
         players.add(new Player(user));
 
+        // when players joins set all to false
         setAllPlayersBustToFalse();
         setAllPlayersWonToFalse();
         setAllPlayersStandToFalse();
