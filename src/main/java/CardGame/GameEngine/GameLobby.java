@@ -186,6 +186,11 @@ public class GameLobby {
 
     public synchronized void addPlayer(User user) {
         players.add(new Player(user));
+
+        // when players joins set all to false
+        setAllPlayersBustToFalse();
+        setAllPlayersWonToFalse();
+        setAllPlayersStandToFalse();
     }
 
     public synchronized Player getPlayer(User user) {
@@ -264,7 +269,9 @@ public class GameLobby {
         // change to check player.isfinishedround
 
         for (Player p : players) {
-            if (!getPlayersWon().get(p.getUsername()) && !getPlayersStand().get(p.getUsername())) {
+            boolean isPlayerWon = getPlayersWon().get(p.getUsername());
+            boolean isPlayerStand = getPlayersStand().get(p.getUsername());
+            if (!isPlayerWon && !isPlayerStand) {
                 setAllPlayersFinished(false);
                 return false;
             }
