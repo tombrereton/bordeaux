@@ -864,6 +864,8 @@ public class GameServerTest {
 
     }
 
+
+
     /**
      * We test a hit request while not in a game
      */
@@ -903,6 +905,69 @@ public class GameServerTest {
         // we check the hit was successful
         int successHit = responseProtocol2.getRequestSuccess();
         assertEquals("Should return successful hit response matching success ", SUCCESS, successHit);
+    }
+
+
+    /**
+     * We test a hitting until bust for 2 players in the blackjack game
+     */
+    @Test
+    public void hit03_test() {
+
+        // CREATE GAME (1st player)
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
+        ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
+        // check success
+        int success1st = respCreate.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success1st);
+
+        // JOIN 2ND PLAYER
+        RequestLoginUser requestLoginUser2 = new RequestLoginUser(this.userTest2);
+        RequestJoinGame requestJoinGame2 = new RequestJoinGame(userTest1.getUserName(), userTest2.getUserName());
+        ResponseProtocol responseLogin2 = serverThread2.handleInput(encodeRequest(requestLoginUser2));
+        ResponseProtocol responseJoin2 = serverThread2.handleInput(encodeRequest(requestJoinGame2));
+        // check success
+        int success2nd = responseJoin2.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success2nd);
+
+        // BET PLAYER 1
+        RequestBet requestBet1 = new RequestBet(10, userTest1.getUserName());
+        ResponseProtocol responsBet1 = this.serverThread1.handleInput(encodeRequest(requestBet1));
+
+        // We check the bet 1 was successful
+        int successBet1 = responsBet1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet1);
+
+        // BET PLAYER 1
+        RequestBet requestBet2 = new RequestBet(10, userTest2.getUserName());
+        ResponseProtocol responsBet2 = this.serverThread2.handleInput(encodeRequest(requestBet2));
+
+        // We check the bet 2 was successful
+        int successBet2 = responsBet2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet2);
+
+        // HIT FOR PLAYER ONE
+        RequestHit requestHit1_1 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol1_1 = serverThread1.handleInput(encodeRequest(requestHit1_1));
+        // We check the hit was successful
+        int success1_1 = responseProtocol1_1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_1);
+
+        RequestHit requestHit1_2 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol1_2 = serverThread1.handleInput(encodeRequest(requestHit1_2));
+        // We check the hit was successful
+        int success1_2 = responseProtocol1_2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_2);
+
+//        RequestHit requestHit1_3 = new RequestHit(userTest1.getUserName());
+//        ResponseProtocol responseProtocol1_3 = serverThread1.handleInput(encodeRequest(requestHit1_3));
+//        // We check the hit was successful
+//        int success1_3 = responseProtocol1_3.getRequestSuccess();
+//        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_3);
+
+
     }
 
     /**
