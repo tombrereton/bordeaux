@@ -700,21 +700,17 @@ public class GameScreen extends JPanel implements Observer {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
+            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
+                dealerHandOffset = 0;
+            }
             while (dealerHandOffset < dealerHandSize) {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
-                repaint();
-                revalidate();
             }
-            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
-                for(int i=0; i<model.getDealerHand().getHand().size();i++){
-                    setLbCards(dealerGui, i, model.getDealerHand().getCard(i).getImageID());
-                }
-                repaint();
-                revalidate();
-//                setDealerFacedUp(false);
-            }
+            repaint();
+            revalidate();
+
         }
     }
 

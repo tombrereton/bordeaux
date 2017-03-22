@@ -202,9 +202,6 @@ public class PlayerGui extends JPanel {
             ex.printStackTrace();
         }
         add(lblAvatar);
-
-        repaint();
-        revalidate();
     }
 
     public void setLblCard1(String cardID){
