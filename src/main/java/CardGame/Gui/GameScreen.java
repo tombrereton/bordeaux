@@ -420,6 +420,9 @@ public class GameScreen extends JPanel implements Observer {
 
                 // reset all game data on the client
                 getClientModel().resetGameData();
+
+                // reset game data on game screen
+                resetHands();
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
