@@ -121,7 +121,7 @@ public class PlayerGui extends JPanel {
     }
 
     public void setPlayerBounds(){
-        lblAvatar.setBounds(10, 60, 64, 64);
+        lblAvatar.setBounds(15, 60, 64, 64);
         lblName.setBounds(0, 124, 94, 20);
         lblCredits.setBounds(0, 164, 94, 20);
         lblBetAmount.setBounds(0, 144, 94, 20);
@@ -336,7 +336,6 @@ public class PlayerGui extends JPanel {
     }
 
     public void refreshPlayerGui(){
-        remove(lblAvatar);
         remove(lblCard1);
         remove(lblCard2);
         remove(lblCard3);
@@ -349,6 +348,7 @@ public class PlayerGui extends JPanel {
         remove(lblCard10);
         remove(lblCard11);
         remove(lblCard12);
+        remove(lblAvatar);
         add(lblAvatar);
         add(lblCard12);
         add(lblCard11);

@@ -551,6 +551,10 @@ public class GameScreen extends JPanel implements Observer {
         return playerGui;
     }
 
+    public PlayerGui getDealerGui(){
+        return dealerGui;
+    }
+
     /**
      * A helper method to set each player's card
      *
@@ -654,8 +658,6 @@ public class GameScreen extends JPanel implements Observer {
 
                     //set each player's avatar
                     getplayerGui(i).setLblAvatar(playerAvatar);
-
-
                 }
             }
         }
@@ -680,10 +682,10 @@ public class GameScreen extends JPanel implements Observer {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                getDealerGui().refreshPlayerGui();
             }
             repaint();
             revalidate();
-
         }
     }
 
