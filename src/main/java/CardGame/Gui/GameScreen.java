@@ -91,6 +91,7 @@ public class GameScreen extends JPanel implements Observer {
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
         btnLeaveGame = new JButton("Leave");
+        textArea = new JTextArea();
 
         btnBet1 = new JButton();
         btnBet2 = new JButton();
@@ -204,10 +205,10 @@ public class GameScreen extends JPanel implements Observer {
         /**
          * Editable text area for sending messages
          */
-        textArea = new JTextArea();
         textArea.setLineWrap(true);
         add(textArea);
         textArea.setColumns(10);
+
         // END CHAT MESSAGE BOX
 
         // STAND BUTTON
