@@ -699,9 +699,9 @@ public class GameScreen extends JPanel implements Observer {
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
                 getDealerGui().refreshPlayerGui();
+                repaint();
+                revalidate();
             }
-            repaint();
-            revalidate();
         }
     }
 
