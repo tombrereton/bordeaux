@@ -707,13 +707,13 @@ public class GameScreen extends JPanel implements Observer {
                 repaint();
                 revalidate();
             }
-            if (dealerFacedUp && model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
+            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
                 for(int i=0; i<model.getDealerHand().getHand().size();i++){
                     setLbCards(dealerGui, i, model.getDealerHand().getCard(i).getImageID());
-                    setDealerFacedUp(true);
                 }
                 repaint();
                 revalidate();
+//                setDealerFacedUp(false);
             }
         }
     }
