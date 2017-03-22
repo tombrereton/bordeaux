@@ -367,19 +367,16 @@ public class GameServerThread implements Runnable {
         } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isBetPlaced()) {
             // return fail if user has not places a bet
             return new ResponseHit(protocolId, FAIL, NO_BET);
-        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()) {
             // return fail if user is bust
             return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
-        }else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()){
+        } else if (getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // return fail if all players standing
             return new ResponseHit(protocolId, FAIL, ALREADY_STANDING);
-        }else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
+        } else if (!getGame(gameJoined).getPlayer(getLoggedInUser()).isPlayerStand()) {
             // if player has not finished the round, give the player a card
             getGame(gameJoined).hit(getLoggedInUser());
-            // if player bust after hitting, tell him
-//            if(getGame(gameJoined).getPlayer(getLoggedInUser()).isBust()){
-//                return new ResponseHit(protocolId, FAIL, PLAYER_BUST);
-//            }
+
             // return success
             return new ResponseHit(protocolId, SUCCESS);
         } else {
@@ -628,6 +625,9 @@ public class GameServerThread implements Runnable {
         } else if (getGame(gameToJoin) == null) {
             // return fail if game to join does not exist
             return new ResponseJoinGame(protocolId, FAIL, NO_GAME);
+        } else if (getGame(gameToJoin).getPlayers().size() >= 4) {
+            // return fail if game full (more than 4 players)
+            return new ResponseJoinGame(protocolId, FAIL, GAME_FULL);
         } else {
             this.gameJoined = gameToJoin;
             joinGame(gameToJoin);
