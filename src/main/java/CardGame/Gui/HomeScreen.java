@@ -125,13 +125,13 @@ public class HomeScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        btnLogout.setBounds(blackjackOnline.getxOrigin() + 250, blackjackOnline.getyOrigin() + 320, 165, 34);
-        lblWelcome.setBounds(blackjackOnline.getxOrigin() + 391, 10, 242, 34);
-        btnGoToLobby.setBounds(blackjackOnline.getxOrigin() + 250, blackjackOnline.getyOrigin() + 220, 165, 34);
-        lblCredits.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 191, 225, 34);
-        lblGamesWon.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 300, 225, 34);
-        lblGamesLost.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 352, 225, 34);
-        lblGamesPlayed.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 243, 225, 34);
+        btnLogout.setBounds(blackjackOnline.getxScreenDiff() + 250, blackjackOnline.getyScreenDiff() + 320, 165, 34);
+        lblWelcome.setBounds(blackjackOnline.getxScreenDiff() + 391, 10, 242, 34);
+        btnGoToLobby.setBounds(blackjackOnline.getxScreenDiff() + 250, blackjackOnline.getyScreenDiff() + 220, 165, 34);
+        lblCredits.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 191, 225, 34);
+        lblGamesWon.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 300, 225, 34);
+        lblGamesLost.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 352, 225, 34);
+        lblGamesPlayed.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 243, 225, 34);
     }
 
     public GameClient getClientModel() {
