@@ -163,33 +163,31 @@ public class GameScreen extends JPanel implements Observer {
          *
          * And display the error if not successful
          */
-        btnSendMessage.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        btnSendMessage.addActionListener(e -> {
 
-                // show error in pop up box
-                if (textArea.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null,
-                            "You can not send empty messages!",
-                            "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                // send message from text area to server
-                ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
-                textArea.setText("");
-                textArea.grabFocus();
-
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-
+            // show error in pop up box
+            if (textArea.getText().equals("")) {
+                JOptionPane.showMessageDialog(null,
+                        "You can not send empty messages!",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            // send message from text area to server
+            ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
+            textArea.setText("");
+            textArea.grabFocus();
+
+
+            // We display the error if not successful
+            int success = responseProtocol.getRequestSuccess();
+            String errorMsg = responseProtocol.getErrorMsg();
+            if (success == 0) {
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+
         });
 
         btnSendMessage.setContentAreaFilled(false);
@@ -835,21 +833,17 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     private synchronized void resetHands() {
-        // we reset the client dealer hand
+        // we reset the client player and dealer hands
         getClientModel().resetDealerAndPlayerHands();
-//        for (int i = 0; i < dealerHandOffset; i++) {
-//            getClientModel().getDealerHand().removeCard(i);
-//        }
 
-        // reset the dealer hand offset
+        // reset the gamescreen dealer hand offset
         dealerHandOffset = 0;
 
-        // we reset the dealer gui hand
+        // we reset the dealer gui hand to a blank image
         for (int i = 0; i < 12; i++) {
             setLbCards(dealerGui, i, "400");
         }
 
-        // we reset the client player hands
 
         // we reset the player cards to a blank image
         for(int i = 0; i< 4;i++){
@@ -858,7 +852,7 @@ public class GameScreen extends JPanel implements Observer {
             }
         }
 
-        // we reset all the player hand offsets to 0
+        // we reset all the game screen player hand offsets to 0
         for (int i = 0; i < 4; i++) {
             this.setPlayerHandOffset(i, 0);
         }

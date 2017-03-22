@@ -681,7 +681,7 @@ public class GameServerThread implements Runnable {
 
 
     private void joinGame(String lobbyname) {
-        getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
+        getGame(lobbyname).addPlayer(this.getLoggedInUser());
     }
 
     /**
@@ -692,11 +692,11 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private GameLobby createGame() {
-        GameLobby newGame = new GameLobby(getLoggedInUser(), this.toClientSocket);
+        GameLobby newGame = new GameLobby(getLoggedInUser());
 
         this.getGames().add(newGame);
 
-        this.updateGameNames();
+        updateGameNames();
 
         return newGame;
     }
