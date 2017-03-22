@@ -70,7 +70,7 @@ public class GameLobby {
     }
 
     private void setAllPlayersStandToFalse() {
-        for (Player p: players){
+        for (Player p : players) {
             getPlayersStand().put(p.getUsername(), false);
         }
     }
@@ -193,8 +193,6 @@ public class GameLobby {
         for (Player player : players) {
             if (player.getUsername().equals(user.getUserName())) {
                 return player;
-            } else {
-                return null;
             }
         }
         return null;
@@ -372,7 +370,7 @@ public class GameLobby {
     private void removeDealerCards() {
         Iterator<Card> iterator = dealerHand.getHand().iterator();
 
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             iterator.next();
             iterator.remove();
         }
@@ -393,7 +391,7 @@ public class GameLobby {
 
         setAllPlayersFinished();
 
-        if (isAllPlayersFinished()){
+        if (isAllPlayersFinished()) {
             setAllPlayersBustToFalse();
             setAllPlayersWonToFalse();
             setAllPlayersStandToFalse();
@@ -406,13 +404,13 @@ public class GameLobby {
     }
 
     private void resetPlayers() {
-        for (Player player : players){
+        for (Player player : players) {
             player.setBetPlaced(false);
             player.setPlayerStand(false);
         }
     }
 
-//    /**
+    //    /**
 //     * adds card to player hand
 //     * returns true if below or equal 21
 //     * sets player to finished round
@@ -430,7 +428,7 @@ public class GameLobby {
 //        return player.getPlayerHand().getBlackjackValue() <= 21;
 //    }
     private void setDealerCardsFaceUp() {
-        for(Card card: getDealerHand().getHand()){
+        for (Card card : getDealerHand().getHand()) {
             card.setFaceUp(true);
         }
     }
