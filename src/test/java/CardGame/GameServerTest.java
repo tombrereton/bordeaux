@@ -656,7 +656,7 @@ public class GameServerTest {
         RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
         RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
 
-        RequestLoginUser requestLoginUser1 = new RequestLoginUser(this.userBoris);
+        RequestLoginUser requestLoginUser1 = new RequestLoginUser(this.userTest2);
 
         // LOGIN
 
@@ -686,7 +686,7 @@ public class GameServerTest {
 
         // We check the second user, userBoris
         User loggedInUser = this.serverThread2.getLoggedInUser();
-        assertEquals("Should return logged in user matching usertesttwo ", userBoris, loggedInUser);
+        assertEquals("Should return logged in user matching usertesttwo ", userTest2, loggedInUser);
 
         // we check second user logged in
         int successLogin2 = responseLogin2.getRequestSuccess();
@@ -718,14 +718,15 @@ public class GameServerTest {
 
         // We check the game list is pushed
 
-        ArrayList<String> expectedGames = new ArrayList<>();
+        ConcurrentLinkedDeque<String> expectedGames = new ConcurrentLinkedDeque<>();
         expectedGames.add(this.userTest1.getUserName());
 
-        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
+        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames.toString(),
+                gameNames.toString());
 
         // SECOND USER JOIN GAME
         String gameName = userTest1.getUserName();
-        RequestJoinGame requestJoinGame = new RequestJoinGame(gameName, userBoris.getUserName());
+        RequestJoinGame requestJoinGame = new RequestJoinGame(gameName, userTest2.getUserName());
         ResponseProtocol responseJoin = this.serverThread2.handleInput(encodeRequest(requestJoinGame));
 
         // we check for successful response
@@ -910,6 +911,8 @@ public class GameServerTest {
 
     /**
      * We test a hitting until bust for 2 players in the blackjack game
+     * NOTE: this test only works for when the shuffle method in Deck, has
+     * it's random seed = 1. This test will be disabled if it is not 1.
      */
     @Test
     public void hit03_test() {
@@ -961,13 +964,38 @@ public class GameServerTest {
         int success1_2 = responseProtocol1_2.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, success1_2);
 
-//        RequestHit requestHit1_3 = new RequestHit(userTest1.getUserName());
-//        ResponseProtocol responseProtocol1_3 = serverThread1.handleInput(encodeRequest(requestHit1_3));
-//        // We check the hit was successful
-//        int success1_3 = responseProtocol1_3.getRequestSuccess();
-//        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_3);
+        RequestHit requestHit1_3 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol1_3 = serverThread1.handleInput(encodeRequest(requestHit1_3));
+        // We check the hit was successful
+        int success1_3 = responseProtocol1_3.getRequestSuccess();
+        assertEquals("Should return failed hit response matching FAIL ", FAIL, success1_3);
 
 
+        // HIT FOR PLAYER TWO
+        RequestHit requestHit2_1 = new RequestHit(userTest2.getUserName());
+        ResponseProtocol responseProtocol2_1 = serverThread2.handleInput(encodeRequest(requestHit2_1));
+        // We check the hit was successful
+        int success2_1 = responseProtocol2_1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success2_1);
+
+        RequestHit requestHit2_2 = new RequestHit(userTest2.getUserName());
+        ResponseProtocol responseProtocol2_2 = serverThread2.handleInput(encodeRequest(requestHit2_2));
+        // We check the hit was successful
+        int success2_2 = responseProtocol2_2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success2_2);
+
+        RequestHit requestHit2_3 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol2_3 = serverThread2.handleInput(encodeRequest(requestHit2_3));
+        // We check the hit was successful
+        int success2_3 = responseProtocol2_3.getRequestSuccess();
+        assertEquals("Should return failed hit response matching FAIL ", FAIL, success2_3);
+
+        // CHECK IF ALL FINISHED
+        boolean allFinished1 = serverThread1.getGame(userTest1.getUserName()).isAllPlayersFinished();
+        boolean allFinished2 = serverThread2.getGame(userTest1.getUserName()).isAllPlayersFinished();
+
+        assertEquals("Should return all players finished matching true ", true, allFinished1);
+        assertEquals("Should return all players finished matching true ", true, allFinished2);
     }
 
     /**
