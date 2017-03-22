@@ -123,8 +123,8 @@ public class PlayerGui extends JPanel {
     public void setPlayerBounds(){
         lblAvatar.setBounds(10, 60, 64, 64);
         lblName.setBounds(0, 124, 94, 20);
-        lblCredits.setBounds(0, 144, 94, 20);
-        lblBetAmount.setBounds(0, 164, 94, 20);
+        lblCredits.setBounds(0, 164, 94, 20);
+        lblBetAmount.setBounds(0, 144, 94, 20);
         lblName.setHorizontalAlignment(SwingConstants.CENTER);
         lblCredits.setHorizontalAlignment(SwingConstants.CENTER);
         lblBetAmount.setHorizontalAlignment(SwingConstants.CENTER);

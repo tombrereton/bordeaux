@@ -30,10 +30,8 @@ public class GameScreen extends JPanel implements Observer {
     private JScrollPane scrollPane;
     private JLabel lblChat;
     private JButton btnSendMessage;
-    private JButton btnDoubleDown;
     private JButton btnStand;
     private JButton btnHit;
-    private JButton btnFold;
     private JLabel lblBudget;
     private JLabel lblSubmitBet;
     private JButton btnSubmitBet;
@@ -98,10 +96,8 @@ public class GameScreen extends JPanel implements Observer {
         btnBet2 = new JButton();
         btnBet3 = new JButton();
         btnBet4 = new JButton();
-        btnDoubleDown = new JButton();
         btnStand = new JButton();
         btnHit = new JButton();
-        btnFold = new JButton();
 
         lblBudget = new JLabel("Credits: £ " + Integer.toString(credits));
         lblCreditsBox = new JLabel();
@@ -201,8 +197,8 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnSendMessage);
-
         // END SEND BUTTON
+
 
         // CHAT MESSAGE BOX
         /**
@@ -213,40 +209,6 @@ public class GameScreen extends JPanel implements Observer {
         add(textArea);
         textArea.setColumns(10);
         // END CHAT MESSAGE BOX
-
-        // DOUBLE BET BUTTON
-        /**
-         * Double Bet button
-         *
-         * And display the error if not successful
-         */
-        //DoubleDown Button
-        btnDoubleDown.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                // send a double down request to server
-                ResponseProtocol responseProtocol = client.requestDoubleBet();
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-
-            }
-        });
-        btnDoubleDown.setContentAreaFilled(false);
-        btnDoubleDown.setBorderPainted(false);
-        try {
-            Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
-            btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(btnDoubleDown);
-        // END DOUBLE BUTTON
 
         // STAND BUTTON
         /**
@@ -281,6 +243,7 @@ public class GameScreen extends JPanel implements Observer {
         add(btnStand);
         // END STAND BUTTON
 
+
         // HIT BUTTON
         /**
          * Hit Button
@@ -313,38 +276,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnHit);
         // END HIT BUTTON
-
-        // FOLD BUTTON
-        /**
-         * Fold Button
-         *
-         * And display the error if not successful
-         */
-        btnFold.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // send a hold request to server
-                ResponseProtocol responseProtocol = client.requestFold();
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-
-        btnFold.setContentAreaFilled(false);
-        btnFold.setBorderPainted(false);
-        try {
-            Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
-            btnFold.setIcon(new ImageIcon(imgFold));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(btnFold);
-        // END FOLD BUTTON
 
         /**
          * Player credits label
@@ -576,10 +507,8 @@ public class GameScreen extends JPanel implements Observer {
         lblSideFillHud.setBounds(blackjackOnline.getxOrigin() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyOrigin() + 800);
         btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxOrigin() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
         btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 120, 10, 100, 30);
-        btnDoubleDown.setBounds(740, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnStand.setBounds(640, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnHit.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnFold.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnStand.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnHit.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
         lblBudget.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 81, 200, 35);
         lblSubmitBet.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 121, 92, 35);
         btnSubmitBet.setBounds(5, blackjackOnline.getScreenHeightCurrent() - 226, 98, 91);
@@ -733,6 +662,7 @@ public class GameScreen extends JPanel implements Observer {
                     String playerName = model.getPlayerNames().get(i);
                     String playerBudget = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
+                    String playerAvatar = model.getLoggedInUser().getAvatarID();
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
@@ -742,6 +672,9 @@ public class GameScreen extends JPanel implements Observer {
 
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
+
+                    //set each player's avatar
+                    getplayerGui(i).setLblAvatar(playerAvatar);
 
                     // set each player's card
                     updatePlayerHand(model, playerName, i);
