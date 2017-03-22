@@ -8,7 +8,8 @@ import CardGame.Responses.ResponseProtocol;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -418,7 +419,7 @@ public class GameScreen extends JPanel implements Observer {
                 gameScreenChatOffset = 0;
 
                 // reset all game data on the client
-                getClientModel().resetGameData();
+                getClientModel().resetGameDataWhenQuitting();
 
                 // reset game data on game screen
                 resetHands();

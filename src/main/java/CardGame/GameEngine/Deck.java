@@ -14,6 +14,7 @@ public class Deck {
 
     private int cardsUsed; // How many cards have been dealt from the deck.
     private ArrayList<Card> deckOfCards;
+    private int testSeed = 1;
 
     public Deck() {
         deckOfCards = new ArrayList<Card>();
@@ -29,12 +30,19 @@ public class Deck {
 
 
     /**
+     * Randomises the cards with a set seed for testing.
+     */
+    public void shuffleForTests() {
+        Collections.shuffle(deckOfCards, new Random(testSeed));
+        cardsUsed = 0;
+    }
+
+    /**
      * Randomises the cards
      */
     public void shuffle() {
         long seed = System.nanoTime();
-        // TODO: change the seed to random
-        Collections.shuffle(deckOfCards, new Random(1));
+        Collections.shuffle(deckOfCards, new Random(seed));
         cardsUsed = 0;
     }
 

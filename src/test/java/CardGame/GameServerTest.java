@@ -922,6 +922,7 @@ public class GameServerTest {
         RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
         ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
         ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
+
         // check success
         int success1st = respCreate.getRequestSuccess();
         assertEquals("Should return failed response matching success ", SUCCESS, success1st);
@@ -943,13 +944,17 @@ public class GameServerTest {
         int successBet1 = responsBet1.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, successBet1);
 
-        // BET PLAYER 1
+        // BET PLAYER 2
         RequestBet requestBet2 = new RequestBet(10, userTest2.getUserName());
         ResponseProtocol responsBet2 = this.serverThread2.handleInput(encodeRequest(requestBet2));
 
         // We check the bet 2 was successful
         int successBet2 = responsBet2.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, successBet2);
+
+
+//        // start game again with random seed set to 1
+//        serverThread1.getGame(userTest1.getUserName()).startGameForTesting();
 
         // HIT FOR PLAYER ONE
         RequestHit requestHit1_1 = new RequestHit(userTest1.getUserName());

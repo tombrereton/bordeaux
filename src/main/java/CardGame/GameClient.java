@@ -978,7 +978,7 @@ public class GameClient extends Observable {
         }
     }
 
-    public synchronized void resetGameData() {
+    public synchronized void resetGameDataWhenQuitting() {
         this.chatOffset = -1;
         this.playersFinished = new TreeMap<>();
         this.dealerHand = new Hand();
