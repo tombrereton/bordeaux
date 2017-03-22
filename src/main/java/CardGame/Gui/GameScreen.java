@@ -662,6 +662,7 @@ public class GameScreen extends JPanel implements Observer {
                     String playerName = model.getPlayerNames().get(i);
                     String playerBudget = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
+                    String playerAvatar = model.getLoggedInUser().getAvatarID();
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
@@ -671,6 +672,9 @@ public class GameScreen extends JPanel implements Observer {
 
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
+
+                    //set each player's avatar
+                    getplayerGui(i).setLblAvatar(playerAvatar);
 
                     // set each player's card
                     updatePlayerHand(model, playerName, i);
