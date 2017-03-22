@@ -207,6 +207,7 @@ public class GameServerThread implements Runnable {
     }
 
     private ResponseProtocol handleGetDealerhand(int protocolId) {
+        // TODO: i think a multiplayer error is here
         Hand dealerHand = this.getGame(gameJoined).getDealerHand();
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);
@@ -680,7 +681,7 @@ public class GameServerThread implements Runnable {
 
 
     private void joinGame(String lobbyname) {
-        getGame(lobbyname).addPlayer(this.getLoggedInUser(), this.toClientSocket);
+        getGame(lobbyname).addPlayer(this.getLoggedInUser());
     }
 
     /**
@@ -691,11 +692,11 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private GameLobby createGame() {
-        GameLobby newGame = new GameLobby(getLoggedInUser(), this.toClientSocket);
+        GameLobby newGame = new GameLobby(getLoggedInUser());
 
         this.getGames().add(newGame);
 
-        this.updateGameNames();
+        updateGameNames();
 
         return newGame;
     }

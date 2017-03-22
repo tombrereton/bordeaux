@@ -74,7 +74,7 @@ public class GameServer {
                         this.socketList, this.users, this.functionDB, this.games, this.gameNames));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Cannot open server socket, host likely already in use.");
         }
     }
 

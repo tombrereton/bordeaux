@@ -2,7 +2,6 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
-import CardGame.GameEngine.Player;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseProtocol;
 
@@ -164,33 +163,31 @@ public class GameScreen extends JPanel implements Observer {
          *
          * And display the error if not successful
          */
-        btnSendMessage.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        btnSendMessage.addActionListener(e -> {
 
-                // show error in pop up box
-                if (textArea.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null,
-                            "You can not send empty messages!",
-                            "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                // send message from text area to server
-                ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
-                textArea.setText("");
-                textArea.grabFocus();
-
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-
+            // show error in pop up box
+            if (textArea.getText().equals("")) {
+                JOptionPane.showMessageDialog(null,
+                        "You can not send empty messages!",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            // send message from text area to server
+            ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
+            textArea.setText("");
+            textArea.grabFocus();
+
+
+            // We display the error if not successful
+            int success = responseProtocol.getRequestSuccess();
+            String errorMsg = responseProtocol.getErrorMsg();
+            if (success == 0) {
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+
         });
 
         btnSendMessage.setContentAreaFilled(false);
@@ -370,38 +367,33 @@ public class GameScreen extends JPanel implements Observer {
          *
          * And display the error if not successful
          */
-        btnSubmitBet.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // we send the request to bet
-                ResponseProtocol response = client.requestBet(amountToBet);
+        btnSubmitBet.addActionListener(e -> {
 
-                if (response.getRequestSuccess() == 0) {
-                    // display error msg if not successful
-                    String errorMsg = response.getErrorMsg();
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
+            // we send the request to bet
+            ResponseProtocol response = client.requestBet(amountToBet);
 
-                    // set bet amount to 0
-                    amountToBet = 0;
-                    lblSubmitBet.setText(Integer.toString(amountToBet));
-                    return;
-                }
+            if (response.getRequestSuccess() == 0) {
+                // display error msg if not successful
+                String errorMsg = response.getErrorMsg();
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
 
                 // set bet amount to 0
                 amountToBet = 0;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-
-                // reset offsets to 0
-                resetHands();
-                for(int i = 0; i< 4;i++){
-                    setLbCards(getplayerGui(i),i,"400");
-                }
-
-                repaint();
-                revalidate();
-
+                return;
             }
+
+            // set bet amount to 0
+            amountToBet = 0;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
+
+            // reset offsets to 0
+            resetHands();
+
         });
+
+        // set image for bet
         btnSubmitBet.setContentAreaFilled(false);
         btnSubmitBet.setBorderPainted(false);
         try {
@@ -484,23 +476,26 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-
+        // LEAVE BUTTON
         /**
          * leave game button
          */
-        btnLeaveGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+        btnLeaveGame.addActionListener(e -> {
+            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
 
-                if (leaveGame.getRequestSuccess() == 1) {
-                    chatMessageModel.clear();
-                    gameScreenChatOffset = 0;
-                }
+            if (leaveGame.getRequestSuccess() == 1) {
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
+
+                // reset all game data on the client
+                getClientModel().resetGameData();
             }
         });
         btnLeaveGame.setBackground(Color.WHITE);
         btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
         add(btnLeaveGame);
+
+        // END LEAVE BUTTON
 
 
         /**
@@ -838,12 +833,32 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     private synchronized void resetHands() {
+        // we reset the client player and dealer hands
+        getClientModel().resetDealerAndPlayerHands();
+
+        // reset the gamescreen dealer hand offset
         dealerHandOffset = 0;
 
-        // we reset all the player hand offsets to 0
+        // we reset the dealer gui hand to a blank image
+        for (int i = 0; i < 12; i++) {
+            setLbCards(dealerGui, i, "400");
+        }
+
+
+        // we reset the player cards to a blank image
+        for(int i = 0; i< 4;i++){
+            for (int j = 0; j < 12; j++){
+                setLbCards(getplayerGui(i),j,"400");
+            }
+        }
+
+        // we reset all the game screen player hand offsets to 0
         for (int i = 0; i < 4; i++) {
             this.setPlayerHandOffset(i, 0);
         }
+
+        repaint();
+        revalidate();
     }
 
     private synchronized void updateMessageList(GameClient model) {

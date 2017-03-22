@@ -1,5 +1,6 @@
 package CardGame;
 
+import CardGame.GameEngine.Card;
 import CardGame.GameEngine.Hand;
 import CardGame.Pushes.*;
 import CardGame.Requests.*;
@@ -967,6 +968,35 @@ public class GameClient extends Observable {
 
     public int getReconnectAttempts() {
         return reconnectAttempts;
+    }
+
+    public synchronized void resetDealerAndPlayerHands(){
+
+        // reset player hands to empty
+        for (Map.Entry<String, Hand> playerhand : this.playerHands.entrySet()){
+            playerhand.setValue(new Hand());
+        }
+
+        // reset dealer hand to empty
+        Iterator<Card> dealerIterator = this.dealerHand.getHand().iterator();
+
+        while(dealerIterator.hasNext()){
+            dealerIterator.next();
+            dealerIterator.remove();
+        }
+    }
+
+    public synchronized void resetGameData() {
+        this.chatOffset = -1;
+        this.playersFinished = new TreeMap<>();
+        this.dealerHand = new Hand();
+        this.playerBets = new TreeMap<>();
+        this.playerBudgets = new TreeMap<>();
+        this.playerHands = new TreeMap<>();
+        this.playerNames = new TreeSet<>();
+        this.playersBust = new TreeMap<>();
+        this.playersStand = new TreeMap<>();
+        this.playersWon = new TreeMap<>();
     }
 }
 

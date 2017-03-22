@@ -199,7 +199,7 @@ public class PlayerGui extends JPanel {
             Image imgAvatar = ImageIO.read(getClass().getResource("/avatars/"+avatarID+".png"));
             lblAvatar.setIcon(new ImageIcon(imgAvatar));
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace();
         }
         add(lblAvatar);
     }

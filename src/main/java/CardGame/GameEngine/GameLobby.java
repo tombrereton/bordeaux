@@ -3,7 +3,6 @@ package CardGame.GameEngine;
 import CardGame.MessageObject;
 import CardGame.User;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class GameLobby {
     private String lobbyName;
     private ArrayList<Player> players;
-    private Map<String, Socket> playerSockets;
     private Deck deck;
 
     // boolean flags
@@ -41,14 +39,11 @@ public class GameLobby {
      *
      * @param user user1's name
      */
-    public GameLobby(User user, Socket socket) {
+    public GameLobby(User user) {
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
 
         this.players.add(new Player(user));
-
-        this.playerSockets = new HashMap<>();
-        this.playerSockets.put(user.getUserName(), socket);
 
         // boolean flags
         this.allPlayersBetPlaced = false;
@@ -189,10 +184,8 @@ public class GameLobby {
         }
     }
 
-    public synchronized void addPlayer(User user, Socket playerSocket) {
-        this.playerSockets.put(user.getUserName(), playerSocket);
+    public synchronized void addPlayer(User user) {
         players.add(new Player(user));
-        // fill out
     }
 
     public synchronized Player getPlayer(User user) {
