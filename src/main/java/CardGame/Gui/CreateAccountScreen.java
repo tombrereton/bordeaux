@@ -50,6 +50,7 @@ public class CreateAccountScreen extends JPanel {
 
     /**
      * Initialise the components of the panel for labels, text fields and buttons.
+     * Method run as part of the constructor.
      */
     private void initialize() {
 

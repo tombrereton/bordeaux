@@ -15,36 +15,40 @@ import java.util.Observer;
 
 
 /**
- * gameScreen
- *
+ * Class for the game screen
  * @author Alex
  */
 public class GameScreen extends JPanel implements Observer {
 
+    //Client and main GUI class
     private GameClient client;
     private BlackjackOnline blackjackOnline;
 
+    //Message sidebar components
     private JTextArea textArea;
     private JList<String> listChat;
     private JScrollPane scrollPane;
     private JLabel lblChat;
     private JButton btnSendMessage;
-    private JButton btnStand;
-    private JButton btnHit;
-    private JLabel lblBudget;
-    private JLabel lblSubmitBet;
+    private JButton btnLeaveGame;
+    private JLabel lblBackHud;
+    private JLabel lblSideHud;
+    private JLabel lblSideFillHud;
+
+    //HUD panel components
     private JButton btnSubmitBet;
     private JButton btnBet1;
     private JButton btnBet2;
     private JButton btnBet3;
     private JButton btnBet4;
-    private JButton btnLeaveGame;
-    private JLabel lblCreditsBox;
+    private JButton btnHit;
+    private JButton btnStand;
+    private JLabel lblBudget;
+    private JLabel lblSubmitBet;
+    private JLabel lblBudgetBox;
     private JLabel lblSubmitBetBox;
-    private JLabel lblBackHud;
-    private JLabel lblSideHud;
-    private JLabel lblSideFillHud;
 
+    //Game components
     private JLabel lblDeck;
     private PlayerGui dealerGui;
     private PlayerGui playerGui1;
@@ -68,7 +72,7 @@ public class GameScreen extends JPanel implements Observer {
     private int player3HandOffset;
 
     /**
-     * Create the application.
+     * Instantiates the client and GUI, sets the background and initialises the components
      */
     public GameScreen(GameClient gameClient, BlackjackOnline blackjackOnline) {
         // we add this to list of observers
@@ -86,30 +90,31 @@ public class GameScreen extends JPanel implements Observer {
         this.blackjackOnline = blackjackOnline;
         this.amountToBet = amountToBet;
         this.credits = 100;
+
+        //Message sidebar components
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
         btnLeaveGame = new JButton("Leave");
         textArea = new JTextArea();
+        lblBackHud = new JLabel();
+        lblSideHud = new JLabel();
+        lblSideFillHud = new JLabel();
 
+        //HUD panel components
+        btnSubmitBet = new JButton();
         btnBet1 = new JButton();
         btnBet2 = new JButton();
         btnBet3 = new JButton();
         btnBet4 = new JButton();
         btnStand = new JButton();
         btnHit = new JButton();
-
         lblBudget = new JLabel("Credits: £ " + Integer.toString(credits));
-        lblCreditsBox = new JLabel();
+        lblBudgetBox = new JLabel();
         lblSubmitBet = new JLabel(Integer.toString(amountToBet));
         lblSubmitBetBox = new JLabel();
-        btnSubmitBet = new JButton();
 
-        lblBackHud = new JLabel();
-        lblSideHud = new JLabel();
-        lblSideFillHud = new JLabel();
-
-        //board images and players
+        //Game components
         lblDeck = new JLabel();
         playerGui1 = new PlayerGui();
         playerGui2 = new PlayerGui();
@@ -130,35 +135,24 @@ public class GameScreen extends JPanel implements Observer {
         setBackground(new Color(46, 139, 87));
         initialize();
         updateBounds();
-
         updateMessageList(gameClient);
     }
 
     /**
-     * Initialize the contents of the frame.
+     * Initialise the components of the panel for labels, text fields and buttons.
+     * Method run as part of the constructor.
      */
     private void initialize() {
 
-        /**
-         * Chat message box as a JScroll Pane
-         */
-
+        //INITIALISE MESSAGE COMPONENTS
         add(scrollPane);
 
-        /**
-         * chat label
-         */
+        //chat label
         lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
         lblChat.setForeground(Color.WHITE);
         add(lblChat);
 
-
-        // SEND BUTTON
-        /**
-         * Send message button
-         *
-         * And display the error if not successful
-         */
+        // SEND BUTTON. Display the error if not successful
         btnSendMessage.addActionListener(e -> {
 
             // show error in pop up box
@@ -175,7 +169,6 @@ public class GameScreen extends JPanel implements Observer {
             textArea.setText("");
             textArea.grabFocus();
 
-
             // We display the error if not successful
             int success = responseProtocol.getRequestSuccess();
             String errorMsg = responseProtocol.getErrorMsg();
@@ -183,7 +176,6 @@ public class GameScreen extends JPanel implements Observer {
                 JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                         JOptionPane.WARNING_MESSAGE);
             }
-
         });
         btnSendMessage.setContentAreaFilled(false);
         btnSendMessage.setBorderPainted(false);
@@ -198,23 +190,56 @@ public class GameScreen extends JPanel implements Observer {
         add(btnSendMessage);
         // END SEND BUTTON
 
-
         // CHAT MESSAGE BOX
-        /**
-         * Editable text area for sending messages
-         */
         textArea.setLineWrap(true);
         add(textArea);
         textArea.setColumns(10);
-
         // END CHAT MESSAGE BOX
 
-        // STAND BUTTON
-        /**
-         * Stand button
-         *
-         * And display the error if not successful
-         */
+        // LEAVE BUTTON
+        btnLeaveGame.addActionListener(e -> {
+            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+
+            if (leaveGame.getRequestSuccess() == 1) {
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
+
+                // reset all game data on the client
+                getClientModel().resetGameData();
+
+                // reset game data on game screen
+                resetHands();
+            }
+        });
+        btnLeaveGame.setBackground(Color.WHITE);
+        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
+        add(btnLeaveGame);
+        // END LEAVE BUTTON
+
+        //HUD BACKGROUND
+        try {
+            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
+            lblBackHud.setIcon(new ImageIcon(imgHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblBackHud);
+
+        //SIDE FILLED HUD
+        lblSideFillHud.setOpaque(true);
+        lblSideFillHud.setBackground(new Color(127, 37, 27));
+        add(lblSideFillHud);
+
+        //SIDE HUD IMAGE
+        try {
+            Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
+            lblSideHud.setIcon(new ImageIcon(imgSideHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblSideHud);
+
+        // STAND BUTTON. Display the error if not successful
         btnStand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // send a stand request to server
@@ -228,7 +253,6 @@ public class GameScreen extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
-
             }
         });
         btnStand.setContentAreaFilled(false);
@@ -242,13 +266,7 @@ public class GameScreen extends JPanel implements Observer {
         add(btnStand);
         // END STAND BUTTON
 
-
-        // HIT BUTTON
-        /**
-         * Hit Button
-         *
-         * And display the error if not successful
-         */
+        // HIT BUTTON. Display the error if not successful
         btnHit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // send a hit request to server
@@ -261,10 +279,8 @@ public class GameScreen extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
-
             }
         });
-
         btnHit.setContentAreaFilled(false);
         btnHit.setBorderPainted(false);
         try {
@@ -404,30 +420,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-        // LEAVE BUTTON
-        /**
-         * leave game button
-         */
-        btnLeaveGame.addActionListener(e -> {
-            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
-
-            if (leaveGame.getRequestSuccess() == 1) {
-                chatMessageModel.clear();
-                gameScreenChatOffset = 0;
-
-                // reset all game data on the client
-                getClientModel().resetGameData();
-
-                // reset game data on game screen
-                resetHands();
-            }
-        });
-        btnLeaveGame.setBackground(Color.WHITE);
-        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
-        add(btnLeaveGame);
-
-        // END LEAVE BUTTON
-
 
         /**
          * Credits Box
@@ -435,11 +427,11 @@ public class GameScreen extends JPanel implements Observer {
 
         try {
             Image imgBoxCredits = ImageIO.read(getClass().getResource("/gameHud/imageBoxCredits.png"));
-            lblCreditsBox.setIcon(new ImageIcon(imgBoxCredits));
+            lblBudgetBox.setIcon(new ImageIcon(imgBoxCredits));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCreditsBox);
+        add(lblBudgetBox);
 
         /**
          * Bet Box
@@ -451,28 +443,6 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(lblSubmitBetBox);
-
-
-        //Hud background, lblBackHud, lblSideHud, lblSideFillHud
-        try {
-            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
-            lblBackHud.setIcon(new ImageIcon(imgHud));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblBackHud);
-
-        lblSideFillHud.setOpaque(true);
-        lblSideFillHud.setBackground(new Color(127, 37, 27));
-        add(lblSideFillHud);
-
-        try {
-            Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
-            lblSideHud.setIcon(new ImageIcon(imgSideHud));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblSideHud);
 
 
         //Player positions and board images: lblDeck, playerGui1, playerGui2, playerGui3, playerGui4
@@ -516,7 +486,7 @@ public class GameScreen extends JPanel implements Observer {
         btnBet2.setBounds(186, blackjackOnline.getScreenHeightCurrent() - 166, 81, 81);
         btnBet3.setBounds(267, blackjackOnline.getScreenHeightCurrent() - 136, 81, 81);
         btnBet4.setBounds(353, blackjackOnline.getScreenHeightCurrent() - 126, 81, 81);
-        lblCreditsBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
+        lblBudgetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
         lblSubmitBetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 126, 144, 45);
         lblBackHud.setBounds(-20, blackjackOnline.getScreenHeightCurrent() - 176, 2590, 204);
         lblDeck.setBounds(blackjackOnline.getxScreenDiff() + 650, 20, 64, 93);
