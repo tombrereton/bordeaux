@@ -238,8 +238,6 @@ public class GameClient extends Observable {
      */
     public String hashPassword(String password) {
         return Hasher.hashPassword(password);
-//        String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
-//        return sha256hex;
     }
 
     // SPECIFIC REQUEST METHODS
@@ -971,17 +969,17 @@ public class GameClient extends Observable {
         return reconnectAttempts;
     }
 
-    public synchronized void resetDealerAndPlayerHands(){
+    public synchronized void resetDealerAndPlayerHands() {
 
         // reset player hands to empty
-        for (Map.Entry<String, Hand> playerhand : this.playerHands.entrySet()){
+        for (Map.Entry<String, Hand> playerhand : this.playerHands.entrySet()) {
             playerhand.setValue(new Hand());
         }
 
         // reset dealer hand to empty
         Iterator<Card> dealerIterator = this.dealerHand.getHand().iterator();
 
-        while(dealerIterator.hasNext()){
+        while (dealerIterator.hasNext()) {
             dealerIterator.next();
             dealerIterator.remove();
         }
