@@ -237,8 +237,9 @@ public class GameClient extends Observable {
      * @return
      */
     public String hashPassword(String password) {
-        String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
-        return sha256hex;
+        return Hasher.hashPassword(password);
+//        String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+//        return sha256hex;
     }
 
     // SPECIFIC REQUEST METHODS

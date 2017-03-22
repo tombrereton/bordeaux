@@ -757,7 +757,7 @@ public class GameScreen extends JPanel implements Observer {
         }
     }
 
-    private synchronized void updateDealerHand(GameClient model) {
+    private void updateDealerHand(GameClient model) {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
@@ -776,7 +776,7 @@ public class GameScreen extends JPanel implements Observer {
      * @param player
      * @return
      */
-    private synchronized int getPlayerHandOffset(int player) {
+    private int getPlayerHandOffset(int player) {
         switch (player) {
             case 0:
                 return player0HandOffset;
@@ -798,7 +798,7 @@ public class GameScreen extends JPanel implements Observer {
      * @param player
      * @param offset
      */
-    private synchronized void setPlayerHandOffset(int player, int offset) {
+    private void setPlayerHandOffset(int player, int offset) {
         switch (player) {
             case 0:
                 this.player0HandOffset = offset;
@@ -812,7 +812,7 @@ public class GameScreen extends JPanel implements Observer {
 
     }
 
-    private synchronized void updatePlayerHand(GameClient model, String playerName, int i) {
+    private void updatePlayerHand(GameClient model, String playerName, int i) {
 
         // set each player's card
         ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
@@ -832,7 +832,7 @@ public class GameScreen extends JPanel implements Observer {
         setPlayerHandOffset(i, playerHandOffset);
     }
 
-    private synchronized void resetHands() {
+    private void resetHands() {
         // we reset the client player and dealer hands
         getClientModel().resetDealerAndPlayerHands();
 
@@ -861,7 +861,7 @@ public class GameScreen extends JPanel implements Observer {
         revalidate();
     }
 
-    private synchronized void updateMessageList(GameClient model) {
+    private void updateMessageList(GameClient model) {
         // get clientGameOf
         int clientMsgOffset = model.getMessages().size();
 

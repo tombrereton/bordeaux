@@ -119,18 +119,16 @@ public class LobbyScreen extends JPanel implements Observer {
         /**
          * Join button
          */
-        btnJoinGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        btnJoinGame.addActionListener(e -> {
 
-                ResponseProtocol responseProtocol = getClientModel().requestJoinGame(getGameName());
+            ResponseProtocol responseProtocol = getClientModel().requestJoinGame(getGameName());
 
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
+            // We display the error if not successful
+            int success = responseProtocol.getRequestSuccess();
+            String errorMsg = responseProtocol.getErrorMsg();
+            if (success == 0) {
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
         btnJoinGame.setFont(new Font("Soho Std", Font.PLAIN, 16));
