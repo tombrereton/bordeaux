@@ -259,7 +259,6 @@ public class GameScreen extends JPanel implements Observer {
                 // We display the error if not successful
                 int success = responseProtocol.getRequestSuccess();
                 String errorMsg = responseProtocol.getErrorMsg();
-
                 if (success == 0) {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
@@ -554,6 +553,10 @@ public class GameScreen extends JPanel implements Observer {
         return playerGui;
     }
 
+    public PlayerGui getDealerGui(){
+        return dealerGui;
+    }
+
     /**
      * A helper method to set each player's card
      *
@@ -695,10 +698,10 @@ public class GameScreen extends JPanel implements Observer {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                getDealerGui().refreshPlayerGui();
             }
             repaint();
             revalidate();
-
         }
     }
 
