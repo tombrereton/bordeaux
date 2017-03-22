@@ -8,7 +8,8 @@ import CardGame.Responses.ResponseProtocol;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -70,6 +71,7 @@ public class GameScreen extends JPanel implements Observer {
     private int player1HandOffset;
     private int player2HandOffset;
     private int player3HandOffset;
+    private boolean dealerFacedUp;
 
     /**
      * Instantiates the client and GUI, sets the background and initialises the components
@@ -121,6 +123,7 @@ public class GameScreen extends JPanel implements Observer {
         playerGui3 = new PlayerGui();
         playerGui4 = new PlayerGui();
         dealerGui = new PlayerGui("1");
+        dealerFacedUp = true;
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -420,6 +423,30 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
+        // LEAVE BUTTON
+        /**
+         * leave game button
+         */
+        btnLeaveGame.addActionListener(e -> {
+            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
+
+            if (leaveGame.getRequestSuccess() == 1) {
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
+
+                // reset all game data on the client
+                getClientModel().resetGameDataWhenQuitting();
+
+                // reset game data on game screen
+                resetHands();
+            }
+        });
+        btnLeaveGame.setBackground(Color.WHITE);
+        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
+        add(btnLeaveGame);
+
+        // END LEAVE BUTTON
+
 
         /**
          * Credits Box
@@ -625,6 +652,7 @@ public class GameScreen extends JPanel implements Observer {
             // we update the dealer hand
             updateDealerHand(model);
 
+
             // set players' information and set cards to players
             if (model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()) {
 
@@ -643,15 +671,18 @@ public class GameScreen extends JPanel implements Observer {
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
 
+                    // set each player's card
+                    updatePlayerHand(model, playerName, i);
+
                     //set each player's avatar
                     getplayerGui(i).setLblAvatar(playerAvatar);
 
-                    // set each player's card
-                    updatePlayerHand(model, playerName, i);
+
                 }
             }
         }
     }
+
 
     private void showWarningWhenServerDown(GameClient model) {
         if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
@@ -664,11 +695,17 @@ public class GameScreen extends JPanel implements Observer {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
+            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
+                dealerHandOffset = 0;
+            }
             while (dealerHandOffset < dealerHandSize) {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
             }
+            repaint();
+            revalidate();
+
         }
     }
 
@@ -777,4 +814,7 @@ public class GameScreen extends JPanel implements Observer {
         }
     }
 
+    public void setDealerFacedUp(boolean dealerFacedUp) {
+        this.dealerFacedUp = dealerFacedUp;
+    }
 }

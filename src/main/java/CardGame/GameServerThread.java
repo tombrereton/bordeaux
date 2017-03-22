@@ -202,13 +202,20 @@ public class GameServerThread implements Runnable {
                 return handleGetPlayersBust(protocolId);
             case PUSH_DEALER_HAND:
                 return handleGetDealerhand(protocolId);
+            case PUSH_ARE_PLAYERS_FINISHED:
+                return handleGetAllPlayersFinished(protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
     }
 
+    private ResponseProtocol handleGetAllPlayersFinished(int protocolId) {
+        boolean allPlayersFinished = this.getGame(gameJoined).isAllPlayersFinished();
+
+        return new PushAreAllPlayersFinished(protocolId, SUCCESS, allPlayersFinished);
+    }
+
     private ResponseProtocol handleGetDealerhand(int protocolId) {
-        // TODO: i think a multiplayer error is here
         Hand dealerHand = this.getGame(gameJoined).getDealerHand();
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);

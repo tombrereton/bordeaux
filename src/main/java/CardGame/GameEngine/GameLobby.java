@@ -186,6 +186,11 @@ public class GameLobby {
 
     public synchronized void addPlayer(User user) {
         players.add(new Player(user));
+
+        // when players joins set all to false
+        setAllPlayersBustToFalse();
+        setAllPlayersWonToFalse();
+        setAllPlayersStandToFalse();
     }
 
     public synchronized Player getPlayer(User user) {
@@ -244,27 +249,13 @@ public class GameLobby {
         }
     }
 
-//    /**
-//     * This method will check whether all cards are left on this deck
-//     *
-//     * @return If the player still has the cards, return false, else true
-//     */
-//    public synchronized boolean allPlayersNoCards() {
-//        for (Player p : players) {
-//            // if the player still have cards
-//            // return false
-//            if (p.isCardLeft()) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
     public synchronized boolean setAllPlayersFinished() {
         // change to check player.isfinishedround
 
         for (Player p : players) {
-            if (!getPlayersWon().get(p.getUsername()) && !getPlayersStand().get(p.getUsername())) {
+            boolean isPlayerWon = getPlayersWon().get(p.getUsername());
+            boolean isPlayerStand = getPlayersStand().get(p.getUsername());
+            if (!isPlayerWon && !isPlayerStand) {
                 setAllPlayersFinished(false);
                 return false;
             }
@@ -300,20 +291,12 @@ public class GameLobby {
         return playerBets;
     }
 
-//    /**
-//     * This method returns a map of all players and their isFinishedRound status.
-//     *
-//     * @return
-//     */
-//    public synchronized Map<String, Boolean> getPlayersFinished() {
-//        Map<String, Boolean> playersFinished = new HashMap<>();
-//
-//        for (Player player : players) {
-//            playersFinished.put(player.getUsername(), player.isFinishedRound());
-//        }
-//
-//        return playersFinished;
-//    }
+    public synchronized void startGameForTesting(){
+        // shuffles deck with random seed = 1
+        deck.shuffleForTests();
+
+        nextGame();
+    }
 
     /**
      * deals 2 cards to everyone, all cards face up

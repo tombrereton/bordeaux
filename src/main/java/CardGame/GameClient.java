@@ -58,6 +58,7 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
+    private boolean allPlayersFinished;
 
 
     // chat variables
@@ -513,33 +514,6 @@ public class GameClient extends Observable {
         return getResponse(ResponseHit.class);
     }
 
-    /**
-     * send double bet request
-     *
-     * @return
-     */
-    public synchronized ResponseDoubleBet requestDoubleBet() {
-        // create request and send request
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(getLoggedInUser().getUserName());
-        sendRequest(requestDoubleBet);
-
-        // get response from server and returnit
-        return getResponse(ResponseDoubleBet.class);
-    }
-
-    /**
-     * send fold bet request
-     *
-     * @return
-     */
-    public synchronized ResponseFold requestFold() {
-        // create request and send request
-        RequestFold requestFold = new RequestFold(getLoggedInUser().getUserName());
-        sendRequest(requestFold);
-
-        // get response from server and returnit
-        return getResponse(ResponseFold.class);
-    }
 
     /**
      * send stand request
@@ -652,9 +626,21 @@ public class GameClient extends Observable {
 
         // get response from server and returnit
         PushPlayersWon pushPlayersWon = getResponse(PushPlayersWon.class);
-        playersWon = pushPlayersWon.getPlayersWon();
+        this.playersWon = pushPlayersWon.getPlayersWon();
 
         return pushPlayersWon;
+    }
+
+    public synchronized PushAreAllPlayersFinished requestGetAreAllPlayersFinished() {
+        // create request and send request
+        RequestGetAllPlayersFinished requestGetAllPlayersFinished = new RequestGetAllPlayersFinished();
+        sendRequest(requestGetAllPlayersFinished);
+
+        // get response from server and return it
+        PushAreAllPlayersFinished pushAreAllPlayersFinished = getResponse(PushAreAllPlayersFinished.class);
+        this.allPlayersFinished = pushAreAllPlayersFinished.isAllPlayersFinished();
+
+        return pushAreAllPlayersFinished;
     }
 
 
@@ -839,6 +825,9 @@ public class GameClient extends Observable {
 
         isGameDataUpdated = false;
 
+        // All players finished
+        requestGetAreAllPlayersFinished();
+
         // Dealer hand
         requestGetDealerHand();
 
@@ -969,6 +958,10 @@ public class GameClient extends Observable {
         return reconnectAttempts;
     }
 
+    public boolean isAllPlayersFinished() {
+        return allPlayersFinished;
+    }
+
     public synchronized void resetDealerAndPlayerHands() {
 
         // reset player hands to empty
@@ -985,7 +978,7 @@ public class GameClient extends Observable {
         }
     }
 
-    public synchronized void resetGameData() {
+    public synchronized void resetGameDataWhenQuitting() {
         this.chatOffset = -1;
         this.playersFinished = new TreeMap<>();
         this.dealerHand = new Hand();
