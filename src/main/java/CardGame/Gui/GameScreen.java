@@ -17,6 +17,7 @@ import java.util.Observer;
 
 /**
  * Class for the game screen
+ *
  * @author Alex
  */
 public class GameScreen extends JPanel implements Observer {
@@ -208,7 +209,7 @@ public class GameScreen extends JPanel implements Observer {
                 gameScreenChatOffset = 0;
 
                 // reset all game data on the client
-                getClientModel().resetGameData();
+                getClientModel().resetGameDataWhenQuitting();
 
                 // reset game data on game screen
                 resetHands();
@@ -219,28 +220,6 @@ public class GameScreen extends JPanel implements Observer {
         add(btnLeaveGame);
         // END LEAVE BUTTON
 
-        //HUD BACKGROUND
-        try {
-            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
-            lblBackHud.setIcon(new ImageIcon(imgHud));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblBackHud);
-
-        //SIDE FILLED HUD
-        lblSideFillHud.setOpaque(true);
-        lblSideFillHud.setBackground(new Color(127, 37, 27));
-        add(lblSideFillHud);
-
-        //SIDE HUD IMAGE
-        try {
-            Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
-            lblSideHud.setIcon(new ImageIcon(imgSideHud));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(lblSideHud);
 
         // STAND BUTTON. Display the error if not successful
         btnStand.addActionListener(new ActionListener() {
@@ -423,31 +402,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-        // LEAVE BUTTON
-        /**
-         * leave game button
-         */
-        btnLeaveGame.addActionListener(e -> {
-            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
-
-            if (leaveGame.getRequestSuccess() == 1) {
-                chatMessageModel.clear();
-                gameScreenChatOffset = 0;
-
-                // reset all game data on the client
-                getClientModel().resetGameDataWhenQuitting();
-
-                // reset game data on game screen
-                resetHands();
-            }
-        });
-        btnLeaveGame.setBackground(Color.WHITE);
-        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
-        add(btnLeaveGame);
-
-        // END LEAVE BUTTON
-
-
         /**
          * Credits Box
          */
@@ -470,6 +424,30 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(lblSubmitBetBox);
+
+
+        //HUD BACKGROUND
+        try {
+            Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
+            lblBackHud.setIcon(new ImageIcon(imgHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblBackHud);
+
+        //SIDE FILLED HUD
+        lblSideFillHud.setOpaque(true);
+        lblSideFillHud.setBackground(new Color(127, 37, 27));
+        add(lblSideFillHud);
+
+        //SIDE HUD IMAGE
+        try {
+            Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
+            lblSideHud.setIcon(new ImageIcon(imgSideHud));
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        add(lblSideHud);
 
 
         //Player positions and board images: lblDeck, playerGui1, playerGui2, playerGui3, playerGui4
@@ -685,7 +663,7 @@ public class GameScreen extends JPanel implements Observer {
 
 
     private void showWarningWhenServerDown(GameClient model) {
-        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
+        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN) {
             JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -695,7 +673,7 @@ public class GameScreen extends JPanel implements Observer {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
-            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
+            if (model.getDealerHand().getHand().size() > 0 && model.isAllPlayersFinished()) {
                 dealerHandOffset = 0;
             }
             while (dealerHandOffset < dealerHandSize) {
@@ -787,9 +765,9 @@ public class GameScreen extends JPanel implements Observer {
 
 
         // we reset the player cards to a blank image
-        for(int i = 0; i< 4;i++){
-            for (int j = 0; j < 12; j++){
-                setLbCards(getplayerGui(i),j,"400");
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 12; j++) {
+                setLbCards(getplayerGui(i), j, "400");
             }
         }
 
