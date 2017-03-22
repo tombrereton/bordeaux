@@ -52,8 +52,8 @@ public class Deck {
 
     public Card dealCard() {
         // Deals one card from the deck and returns it.
-        if (cardsUsed == 52)
-            shuffle();
+//        if (cardsUsed == 52)
+//            shuffle();
         cardsUsed++;
         return deckOfCards.get(cardsUsed - 1);
     }

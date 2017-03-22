@@ -180,6 +180,7 @@ public class GameLobby {
 
         if (dealerHand.getBlackjackValue() < 17) {
             Card newCard = deck.dealCard();
+            newCard.setFaceUp(true);
             dealerHand.addCard(newCard);
         }
     }
@@ -427,6 +428,7 @@ public class GameLobby {
         Player player = getPlayer(user);
 
         Card newCard = deck.dealCard();
+        newCard.setFaceUp(true);
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
@@ -446,6 +448,7 @@ public class GameLobby {
         Player player = getPlayer(username);
 
         Card newCard = deck.dealCard();
+        newCard.setFaceUp(true);
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
