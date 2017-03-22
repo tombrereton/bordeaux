@@ -7,3 +7,5 @@ target/
 .settings/
 out/
 /bordeaux.iml
+/.idea/uiDesigner.xml
+/.idea/
