@@ -2,6 +2,7 @@ package CardGame;
 
 import CardGame.GameEngine.GameLobby;
 import CardGame.GameEngine.Hand;
+import CardGame.GameEngine.Player;
 import CardGame.Pushes.*;
 import CardGame.Requests.*;
 import CardGame.Responses.*;
@@ -428,7 +429,12 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private boolean isBetWithinBudget(int betAmount) {
-        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
+        User l = getLoggedInUser();
+        GameLobby g = getGame(gameJoined);
+        Player p = g.getPlayer(l);
+        Boolean b = p.isBetWithinBudget(betAmount);
+        return b;
+//        return getGame(gameJoined).getPlayer(getLoggedInUser()).isBetWithinBudget(betAmount);
     }
 
     /**

@@ -373,11 +373,9 @@ public class GameScreen extends JPanel implements Observer {
         add(btnBet2);
 
         //Bet 3: high
-        btnBet3.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 20;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet3.addActionListener(e -> {
+            amountToBet += 20;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet3.setContentAreaFilled(false);
         btnBet3.setBorderPainted(false);

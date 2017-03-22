@@ -557,10 +557,10 @@ public class GameServerTest {
         // We check the game list is pushed
 
 
-        ArrayList<String> expectedGames = new ArrayList<>();
+        ConcurrentLinkedDeque<String> expectedGames = new ConcurrentLinkedDeque<>();
         expectedGames.add(this.userTest1.getUserName());
 
-        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames, gameNames);
+        assertEquals("Should return list of gamenames matching expected gamesList ", expectedGames.toString(), gameNames.toString());
     }
 
     /**
@@ -645,69 +645,6 @@ public class GameServerTest {
         assertEquals("Should return error message matching user not logged in ", USERNAME_MISMATCH, errorJoin);
     }
 
-
-    /**
-     * We test for 5 people joining a game, should return full game error for 5th person.
-     * If we reach this point we also know the database and database methods are working correctly
-     * for logging in.
-     */
-    @Test
-    public void joinGame03_test() {
-        // LOG OUT OF THREAD 1 AND 2
-        RequestLogOut requestLogOut = new RequestLogOut(this.userTest1.getUserName());
-        ResponseProtocol responseLogOut = serverThread1.handleInput(encodeRequest(requestLogOut));
-
-        // CREATE GAME (1st player)
-        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
-        RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
-        ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
-        ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
-        // check success
-        int success1st = respCreate.getRequestSuccess();
-        assertEquals("Should return failed response matching success ", SUCCESS, success1st);
-
-        // JOIN 2ND PLAYER
-        RequestLoginUser requestLoginUser2 = new RequestLoginUser(this.userTest2);
-        RequestJoinGame requestJoinGame2 = new RequestJoinGame(userTest1.getUserName(), userTest2.getUserName());
-        ResponseProtocol responseLogin2 = serverThread2.handleInput(encodeRequest(requestLoginUser2));
-        ResponseProtocol responseJoin2 = serverThread2.handleInput(encodeRequest(requestJoinGame2));
-        // check success
-        int success2nd = responseJoin2.getRequestSuccess();
-        assertEquals("Should return failed response matching success ", SUCCESS, success2nd);
-
-        // JOIN 3rd PLAYER
-        RequestLoginUser requestLoginUser3 = new RequestLoginUser(this.userTest3);
-        RequestJoinGame requestJoinGame3 = new RequestJoinGame(userTest1.getUserName(), userTest3.getUserName());
-        ResponseProtocol responseLogin3 = serverThread3.handleInput(encodeRequest(requestLoginUser3));
-        ResponseProtocol responseJoin3 = serverThread3.handleInput(encodeRequest(requestJoinGame3));
-        // check success
-        int success3rd = responseJoin3.getRequestSuccess();
-        assertEquals("Should return failed response matching success", SUCCESS, success3rd);
-
-        // JOIN 4th PLAYER
-        RequestLoginUser requestLoginUser4 = new RequestLoginUser(this.userTest4);
-        RequestJoinGame requestJoinGame4 = new RequestJoinGame(userTest1.getUserName(), userTest4.getUserName());
-        ResponseProtocol responseLogin4 = serverThread4.handleInput(encodeRequest(requestLoginUser4));
-        ResponseProtocol responseJoin4 = serverThread4.handleInput(encodeRequest(requestJoinGame4));
-        // check success
-        int success4th = responseJoin4.getRequestSuccess();
-        assertEquals("Should return failed response matching success ", SUCCESS, success4th);
-
-        // JOIN 5th PLAYER
-        RequestLoginUser requestLoginUser5 = new RequestLoginUser(this.userTest5);
-        RequestJoinGame requestJoinGame5 = new RequestJoinGame(userTest1.getUserName(), userTest5.getUserName());
-        ResponseProtocol responseLogin5 = serverThread5.handleInput(encodeRequest(requestLoginUser5));
-        ResponseProtocol responseJoin5 = serverThread5.handleInput(encodeRequest(requestJoinGame5));
-
-        // 5th player should return failed response
-        int success5th = responseJoin5.getRequestSuccess();
-        String errorMsg5th = responseJoin5.getErrorMsg();
-
-        assertEquals("Should return failed response matching fail ", FAIL, success5th);
-
-        assertEquals("Should return error message saying game is full matching GAME_FULL ", GAME_FULL, errorMsg5th);
-
-    }
 
     /**
      * We test for 1 clientSideThread creating a game, another clientSideThread joining that game.
@@ -796,6 +733,67 @@ public class GameServerTest {
         assertEquals("Should return success join response  ", SUCCESS, successJoin);
     }
 
+
+    /**
+     * We test for 5 people joining a game, should return full game error for 5th person.
+     * If we reach this point we also know the database and database methods are working correctly
+     * for logging in.
+     */
+    @Test
+    public void joinGame03_test() {
+
+        // CREATE GAME (1st player)
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
+        ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
+        // check success
+        int success1st = respCreate.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success1st);
+
+        // JOIN 2ND PLAYER
+        RequestLoginUser requestLoginUser2 = new RequestLoginUser(this.userTest2);
+        RequestJoinGame requestJoinGame2 = new RequestJoinGame(userTest1.getUserName(), userTest2.getUserName());
+        ResponseProtocol responseLogin2 = serverThread2.handleInput(encodeRequest(requestLoginUser2));
+        ResponseProtocol responseJoin2 = serverThread2.handleInput(encodeRequest(requestJoinGame2));
+        // check success
+        int success2nd = responseJoin2.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success2nd);
+
+        // JOIN 3rd PLAYER
+        RequestLoginUser requestLoginUser3 = new RequestLoginUser(this.userTest3);
+        RequestJoinGame requestJoinGame3 = new RequestJoinGame(userTest1.getUserName(), userTest3.getUserName());
+        ResponseProtocol responseLogin3 = serverThread3.handleInput(encodeRequest(requestLoginUser3));
+        ResponseProtocol responseJoin3 = serverThread3.handleInput(encodeRequest(requestJoinGame3));
+        // check success
+        int success3rd = responseJoin3.getRequestSuccess();
+        assertEquals("Should return failed response matching success", SUCCESS, success3rd);
+
+        // JOIN 4th PLAYER
+        RequestLoginUser requestLoginUser4 = new RequestLoginUser(this.userTest4);
+        RequestJoinGame requestJoinGame4 = new RequestJoinGame(userTest1.getUserName(), userTest4.getUserName());
+        ResponseProtocol responseLogin4 = serverThread4.handleInput(encodeRequest(requestLoginUser4));
+        ResponseProtocol responseJoin4 = serverThread4.handleInput(encodeRequest(requestJoinGame4));
+        // check success
+        int success4th = responseJoin4.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success4th);
+
+        // JOIN 5th PLAYER
+        RequestLoginUser requestLoginUser5 = new RequestLoginUser(this.userTest5);
+        RequestJoinGame requestJoinGame5 = new RequestJoinGame(userTest1.getUserName(), userTest5.getUserName());
+        ResponseProtocol responseLogin5 = serverThread5.handleInput(encodeRequest(requestLoginUser5));
+        ResponseProtocol responseJoin5 = serverThread5.handleInput(encodeRequest(requestJoinGame5));
+
+        // 5th player should return failed response
+        int success5th = responseJoin5.getRequestSuccess();
+        String errorMsg5th = responseJoin5.getErrorMsg();
+
+        assertEquals("Should return failed response matching fail ", FAIL, success5th);
+
+        assertEquals("Should return error message saying game is full matching GAME_FULL ", GAME_FULL, errorMsg5th);
+    }
+
+
     /**
      * We test a bet request for the blackjack game
      */
@@ -817,6 +815,56 @@ public class GameServerTest {
         int successBet = responseBet.getRequestSuccess();
         assertEquals("Should return successful bet response matching success ", SUCCESS, successBet);
     }
+
+
+    /**
+     * We test a bet request for 2 players in the blackjack game
+     */
+    @Test
+    public void bet02_test() {
+
+        // CREATE GAME (1st player)
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
+        ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
+        // check success
+        int success1st = respCreate.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success1st);
+
+        // JOIN 2ND PLAYER
+        RequestLoginUser requestLoginUser2 = new RequestLoginUser(this.userTest2);
+        RequestJoinGame requestJoinGame2 = new RequestJoinGame(userTest1.getUserName(), userTest2.getUserName());
+        ResponseProtocol responseLogin2 = serverThread2.handleInput(encodeRequest(requestLoginUser2));
+        ResponseProtocol responseJoin2 = serverThread2.handleInput(encodeRequest(requestJoinGame2));
+        // check success
+        int success2nd = responseJoin2.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success2nd);
+
+        // BET PLAYER 1
+        RequestBet requestBet1 = new RequestBet(10, userTest1.getUserName());
+        ResponseProtocol responsBet1 = this.serverThread1.handleInput(encodeRequest(requestBet1));
+
+        // We check the bet 1 was successful
+        int successBet1 = responsBet1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet1);
+
+        // BET PLAYER 1
+        RequestBet requestBet2 = new RequestBet(10, userTest2.getUserName());
+        ResponseProtocol responsBet2 = this.serverThread2.handleInput(encodeRequest(requestBet2));
+
+        // We check the bet 2 was successful
+        int successBet2 = responsBet2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet2);
+
+        // We check error msg is empty
+        String errorMsg2 = responsBet2.getErrorMsg();
+        assertEquals("Should return empty error message matching empty ", "", errorMsg2);
+
+
+    }
+
+
 
     /**
      * We test a hit request while not in a game
@@ -857,6 +905,69 @@ public class GameServerTest {
         // we check the hit was successful
         int successHit = responseProtocol2.getRequestSuccess();
         assertEquals("Should return successful hit response matching success ", SUCCESS, successHit);
+    }
+
+
+    /**
+     * We test a hitting until bust for 2 players in the blackjack game
+     */
+    @Test
+    public void hit03_test() {
+
+        // CREATE GAME (1st player)
+        RequestProtocol requestLoginUser = new RequestLoginUser(this.userTest1);
+        RequestProtocol requestCreateGame = new RequestCreateGame(userTest1.getUserName());
+        ResponseProtocol responseProtocol = serverThread1.handleInput(encodeRequest(requestLoginUser));
+        ResponseProtocol respCreate = serverThread1.handleInput(encodeRequest(requestCreateGame));
+        // check success
+        int success1st = respCreate.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success1st);
+
+        // JOIN 2ND PLAYER
+        RequestLoginUser requestLoginUser2 = new RequestLoginUser(this.userTest2);
+        RequestJoinGame requestJoinGame2 = new RequestJoinGame(userTest1.getUserName(), userTest2.getUserName());
+        ResponseProtocol responseLogin2 = serverThread2.handleInput(encodeRequest(requestLoginUser2));
+        ResponseProtocol responseJoin2 = serverThread2.handleInput(encodeRequest(requestJoinGame2));
+        // check success
+        int success2nd = responseJoin2.getRequestSuccess();
+        assertEquals("Should return failed response matching success ", SUCCESS, success2nd);
+
+        // BET PLAYER 1
+        RequestBet requestBet1 = new RequestBet(10, userTest1.getUserName());
+        ResponseProtocol responsBet1 = this.serverThread1.handleInput(encodeRequest(requestBet1));
+
+        // We check the bet 1 was successful
+        int successBet1 = responsBet1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet1);
+
+        // BET PLAYER 1
+        RequestBet requestBet2 = new RequestBet(10, userTest2.getUserName());
+        ResponseProtocol responsBet2 = this.serverThread2.handleInput(encodeRequest(requestBet2));
+
+        // We check the bet 2 was successful
+        int successBet2 = responsBet2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, successBet2);
+
+        // HIT FOR PLAYER ONE
+        RequestHit requestHit1_1 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol1_1 = serverThread1.handleInput(encodeRequest(requestHit1_1));
+        // We check the hit was successful
+        int success1_1 = responseProtocol1_1.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_1);
+
+        RequestHit requestHit1_2 = new RequestHit(userTest1.getUserName());
+        ResponseProtocol responseProtocol1_2 = serverThread1.handleInput(encodeRequest(requestHit1_2));
+        // We check the hit was successful
+        int success1_2 = responseProtocol1_2.getRequestSuccess();
+        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_2);
+
+//        RequestHit requestHit1_3 = new RequestHit(userTest1.getUserName());
+//        ResponseProtocol responseProtocol1_3 = serverThread1.handleInput(encodeRequest(requestHit1_3));
+//        // We check the hit was successful
+//        int success1_3 = responseProtocol1_3.getRequestSuccess();
+//        assertEquals("Should return successful bet response matching success ", SUCCESS, success1_3);
+
+
     }
 
     /**

@@ -28,9 +28,13 @@ public class Deck {
     }
 
 
+    /**
+     * Randomises the cards
+     */
     public void shuffle() {
         long seed = System.nanoTime();
-        Collections.shuffle(deckOfCards, new Random(seed));
+        // TODO: change the seed to random
+        Collections.shuffle(deckOfCards, new Random(1));
         cardsUsed = 0;
     }
 
