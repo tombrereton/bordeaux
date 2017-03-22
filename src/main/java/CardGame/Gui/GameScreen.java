@@ -66,6 +66,7 @@ public class GameScreen extends JPanel implements Observer {
     private int player1HandOffset;
     private int player2HandOffset;
     private int player3HandOffset;
+    private boolean dealerFacedUp;
 
     /**
      * Create the application.
@@ -116,6 +117,7 @@ public class GameScreen extends JPanel implements Observer {
         playerGui3 = new PlayerGui();
         playerGui4 = new PlayerGui();
         dealerGui = new PlayerGui("1");
+        dealerFacedUp = true;
 
         // chat variables
         this.gameScreenChatOffset = 0;
@@ -655,6 +657,7 @@ public class GameScreen extends JPanel implements Observer {
             // we update the dealer hand
             updateDealerHand(model);
 
+
             // set players' information and set cards to players
             if (model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()) {
 
@@ -673,15 +676,18 @@ public class GameScreen extends JPanel implements Observer {
                     // set each player's bet
                     getplayerGui(i).setLblBetAmount(playerBets);
 
+                    // set each player's card
+                    updatePlayerHand(model, playerName, i);
+
                     //set each player's avatar
                     getplayerGui(i).setLblAvatar(playerAvatar);
 
-                    // set each player's card
-                    updatePlayerHand(model, playerName, i);
+
                 }
             }
         }
     }
+
 
     private void showWarningWhenServerDown(GameClient model) {
         if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
@@ -698,6 +704,16 @@ public class GameScreen extends JPanel implements Observer {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                repaint();
+                revalidate();
+            }
+            if (model.getDealerHand().getHand().size()>0 && model.isAllPlayersFinished()){
+                for(int i=0; i<model.getDealerHand().getHand().size();i++){
+                    setLbCards(dealerGui, i, model.getDealerHand().getCard(i).getImageID());
+                }
+                repaint();
+                revalidate();
+//                setDealerFacedUp(false);
             }
         }
     }
@@ -807,4 +823,7 @@ public class GameScreen extends JPanel implements Observer {
         }
     }
 
+    public void setDealerFacedUp(boolean dealerFacedUp) {
+        this.dealerFacedUp = dealerFacedUp;
+    }
 }
