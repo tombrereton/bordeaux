@@ -5,7 +5,7 @@ target/
 .classpath
 .project
 .settings/
-out/
 /bordeaux.iml
 /.idea/uiDesigner.xml
 /.idea/
+bin/
