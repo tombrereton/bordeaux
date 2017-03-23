@@ -49,7 +49,6 @@ public class GameClient extends Observable {
 
     // game data
     private boolean isGameDataUpdated;
-    private Map<String, Boolean> playersFinished;
     private Hand dealerHand;
     private Map<String, Integer> playerBets;
     private Map<String, Integer> playerBudgets;
@@ -59,7 +58,6 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
     private boolean allPlayersFinished;
-
 
     // chat variables
     private int chatOffset;
@@ -90,7 +88,6 @@ public class GameClient extends Observable {
         // instantiate game variables
         this.chatOffset = -1;
         this.listOfGames = new ConcurrentSkipListSet<>();
-        playersFinished = new TreeMap<>();
         dealerHand = new Hand();
         playerBets = new TreeMap<>();
         playerBudgets = new TreeMap<>();
@@ -719,8 +716,11 @@ public class GameClient extends Observable {
 
     public void reconnectToServer() {
 
+        stopGettingGameData();
+        stopGettingMessages();
+        resetGameDataWhenQuitting();
+
         while (isServerDown && reconnectAttempts < 3) {
-            // tell observers about reconnection attempts
 
             System.out.println("Will try to reconnect to server in 5 seconds");
 
@@ -734,13 +734,16 @@ public class GameClient extends Observable {
             // try to reconnect
             connectToServer();
 
-            // send login request if connected to server
-            if (!isServerDown()) {
-                requestReLogin(loggedInUser.getUserName(), loggedInUser.getPassword());
-                break;
-            }
             reconnectAttempts++;
+
+            // tell observers about reconnection attempts
             notifyObservers();
+        }
+
+        // send login request if connected to server
+        if (!isServerDown()) {
+            requestReLogin(loggedInUser.getUserName(), loggedInUser.getPassword());
+            startGettingGameNames();
         }
     }
 
@@ -766,7 +769,7 @@ public class GameClient extends Observable {
                     getMessagesAndAddToQueue();
 
 
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                 }
             } catch (NullPointerException e) {
                 System.out.println("Can't get messages. Server down.");
@@ -984,7 +987,6 @@ public class GameClient extends Observable {
 
     public synchronized void resetGameDataWhenQuitting() {
         this.chatOffset = -1;
-        this.playersFinished = new TreeMap<>();
         this.dealerHand = new Hand();
         this.playerBets = new TreeMap<>();
         this.playerBudgets = new TreeMap<>();

@@ -95,9 +95,12 @@ public class GameServerThread implements Runnable {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Sleep interrupted while waiting reading and writing to client.");
                 }
             }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            System.out.println("Null pointer exception while handling requests.");
         } catch (EOFException e) {
             System.out.println("GameClient disconnected.");
         } catch (IOException e) {
@@ -106,9 +109,11 @@ public class GameServerThread implements Runnable {
             // log user out of client and game on disconnect
             if (gameJoined != null) {
                 quitGame(gameJoined, getLoggedInUser().getUserName());
+                gameJoined = null;
             }
             logUserOut();
             System.out.println("Logged in user set to: " + getLoggedInUser());
+            System.out.println("Game joined set to: " + gameJoined);
             closeConnections();
         }
     }
@@ -214,7 +219,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetAllPlayersFinished(int protocolId) {
-        boolean allPlayersFinished = this.getGame(gameJoined).isAllPlayersFinished();
+        boolean allPlayersFinished = false;
+        if (gameJoined != null) {
+            allPlayersFinished = this.getGame(gameJoined).isAllPlayersFinished();
+        }
 
         return new PushAreAllPlayersFinished(protocolId, SUCCESS, allPlayersFinished);
     }
@@ -226,7 +234,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetDealerhand(int protocolId) {
-        Hand dealerHand = this.getGame(gameJoined).getDealerHand();
+        Hand dealerHand = null;
+        if (gameJoined != null) {
+            dealerHand = this.getGame(gameJoined).getDealerHand();
+        }
 
         return new PushDealerHand(protocolId, SUCCESS, dealerHand);
     }
@@ -238,7 +249,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayersBust(int protocolId) {
-        Map<String, Boolean> playersBust = this.getGame(gameJoined).getPlayersBust();
+        Map<String, Boolean> playersBust = null;
+        if (gameJoined != null) {
+            playersBust = this.getGame(gameJoined).getPlayersBust();
+        }
 
         return new PushPlayersBust(protocolId, SUCCESS, playersBust);
     }
@@ -250,7 +264,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayersWon(int protocolId) {
-        Map<String, Boolean> playersWon = this.getGame(gameJoined).getPlayersWon();
+        Map<String, Boolean> playersWon = null;
+        if (gameJoined != null) {
+            playersWon = this.getGame(gameJoined).getPlayersWon();
+        }
 
         return new PushPlayersWon(protocolId, SUCCESS, playersWon);
     }
@@ -262,7 +279,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayersStand(int protocolId) {
-        Map<String, Boolean> playersStand = this.getGame(gameJoined).getPlayersStand();
+        Map<String, Boolean> playersStand = null;
+        if (gameJoined != null) {
+            playersStand = this.getGame(gameJoined).getPlayersStand();
+        }
 
         return new PushPlayersStand(protocolId, SUCCESS, playersStand);
     }
@@ -274,7 +294,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayerBudgets(int protocolId) {
-        Map<String, Integer> playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
+        Map<String, Integer> playerBudgets = null;
+        if (gameJoined != null) {
+            playerBudgets = this.getGame(gameJoined).getPlayerBudgets();
+        }
 
         return new PushPlayerBudgets(protocolId, SUCCESS, playerBudgets);
     }
@@ -286,7 +309,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayerBets(int protocolId) {
-        Map<String, Integer> playerBets = this.getGame(gameJoined).getPlayerBets();
+        Map<String, Integer> playerBets = null;
+        if (gameJoined != null) {
+            playerBets = this.getGame(gameJoined).getPlayerBets();
+        }
 
         return new PushPlayerBets(protocolId, SUCCESS, playerBets);
     }
@@ -298,7 +324,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayerHands(int protocolId) {
-        Map<String, Hand> playerHands = this.getGame(gameJoined).getPlayerHands();
+        Map<String, Hand> playerHands = null;
+        if (gameJoined != null) {
+            playerHands = this.getGame(gameJoined).getPlayerHands();
+        }
 
         return new PushPlayerHands(protocolId, SUCCESS, playerHands);
     }
@@ -320,7 +349,10 @@ public class GameServerThread implements Runnable {
      * @return
      */
     private ResponseProtocol handleGetPlayerNames(int protocolId) {
-        Set<String> playerNames = new TreeSet<>(this.getGame(gameJoined).getPlayerNames());
+        Set<String> playerNames = null;
+        if (gameJoined != null) {
+            playerNames = new TreeSet<>(this.getGame(gameJoined).getPlayerNames());
+        }
 
         return new PushPlayerNames(protocolId, SUCCESS, playerNames);
     }

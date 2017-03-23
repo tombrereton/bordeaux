@@ -141,6 +141,8 @@ public class GameScreen extends JPanel implements Observer {
         initialize();
         updateBounds();
         updateMessageList(gameClient);
+
+        resetHands();
     }
 
     /**
@@ -548,7 +550,7 @@ public class GameScreen extends JPanel implements Observer {
         return playerGui;
     }
 
-    public PlayerGui getDealerGui(){
+    public PlayerGui getDealerGui() {
         return dealerGui;
     }
 
@@ -666,9 +668,9 @@ public class GameScreen extends JPanel implements Observer {
 
     private void checkwin(GameClient model) {
         Map<String, Boolean> playerWon = model.getPlayersWon();
-        if(model.isAllPlayersFinished()){
-            if(playerWon != null && playerWon.size()>0 && playerWon.get(model.getLoggedInUser().getUserName())){
-                JOptionPane.showMessageDialog(null, "Congratulations, you win the game!", "Congratulations",
+        if (model.isAllPlayersFinished()) {
+            if (playerWon != null && playerWon.size() > 0 && playerWon.get(model.getLoggedInUser().getUserName())) {
+                JOptionPane.showMessageDialog(null, "Congratulations, you win!", "Congratulations",
                         JOptionPane.WARNING_MESSAGE);
             }
         }
@@ -677,7 +679,8 @@ public class GameScreen extends JPanel implements Observer {
 
     private void showWarningWhenServerDown(GameClient model) {
         if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN) {
-            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+            JOptionPane.showMessageDialog(null, "Server down. Will try to reconnect 3 times." +
+                            "\nRestart Blackjack online if failed to reconnect after 15 seconds.", "Warning",
                     JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -687,10 +690,6 @@ public class GameScreen extends JPanel implements Observer {
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
 
-//            if (model.isAllPlayersFinished() && gameScreenChatOffsetAllPlayerFinished){
-//                dealerHandOffset = 0;
-//                gameScreenChatOffsetAllPlayerFinished = false;
-//            }
             if (dealerHandSize >= 2 && model.isAllPlayersFinished()) {
                 dealerHandOffset = 0;
             }
@@ -751,14 +750,14 @@ public class GameScreen extends JPanel implements Observer {
     private void updatePlayerHand(GameClient model, String playerName, int i) {
 
         // set each player's card
-        ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
+        ArrayList<Card> playersCards = model.getPlayerHands().get(playerName).getHand();
         int playerHandSize = model.getPlayerHands().get(playerName).getHand().size();
 
         //get this player's hand offset
         int playerHandOffset = getPlayerHandOffset(i);
 
         while (playerHandOffset < playerHandSize) {
-            setLbCards(getplayerGui(i), playerHandOffset, playersCard.get(playerHandOffset).getImageID());
+            setLbCards(getplayerGui(i), playerHandOffset, playersCards.get(playerHandOffset).getImageID());
             playerHandOffset++;
             getplayerGui(i).refreshPlayerGui();
             repaint();
