@@ -155,10 +155,11 @@ public class GameEngineTest {
 
         gameLobby.addPlayer(user2);
 
-        gameLobby.getPlayer(user.getUserName()).setBetPlaced(true);
-        gameLobby.getPlayer(user2.getUserName()).setBetPlaced(true);
 
-        gameLobby.setAllPlayersBetPlaced(true);
+//        gameLobby.getPlayer(user.getUserName()).setBetPlaced(true);
+//        gameLobby.getPlayer(user2.getUserName()).setBetPlaced(true);
+
+//        gameLobby.setAllPlayersBetPlaced(true);
         assertEquals(true,gameLobby.isAllPlayersBetPlaced());
 
     }
