@@ -3,7 +3,6 @@ package CardGame.GameEngine;
 import CardGame.MessageObject;
 import CardGame.User;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class GameLobby {
     private String lobbyName;
     private ArrayList<Player> players;
-    private Map<String, Socket> playerSockets;
     private Deck deck;
 
     // boolean flags
@@ -41,14 +39,11 @@ public class GameLobby {
      *
      * @param user user1's name
      */
-    public GameLobby(User user, Socket socket) {
+    public GameLobby(User user) {
         this.lobbyName = user.getUserName();
         this.players = new ArrayList<>();
 
         this.players.add(new Player(user));
-
-        this.playerSockets = new HashMap<>();
-        this.playerSockets.put(user.getUserName(), socket);
 
         // boolean flags
         this.allPlayersBetPlaced = false;
@@ -75,7 +70,7 @@ public class GameLobby {
     }
 
     private void setAllPlayersStandToFalse() {
-        for (Player p: players){
+        for (Player p : players) {
             getPlayersStand().put(p.getUsername(), false);
         }
     }
@@ -184,15 +179,19 @@ public class GameLobby {
         dealerHand.getHand().get(1).setFaceUp(true);
 
         if (dealerHand.getBlackjackValue() < 17) {
-            Card newCard = new Deck().dealCard();
+            Card newCard = deck.dealCard();
+            newCard.setFaceUp(true);
             dealerHand.addCard(newCard);
         }
     }
 
-    public synchronized void addPlayer(User user, Socket playerSocket) {
-        this.playerSockets.put(user.getUserName(), playerSocket);
+    public synchronized void addPlayer(User user) {
         players.add(new Player(user));
-        // fill out
+
+        // when players joins set all to false
+        setAllPlayersBustToFalse();
+        setAllPlayersWonToFalse();
+        setAllPlayersStandToFalse();
     }
 
     public synchronized Player getPlayer(User user) {
@@ -200,8 +199,6 @@ public class GameLobby {
         for (Player player : players) {
             if (player.getUsername().equals(user.getUserName())) {
                 return player;
-            } else {
-                return null;
             }
         }
         return null;
@@ -253,27 +250,13 @@ public class GameLobby {
         }
     }
 
-//    /**
-//     * This method will check whether all cards are left on this deck
-//     *
-//     * @return If the player still has the cards, return false, else true
-//     */
-//    public synchronized boolean allPlayersNoCards() {
-//        for (Player p : players) {
-//            // if the player still have cards
-//            // return false
-//            if (p.isCardLeft()) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
     public synchronized boolean setAllPlayersFinished() {
         // change to check player.isfinishedround
 
         for (Player p : players) {
-            if (!getPlayersWon().get(p.getUsername()) && !getPlayersStand().get(p.getUsername())) {
+            boolean isPlayerWon = getPlayersWon().get(p.getUsername());
+            boolean isPlayerStand = getPlayersStand().get(p.getUsername());
+            if (!isPlayerWon && !isPlayerStand) {
                 setAllPlayersFinished(false);
                 return false;
             }
@@ -309,20 +292,12 @@ public class GameLobby {
         return playerBets;
     }
 
-//    /**
-//     * This method returns a map of all players and their isFinishedRound status.
-//     *
-//     * @return
-//     */
-//    public synchronized Map<String, Boolean> getPlayersFinished() {
-//        Map<String, Boolean> playersFinished = new HashMap<>();
-//
-//        for (Player player : players) {
-//            playersFinished.put(player.getUsername(), player.isFinishedRound());
-//        }
-//
-//        return playersFinished;
-//    }
+    public synchronized void startGameForTesting() {
+        // shuffles deck with random seed = 1
+        deck.shuffleForTests();
+
+        nextGame();
+    }
 
     /**
      * deals 2 cards to everyone, all cards face up
@@ -379,7 +354,7 @@ public class GameLobby {
     private void removeDealerCards() {
         Iterator<Card> iterator = dealerHand.getHand().iterator();
 
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             iterator.next();
             iterator.remove();
         }
@@ -400,7 +375,7 @@ public class GameLobby {
 
         setAllPlayersFinished();
 
-        if (isAllPlayersFinished()){
+        if (isAllPlayersFinished()) {
             setAllPlayersBustToFalse();
             setAllPlayersWonToFalse();
             setAllPlayersStandToFalse();
@@ -413,31 +388,14 @@ public class GameLobby {
     }
 
     private void resetPlayers() {
-        for (Player player : players){
+        for (Player player : players) {
             player.setBetPlaced(false);
             player.setPlayerStand(false);
         }
     }
 
-//    /**
-//     * adds card to player hand
-//     * returns true if below or equal 21
-//     * sets player to finished round
-//     *
-//     * @param user //     * @return if the user is bet and than hit ,or return false
-//     */
-//    public synchronized boolean hit(User user) {
-//        Player player = getPlayer(user);
-//
-//        Card newCard = deck.dealCard();
-//        player.addCardToPlayerHand(newCard);
-//
-//        setPlayersWon();
-//
-//        return player.getPlayerHand().getBlackjackValue() <= 21;
-//    }
     private void setDealerCardsFaceUp() {
-        for(Card card: getDealerHand().getHand()){
+        for (Card card : getDealerHand().getHand()) {
             card.setFaceUp(true);
         }
     }
@@ -453,6 +411,7 @@ public class GameLobby {
         Player player = getPlayer(user);
 
         Card newCard = deck.dealCard();
+        newCard.setFaceUp(true);
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();
@@ -472,6 +431,7 @@ public class GameLobby {
         Player player = getPlayer(username);
 
         Card newCard = deck.dealCard();
+        newCard.setFaceUp(true);
         player.addCardToPlayerHand(newCard);
 
         setPlayersWon();

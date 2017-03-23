@@ -31,9 +31,9 @@ public class PlayerGui extends JPanel {
         setOpaque(false);
         createPlayerComponents();
         setLblAvatar("0");
-        setLblName("username");
-        setLblBetAmount("to bet...");
-        setLblBudget("credits");
+        setLblName("");
+        setLblBetAmount("");
+        setLblBudget("");
         setPlayerBounds();
         addPlayerComponents();
         createCards();
@@ -55,9 +55,9 @@ public class PlayerGui extends JPanel {
             setDealerCardBounds();
         } else {
             createPlayerComponents();
-            setLblName("username");
-            setLblBetAmount("amount to bet");
-            setLblBudget("credits");
+            setLblName("");
+            setLblBetAmount("");
+            setLblBudget("");
             setPlayerBounds();
             addPlayerComponents();
             createCards();
@@ -121,10 +121,10 @@ public class PlayerGui extends JPanel {
     }
 
     public void setPlayerBounds(){
-        lblAvatar.setBounds(10, 60, 64, 64);
+        lblAvatar.setBounds(15, 60, 64, 64);
         lblName.setBounds(0, 124, 94, 20);
-        lblCredits.setBounds(0, 144, 94, 20);
-        lblBetAmount.setBounds(0, 164, 94, 20);
+        lblCredits.setBounds(0, 164, 94, 20);
+        lblBetAmount.setBounds(0, 144, 94, 20);
         lblName.setHorizontalAlignment(SwingConstants.CENTER);
         lblCredits.setHorizontalAlignment(SwingConstants.CENTER);
         lblBetAmount.setHorizontalAlignment(SwingConstants.CENTER);
@@ -186,153 +186,154 @@ public class PlayerGui extends JPanel {
     }
 
     public void setLblBudget(String credits){
-        lblCredits.setText(credits);
+        lblCredits.setText("£ "+credits);
     }
 
     public void setLblBetAmount(String betAmount){
-        lblBetAmount.setText(betAmount);
+        lblBetAmount.setText("Bet: "+betAmount);
     }
 
     public void setLblAvatar(String avatarID) {
-        remove(lblAvatar);
         try {
             Image imgAvatar = ImageIO.read(getClass().getResource("/avatars/"+avatarID+".png"));
             lblAvatar.setIcon(new ImageIcon(imgAvatar));
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace();
         }
-        add(lblAvatar);
     }
 
     public void setLblCard1(String cardID){
-        remove(lblCard1);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard1.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard1);
     }
 
     public void setLblCard2(String cardID) {
-        remove(lblCard2);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard2.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard2);
     }
     public void setLblCard3(String cardID) {
-        remove(lblCard3);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard3.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard3);
     }
 
     public void setLblCard4(String cardID) {
-        remove(lblCard4);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard4.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard4);
     }
 
     public void setLblCard5(String cardID) {
-        remove(lblCard5);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard5.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard5);
     }
 
     public void setLblCard6(String cardID) {
-        remove(lblCard6);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard6.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard6);
     }
 
     public void setLblCard7(String cardID) {
-        remove(lblCard7);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard7.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard7);
     }
 
     public void setLblCard8(String cardID) {
-        remove(lblCard8);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard8.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard8);
     }
 
     public void setLblCard9(String cardID) {
-        remove(lblCard9);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard9.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard9);
     }
 
     public void setLblCard10(String cardID) {
-        remove(lblCard10);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard10.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard10);
     }
 
     public void setLblCard11(String cardID) {
-        remove(lblCard11);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard11.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard11);
     }
 
     public void setLblCard12(String cardID) {
-        remove(lblCard12);
         try {
             Image imgCard = ImageIO.read(getClass().getResource("/cards/"+cardID+".png"));
             lblCard12.setIcon(new ImageIcon(imgCard));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCard12);
     }
 
+    public void refreshPlayerGui(){
+        remove(lblCard1);
+        remove(lblCard2);
+        remove(lblCard3);
+        remove(lblCard4);
+        remove(lblCard5);
+        remove(lblCard6);
+        remove(lblCard7);
+        remove(lblCard8);
+        remove(lblCard9);
+        remove(lblCard10);
+        remove(lblCard11);
+        remove(lblCard12);
+        add(lblCard12);
+        add(lblCard11);
+        add(lblCard10);
+        add(lblCard9);
+        add(lblCard8);
+        add(lblCard7);
+        add(lblCard6);
+        add(lblCard5);
+        add(lblCard4);
+        add(lblCard4);
+        add(lblCard3);
+        add(lblCard2);
+        add(lblCard1);
+    }
 }

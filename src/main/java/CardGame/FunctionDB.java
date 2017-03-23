@@ -54,7 +54,7 @@ public class FunctionDB {
                 con = DriverManager.getConnection(URL, USER, PASS);
                 System.out.println("Connected to database");
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Problem with database connection");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

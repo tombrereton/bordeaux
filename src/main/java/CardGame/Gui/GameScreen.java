@@ -2,7 +2,6 @@ package CardGame.Gui;
 
 import CardGame.GameClient;
 import CardGame.GameEngine.Card;
-import CardGame.GameEngine.Player;
 import CardGame.MessageObject;
 import CardGame.Responses.ResponseProtocol;
 
@@ -12,43 +11,47 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
 
 /**
- * gameScreen
+ * Class for the game screen
  *
  * @author Alex
  */
 public class GameScreen extends JPanel implements Observer {
 
+    //Client and main GUI class
     private GameClient client;
     private BlackjackOnline blackjackOnline;
 
+    //Message sidebar components
     private JTextArea textArea;
     private JList<String> listChat;
     private JScrollPane scrollPane;
     private JLabel lblChat;
     private JButton btnSendMessage;
-    private JButton btnDoubleDown;
-    private JButton btnStand;
-    private JButton btnHit;
-    private JButton btnFold;
-    private JLabel lblBudget;
-    private JLabel lblSubmitBet;
+    private JButton btnLeaveGame;
+    private JLabel lblBackHud;
+    private JLabel lblSideHud;
+    private JLabel lblSideFillHud;
+
+    //HUD panel components
     private JButton btnSubmitBet;
     private JButton btnBet1;
     private JButton btnBet2;
     private JButton btnBet3;
     private JButton btnBet4;
-    private JButton btnLeaveGame;
-    private JLabel lblCreditsBox;
+    private JButton btnHit;
+    private JButton btnStand;
+    private JLabel lblBudget;
+    private JLabel lblSubmitBet;
+    private JLabel lblBudgetBox;
     private JLabel lblSubmitBetBox;
-    private JLabel lblBackHud;
-    private JLabel lblSideHud;
-    private JLabel lblSideFillHud;
 
+    //Game components
     private JLabel lblDeck;
     private PlayerGui dealerGui;
     private PlayerGui playerGui1;
@@ -70,9 +73,10 @@ public class GameScreen extends JPanel implements Observer {
     private int player1HandOffset;
     private int player2HandOffset;
     private int player3HandOffset;
+    private boolean gameScreenChatOffsetAllPlayerFinished;
 
     /**
-     * Create the application.
+     * Instantiates the client and GUI, sets the background and initialises the components
      */
     public GameScreen(GameClient gameClient, BlackjackOnline blackjackOnline) {
         // we add this to list of observers
@@ -85,36 +89,37 @@ public class GameScreen extends JPanel implements Observer {
         this.player1HandOffset = 0;
         this.player2HandOffset = 0;
         this.player3HandOffset = 0;
+        this.gameScreenChatOffsetAllPlayerFinished = true;
 
         // chat variables
         this.blackjackOnline = blackjackOnline;
         this.amountToBet = amountToBet;
         this.credits = 100;
+
+        //Message sidebar components
         scrollPane = new JScrollPane();
         lblChat = new JLabel("Chat");
         btnSendMessage = new JButton();
         btnLeaveGame = new JButton("Leave");
-
-        btnBet1 = new JButton();
-        btnBet2 = new JButton();
-        btnBet3 = new JButton();
-        btnBet4 = new JButton();
-        btnDoubleDown = new JButton();
-        btnStand = new JButton();
-        btnHit = new JButton();
-        btnFold = new JButton();
-
-        lblBudget = new JLabel("Credits: £ " + Integer.toString(credits));
-        lblCreditsBox = new JLabel();
-        lblSubmitBet = new JLabel(Integer.toString(amountToBet));
-        lblSubmitBetBox = new JLabel();
-        btnSubmitBet = new JButton();
-
+        textArea = new JTextArea();
         lblBackHud = new JLabel();
         lblSideHud = new JLabel();
         lblSideFillHud = new JLabel();
 
-        //board images and players
+        //HUD panel components
+        btnSubmitBet = new JButton();
+        btnBet1 = new JButton();
+        btnBet2 = new JButton();
+        btnBet3 = new JButton();
+        btnBet4 = new JButton();
+        btnStand = new JButton();
+        btnHit = new JButton();
+        lblBudget = new JLabel("Credits: £ " + Integer.toString(credits));
+        lblBudgetBox = new JLabel();
+        lblSubmitBet = new JLabel(Integer.toString(amountToBet));
+        lblSubmitBetBox = new JLabel();
+
+        //Game components
         lblDeck = new JLabel();
         playerGui1 = new PlayerGui();
         playerGui2 = new PlayerGui();
@@ -135,64 +140,50 @@ public class GameScreen extends JPanel implements Observer {
         setBackground(new Color(46, 139, 87));
         initialize();
         updateBounds();
-
         updateMessageList(gameClient);
+
+        resetHands();
     }
 
     /**
-     * Initialize the contents of the frame.
+     * Initialise the components of the panel for labels, text fields and buttons.
+     * Method run as part of the constructor.
      */
     private void initialize() {
 
-        /**
-         * Chat message box as a JScroll Pane
-         */
-
+        //INITIALISE MESSAGE COMPONENTS
         add(scrollPane);
 
-        /**
-         * chat label
-         */
+        //chat label
         lblChat.setFont(new Font("Soho Std", Font.PLAIN, 18));
         lblChat.setForeground(Color.WHITE);
         add(lblChat);
 
+        // SEND BUTTON. Display the error if not successful
+        btnSendMessage.addActionListener(e -> {
 
-        // SEND BUTTON
-        /**
-         * Send message button
-         *
-         * And display the error if not successful
-         */
-        btnSendMessage.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            // show error in pop up box
+            if (textArea.getText().equals("")) {
+                JOptionPane.showMessageDialog(null,
+                        "You can not send empty messages!",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-                // show error in pop up box
-                if (textArea.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null,
-                            "You can not send empty messages!",
-                            "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
+            // send message from text area to server
+            ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
+            textArea.setText("");
+            textArea.grabFocus();
 
-                // send message from text area to server
-                ResponseProtocol responseProtocol = client.requestSendMessage(textArea.getText());
-                textArea.setText("");
-                textArea.grabFocus();
-
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-
+            // We display the error if not successful
+            int success = responseProtocol.getRequestSuccess();
+            String errorMsg = responseProtocol.getErrorMsg();
+            if (success == 0) {
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
-
         btnSendMessage.setContentAreaFilled(false);
         btnSendMessage.setBorderPainted(false);
 
@@ -204,59 +195,36 @@ public class GameScreen extends JPanel implements Observer {
             System.out.println(ex);
         }
         add(btnSendMessage);
-
         // END SEND BUTTON
 
         // CHAT MESSAGE BOX
-        /**
-         * Editable text area for sending messages
-         */
-        textArea = new JTextArea();
         textArea.setLineWrap(true);
         add(textArea);
         textArea.setColumns(10);
         // END CHAT MESSAGE BOX
 
-        // DOUBLE BET BUTTON
-        /**
-         * Double Bet button
-         *
-         * And display the error if not successful
-         */
-        //DoubleDown Button
-        btnDoubleDown.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        // LEAVE BUTTON
+        btnLeaveGame.addActionListener(e -> {
+            ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
 
-                // send a double down request to server
-                ResponseProtocol responseProtocol = client.requestDoubleBet();
+            if (leaveGame.getRequestSuccess() == 1) {
+                chatMessageModel.clear();
+                gameScreenChatOffset = 0;
 
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
+                // reset all game data on the client
+                getClientModel().resetGameDataWhenQuitting();
 
+                // reset game data on game screen
+                resetHands();
             }
         });
-        btnDoubleDown.setContentAreaFilled(false);
-        btnDoubleDown.setBorderPainted(false);
-        try {
-            Image imgDoubleDown = ImageIO.read(getClass().getResource("/gameHud/imageBtnDoubleDown.png"));
-            btnDoubleDown.setIcon(new ImageIcon(imgDoubleDown));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(btnDoubleDown);
-        // END DOUBLE BUTTON
+        btnLeaveGame.setBackground(Color.WHITE);
+        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
+        add(btnLeaveGame);
+        // END LEAVE BUTTON
 
-        // STAND BUTTON
-        /**
-         * Stand button
-         *
-         * And display the error if not successful
-         */
+
+        // STAND BUTTON. Display the error if not successful
         btnStand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // send a stand request to server
@@ -270,7 +238,6 @@ public class GameScreen extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
-
             }
         });
         btnStand.setContentAreaFilled(false);
@@ -284,12 +251,7 @@ public class GameScreen extends JPanel implements Observer {
         add(btnStand);
         // END STAND BUTTON
 
-        // HIT BUTTON
-        /**
-         * Hit Button
-         *
-         * And display the error if not successful
-         */
+        // HIT BUTTON. Display the error if not successful
         btnHit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // send a hit request to server
@@ -302,10 +264,8 @@ public class GameScreen extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
-
             }
         });
-
         btnHit.setContentAreaFilled(false);
         btnHit.setBorderPainted(false);
         try {
@@ -316,38 +276,6 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnHit);
         // END HIT BUTTON
-
-        // FOLD BUTTON
-        /**
-         * Fold Button
-         *
-         * And display the error if not successful
-         */
-        btnFold.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // send a hold request to server
-                ResponseProtocol responseProtocol = client.requestFold();
-
-                // We display the error if not successful
-                int success = responseProtocol.getRequestSuccess();
-                String errorMsg = responseProtocol.getErrorMsg();
-                if (success == 0) {
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-
-        btnFold.setContentAreaFilled(false);
-        btnFold.setBorderPainted(false);
-        try {
-            Image imgFold = ImageIO.read(getClass().getResource("/gameHud/imageBtnFold.png"));
-            btnFold.setIcon(new ImageIcon(imgFold));
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        add(btnFold);
-        // END FOLD BUTTON
 
         /**
          * Player credits label
@@ -370,38 +298,33 @@ public class GameScreen extends JPanel implements Observer {
          *
          * And display the error if not successful
          */
-        btnSubmitBet.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // we send the request to bet
-                ResponseProtocol response = client.requestBet(amountToBet);
+        btnSubmitBet.addActionListener(e -> {
 
-                if (response.getRequestSuccess() == 0) {
-                    // display error msg if not successful
-                    String errorMsg = response.getErrorMsg();
-                    JOptionPane.showMessageDialog(null, errorMsg, "Warning",
-                            JOptionPane.WARNING_MESSAGE);
+            // we send the request to bet
+            ResponseProtocol response = client.requestBet(amountToBet);
 
-                    // set bet amount to 0
-                    amountToBet = 0;
-                    lblSubmitBet.setText(Integer.toString(amountToBet));
-                    return;
-                }
+            if (response.getRequestSuccess() == 0) {
+                // display error msg if not successful
+                String errorMsg = response.getErrorMsg();
+                JOptionPane.showMessageDialog(null, errorMsg, "Warning",
+                        JOptionPane.WARNING_MESSAGE);
 
                 // set bet amount to 0
                 amountToBet = 0;
                 lblSubmitBet.setText(Integer.toString(amountToBet));
-
-                // reset offsets to 0
-                resetHands();
-                for(int i = 0; i< 4;i++){
-                    setLbCards(getplayerGui(i),i,"400");
-                }
-
-                repaint();
-                revalidate();
-
+                return;
             }
+
+            // set bet amount to 0
+            amountToBet = 0;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
+
+            // reset offsets to 0
+            resetHands();
+
         });
+
+        // set image for bet
         btnSubmitBet.setContentAreaFilled(false);
         btnSubmitBet.setBorderPainted(false);
         try {
@@ -416,11 +339,9 @@ public class GameScreen extends JPanel implements Observer {
          * Bet Buttons
          */
         //Bet 1: small
-        btnBet1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 5;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet1.addActionListener(e -> {
+            amountToBet += 5;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet1.setContentAreaFilled(false);
         btnBet1.setBorderPainted(false);
@@ -434,11 +355,9 @@ public class GameScreen extends JPanel implements Observer {
 
 
         //Bet 2: medium
-        btnBet2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 10;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet2.addActionListener(e -> {
+            amountToBet += 10;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet2.setContentAreaFilled(false);
         btnBet2.setBorderPainted(false);
@@ -451,11 +370,9 @@ public class GameScreen extends JPanel implements Observer {
         add(btnBet2);
 
         //Bet 3: high
-        btnBet3.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                amountToBet += 20;
-                lblSubmitBet.setText(Integer.toString(amountToBet));
-            }
+        btnBet3.addActionListener(e -> {
+            amountToBet += 20;
+            lblSubmitBet.setText(Integer.toString(amountToBet));
         });
         btnBet3.setContentAreaFilled(false);
         btnBet3.setBorderPainted(false);
@@ -484,36 +401,17 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(btnBet4);
 
-
-        /**
-         * leave game button
-         */
-        btnLeaveGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ResponseProtocol leaveGame = client.requestQuitGame(client.getGameJoined());
-
-                if (leaveGame.getRequestSuccess() == 1) {
-                    chatMessageModel.clear();
-                    gameScreenChatOffset = 0;
-                }
-            }
-        });
-        btnLeaveGame.setBackground(Color.WHITE);
-        btnLeaveGame.setFont(new Font("Soho Std", Font.PLAIN, 11));
-        add(btnLeaveGame);
-
-
         /**
          * Credits Box
          */
 
         try {
             Image imgBoxCredits = ImageIO.read(getClass().getResource("/gameHud/imageBoxCredits.png"));
-            lblCreditsBox.setIcon(new ImageIcon(imgBoxCredits));
+            lblBudgetBox.setIcon(new ImageIcon(imgBoxCredits));
         } catch (Exception ex) {
             System.out.println(ex);
         }
-        add(lblCreditsBox);
+        add(lblBudgetBox);
 
         /**
          * Bet Box
@@ -527,7 +425,7 @@ public class GameScreen extends JPanel implements Observer {
         add(lblSubmitBetBox);
 
 
-        //Hud background, lblBackHud, lblSideHud, lblSideFillHud
+        //HUD BACKGROUND
         try {
             Image imgHud = ImageIO.read(getClass().getResource("/gameHud/imageHud.png"));
             lblBackHud.setIcon(new ImageIcon(imgHud));
@@ -536,10 +434,12 @@ public class GameScreen extends JPanel implements Observer {
         }
         add(lblBackHud);
 
+        //SIDE FILLED HUD
         lblSideFillHud.setOpaque(true);
         lblSideFillHud.setBackground(new Color(127, 37, 27));
         add(lblSideFillHud);
 
+        //SIDE HUD IMAGE
         try {
             Image imgSideHud = ImageIO.read(getClass().getResource("/gameHud/imageHudSide.png"));
             lblSideHud.setIcon(new ImageIcon(imgSideHud));
@@ -574,17 +474,15 @@ public class GameScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        scrollPane.setBounds(blackjackOnline.getxOrigin() + 850, 50, blackjackOnline.getxOrigin() + 150, blackjackOnline.getScreenHeightCurrent() - 230);
-        textArea.setBounds(blackjackOnline.getxOrigin() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxOrigin() + 150, 60);
-        lblChat.setBounds(blackjackOnline.getxOrigin() + 850, 10, 205, 35);
-        lblSideHud.setBounds(blackjackOnline.getxOrigin() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
-        lblSideFillHud.setBounds(blackjackOnline.getxOrigin() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyOrigin() + 800);
-        btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxOrigin() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
+        scrollPane.setBounds(blackjackOnline.getxScreenDiff() + 850, 50, blackjackOnline.getxScreenDiff() + 150, blackjackOnline.getScreenHeightCurrent() - 230);
+        textArea.setBounds(blackjackOnline.getxScreenDiff() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxScreenDiff() + 150, 60);
+        lblChat.setBounds(blackjackOnline.getxScreenDiff() + 850, 10, 205, 35);
+        lblSideHud.setBounds(blackjackOnline.getxScreenDiff() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
+        lblSideFillHud.setBounds(blackjackOnline.getxScreenDiff() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getScreenHeightCurrent());
+        btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxScreenDiff() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
         btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 120, 10, 100, 30);
-        btnDoubleDown.setBounds(740, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnStand.setBounds(640, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnHit.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
-        btnFold.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnStand.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
+        btnHit.setBounds(440, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
         lblBudget.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 81, 200, 35);
         lblSubmitBet.setBounds(30, blackjackOnline.getScreenHeightCurrent() - 121, 92, 35);
         btnSubmitBet.setBounds(5, blackjackOnline.getScreenHeightCurrent() - 226, 98, 91);
@@ -592,16 +490,16 @@ public class GameScreen extends JPanel implements Observer {
         btnBet2.setBounds(186, blackjackOnline.getScreenHeightCurrent() - 166, 81, 81);
         btnBet3.setBounds(267, blackjackOnline.getScreenHeightCurrent() - 136, 81, 81);
         btnBet4.setBounds(353, blackjackOnline.getScreenHeightCurrent() - 126, 81, 81);
-        lblCreditsBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
+        lblBudgetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 86, 241, 42);
         lblSubmitBetBox.setBounds(10, blackjackOnline.getScreenHeightCurrent() - 126, 144, 45);
         lblBackHud.setBounds(-20, blackjackOnline.getScreenHeightCurrent() - 176, 2590, 204);
-        lblDeck.setBounds(blackjackOnline.getxOrigin() + 650, 20, 64, 93);
+        lblDeck.setBounds(blackjackOnline.getxScreenDiff() + 650, 20, 64, 93);
 
-        dealerGui.setBounds((int) (blackjackOnline.getxOrigin() * 0.5) + 320, 20, 200, 200);
+        dealerGui.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.5) + 320, 20, 200, 200);
         playerGui1.setBounds(20, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
-        playerGui2.setBounds((int) (blackjackOnline.getxOrigin() * 0.3) + 220, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
-        playerGui3.setBounds((int) (blackjackOnline.getxOrigin() * 0.7) + 420, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
-        playerGui4.setBounds(blackjackOnline.getxOrigin() + 620, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
+        playerGui2.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.3) + 220, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui3.setBounds((int) (blackjackOnline.getxScreenDiff() * 0.7) + 420, blackjackOnline.getScreenHeightCurrent() - 350, 200, 200);
+        playerGui4.setBounds(blackjackOnline.getxScreenDiff() + 620, blackjackOnline.getScreenHeightCurrent() - 425, 200, 200);
     }
 
     public int getAmountToBet() {
@@ -650,6 +548,10 @@ public class GameScreen extends JPanel implements Observer {
             }
         }
         return playerGui;
+    }
+
+    public PlayerGui getDealerGui() {
+        return dealerGui;
     }
 
     /**
@@ -731,6 +633,7 @@ public class GameScreen extends JPanel implements Observer {
             // we update the dealer hand
             updateDealerHand(model);
 
+
             // set players' information and set cards to players
             if (model.getPlayerNames() != null && !model.getPlayerNames().isEmpty()) {
 
@@ -738,6 +641,7 @@ public class GameScreen extends JPanel implements Observer {
                     String playerName = model.getPlayerNames().get(i);
                     String playerBudget = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
+                    String playerAvatar = model.getPlayerAvatars().get(i);
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
@@ -750,26 +654,52 @@ public class GameScreen extends JPanel implements Observer {
 
                     // set each player's card
                     updatePlayerHand(model, playerName, i);
+
+                    // set each player's avatar
+                    getplayerGui(i).setLblAvatar(playerAvatar);
+
+                    // check if the player is win or lose
+                    checkwin(model);
+
                 }
             }
         }
     }
 
+    private void checkwin(GameClient model) {
+        Map<String, Boolean> playerWon = model.getPlayersWon();
+        if (model.isAllPlayersFinished()) {
+            if (playerWon != null && playerWon.size() > 0 && playerWon.get(model.getLoggedInUser().getUserName())) {
+                JOptionPane.showMessageDialog(null, "Congratulations, you win!", "Congratulations",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+
     private void showWarningWhenServerDown(GameClient model) {
-        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN){
-            JOptionPane.showMessageDialog(null, "Cannot reconnect. Restart BlackjackOnline.", "Warning",
+        if (model.isServerDown() && model.getCurrentScreen() == Screens.GAMESCREEN) {
+            JOptionPane.showMessageDialog(null, "Server down. Will try to reconnect 3 times." +
+                            "\nRestart Blackjack online if failed to reconnect after 15 seconds.", "Warning",
                     JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    private synchronized void updateDealerHand(GameClient model) {
+    private void updateDealerHand(GameClient model) {
         // set dealer cards
         if (model.getDealerHand() != null) {
             int dealerHandSize = model.getDealerHand().getHand().size();
+
+            if (dealerHandSize >= 2 && model.isAllPlayersFinished()) {
+                dealerHandOffset = 0;
+            }
             while (dealerHandOffset < dealerHandSize) {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
                 dealerHandOffset++;
+                getDealerGui().refreshPlayerGui();
+                repaint();
+                revalidate();
             }
         }
     }
@@ -781,7 +711,7 @@ public class GameScreen extends JPanel implements Observer {
      * @param player
      * @return
      */
-    private synchronized int getPlayerHandOffset(int player) {
+    private int getPlayerHandOffset(int player) {
         switch (player) {
             case 0:
                 return player0HandOffset;
@@ -803,7 +733,7 @@ public class GameScreen extends JPanel implements Observer {
      * @param player
      * @param offset
      */
-    private synchronized void setPlayerHandOffset(int player, int offset) {
+    private void setPlayerHandOffset(int player, int offset) {
         switch (player) {
             case 0:
                 this.player0HandOffset = offset;
@@ -817,18 +747,19 @@ public class GameScreen extends JPanel implements Observer {
 
     }
 
-    private synchronized void updatePlayerHand(GameClient model, String playerName, int i) {
+    private void updatePlayerHand(GameClient model, String playerName, int i) {
 
         // set each player's card
-        ArrayList<Card> playersCard = model.getPlayerHands().get(playerName).getHand();
+        ArrayList<Card> playersCards = model.getPlayerHands().get(playerName).getHand();
         int playerHandSize = model.getPlayerHands().get(playerName).getHand().size();
 
         //get this player's hand offset
         int playerHandOffset = getPlayerHandOffset(i);
 
         while (playerHandOffset < playerHandSize) {
-            setLbCards(getplayerGui(i), playerHandOffset, playersCard.get(playerHandOffset).getImageID());
+            setLbCards(getplayerGui(i), playerHandOffset, playersCards.get(playerHandOffset).getImageID());
             playerHandOffset++;
+            getplayerGui(i).refreshPlayerGui();
             repaint();
             revalidate();
         }
@@ -837,16 +768,36 @@ public class GameScreen extends JPanel implements Observer {
         setPlayerHandOffset(i, playerHandOffset);
     }
 
-    private synchronized void resetHands() {
+    private void resetHands() {
+        // we reset the client player and dealer hands
+        getClientModel().resetDealerAndPlayerHands();
+
+        // reset the gamescreen dealer hand offset
         dealerHandOffset = 0;
 
-        // we reset all the player hand offsets to 0
+        // we reset the dealer gui hand to a blank image
+        for (int i = 0; i < 12; i++) {
+            setLbCards(dealerGui, i, "400");
+        }
+
+
+        // we reset the player cards to a blank image
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 12; j++) {
+                setLbCards(getplayerGui(i), j, "400");
+            }
+        }
+
+        // we reset all the game screen player hand offsets to 0
         for (int i = 0; i < 4; i++) {
             this.setPlayerHandOffset(i, 0);
         }
+
+        repaint();
+        revalidate();
     }
 
-    private synchronized void updateMessageList(GameClient model) {
+    private void updateMessageList(GameClient model) {
         // get clientGameOf
         int clientMsgOffset = model.getMessages().size();
 
@@ -857,5 +808,6 @@ public class GameScreen extends JPanel implements Observer {
             gameScreenChatOffset++;
         }
     }
+
 
 }
