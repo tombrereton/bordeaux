@@ -14,6 +14,7 @@ public class Deck {
 
     private int cardsUsed; // How many cards have been dealt from the deck.
     private ArrayList<Card> deckOfCards;
+    private int testSeed = 1;
 
     public Deck() {
         deckOfCards = new ArrayList<Card>();
@@ -28,6 +29,17 @@ public class Deck {
     }
 
 
+    /**
+     * Randomises the cards with a set seed for testing.
+     */
+    public void shuffleForTests() {
+        Collections.shuffle(deckOfCards, new Random(testSeed));
+        cardsUsed = 0;
+    }
+
+    /**
+     * Randomises the cards
+     */
     public void shuffle() {
         long seed = System.nanoTime();
         Collections.shuffle(deckOfCards, new Random(seed));
@@ -40,8 +52,8 @@ public class Deck {
 
     public Card dealCard() {
         // Deals one card from the deck and returns it.
-        if (cardsUsed == 52)
-            shuffle();
+//        if (cardsUsed == 52)
+//            shuffle();
         cardsUsed++;
         return deckOfCards.get(cardsUsed - 1);
     }

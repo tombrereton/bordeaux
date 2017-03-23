@@ -49,7 +49,6 @@ public class GameClient extends Observable {
 
     // game data
     private boolean isGameDataUpdated;
-    private Map<String, Boolean> playersFinished;
     private Hand dealerHand;
     private Map<String, Integer> playerBets;
     private Map<String, Integer> playerBudgets;
@@ -58,7 +57,8 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
-
+    private ArrayList<String> playerAvatars;
+    private boolean allPlayersFinished;
 
     // chat variables
     private int chatOffset;
@@ -89,7 +89,6 @@ public class GameClient extends Observable {
         // instantiate game variables
         this.chatOffset = -1;
         this.listOfGames = new ConcurrentSkipListSet<>();
-        playersFinished = new TreeMap<>();
         dealerHand = new Hand();
         playerBets = new TreeMap<>();
         playerBudgets = new TreeMap<>();
@@ -98,6 +97,11 @@ public class GameClient extends Observable {
         playersBust = new TreeMap<>();
         playersStand = new TreeMap<>();
         playersWon = new TreeMap<>();
+        playerAvatars = new ArrayList<>();
+        Random r = new Random();
+        for(int i=0;i<4;i++){
+            playerAvatars.add(i,Integer.toString(r.nextInt(39)+2));
+        }
 
         // chat variables
         this.messages = new ConcurrentLinkedDeque<>();
@@ -237,8 +241,7 @@ public class GameClient extends Observable {
      * @return
      */
     public String hashPassword(String password) {
-        String sha256hex = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
-        return sha256hex;
+        return Hasher.hashPassword(password);
     }
 
     // SPECIFIC REQUEST METHODS
@@ -514,33 +517,6 @@ public class GameClient extends Observable {
         return getResponse(ResponseHit.class);
     }
 
-    /**
-     * send double bet request
-     *
-     * @return
-     */
-    public synchronized ResponseDoubleBet requestDoubleBet() {
-        // create request and send request
-        RequestDoubleBet requestDoubleBet = new RequestDoubleBet(getLoggedInUser().getUserName());
-        sendRequest(requestDoubleBet);
-
-        // get response from server and returnit
-        return getResponse(ResponseDoubleBet.class);
-    }
-
-    /**
-     * send fold bet request
-     *
-     * @return
-     */
-    public synchronized ResponseFold requestFold() {
-        // create request and send request
-        RequestFold requestFold = new RequestFold(getLoggedInUser().getUserName());
-        sendRequest(requestFold);
-
-        // get response from server and returnit
-        return getResponse(ResponseFold.class);
-    }
 
     /**
      * send stand request
@@ -653,9 +629,21 @@ public class GameClient extends Observable {
 
         // get response from server and returnit
         PushPlayersWon pushPlayersWon = getResponse(PushPlayersWon.class);
-        playersWon = pushPlayersWon.getPlayersWon();
+        this.playersWon = pushPlayersWon.getPlayersWon();
 
         return pushPlayersWon;
+    }
+
+    public synchronized PushAreAllPlayersFinished requestGetAreAllPlayersFinished() {
+        // create request and send request
+        RequestGetAllPlayersFinished requestGetAllPlayersFinished = new RequestGetAllPlayersFinished();
+        sendRequest(requestGetAllPlayersFinished);
+
+        // get response from server and return it
+        PushAreAllPlayersFinished pushAreAllPlayersFinished = getResponse(PushAreAllPlayersFinished.class);
+        this.allPlayersFinished = pushAreAllPlayersFinished.isAllPlayersFinished();
+
+        return pushAreAllPlayersFinished;
     }
 
 
@@ -734,8 +722,11 @@ public class GameClient extends Observable {
 
     public void reconnectToServer() {
 
+        stopGettingGameData();
+        stopGettingMessages();
+        resetGameDataWhenQuitting();
+
         while (isServerDown && reconnectAttempts < 3) {
-            // tell observers about reconnection attempts
 
             System.out.println("Will try to reconnect to server in 5 seconds");
 
@@ -749,13 +740,16 @@ public class GameClient extends Observable {
             // try to reconnect
             connectToServer();
 
-            // send login request if connected to server
-            if (!isServerDown()) {
-                requestReLogin(loggedInUser.getUserName(), loggedInUser.getPassword());
-                break;
-            }
             reconnectAttempts++;
+
+            // tell observers about reconnection attempts
             notifyObservers();
+        }
+
+        // send login request if connected to server
+        if (!isServerDown()) {
+            requestReLogin(loggedInUser.getUserName(), loggedInUser.getPassword());
+            startGettingGameNames();
         }
     }
 
@@ -781,7 +775,7 @@ public class GameClient extends Observable {
                     getMessagesAndAddToQueue();
 
 
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                 }
             } catch (NullPointerException e) {
                 System.out.println("Can't get messages. Server down.");
@@ -839,6 +833,9 @@ public class GameClient extends Observable {
     public void getGameData() {
 
         isGameDataUpdated = false;
+
+        // All players finished
+        requestGetAreAllPlayersFinished();
 
         // Dealer hand
         requestGetDealerHand();
@@ -954,12 +951,18 @@ public class GameClient extends Observable {
         return new ArrayList<>(playerNames);
     }
 
+    public ArrayList<String> getPlayerAvatars(){return playerAvatars;}
+
     public Map<String, Boolean> getPlayersBust() {
         return playersBust;
     }
 
     public Map<String, Boolean> getPlayersStand() {
         return playersStand;
+    }
+
+    public Map<String, Boolean> getPlayersWon() {
+        return playersWon;
     }
 
     public boolean isServerDown() {
@@ -970,25 +973,28 @@ public class GameClient extends Observable {
         return reconnectAttempts;
     }
 
-    public synchronized void resetDealerAndPlayerHands(){
+    public boolean isAllPlayersFinished() {
+        return allPlayersFinished;
+    }
+
+    public synchronized void resetDealerAndPlayerHands() {
 
         // reset player hands to empty
-        for (Map.Entry<String, Hand> playerhand : this.playerHands.entrySet()){
+        for (Map.Entry<String, Hand> playerhand : this.playerHands.entrySet()) {
             playerhand.setValue(new Hand());
         }
 
         // reset dealer hand to empty
         Iterator<Card> dealerIterator = this.dealerHand.getHand().iterator();
 
-        while(dealerIterator.hasNext()){
+        while (dealerIterator.hasNext()) {
             dealerIterator.next();
             dealerIterator.remove();
         }
     }
 
-    public synchronized void resetGameData() {
+    public synchronized void resetGameDataWhenQuitting() {
         this.chatOffset = -1;
-        this.playersFinished = new TreeMap<>();
         this.dealerHand = new Hand();
         this.playerBets = new TreeMap<>();
         this.playerBudgets = new TreeMap<>();

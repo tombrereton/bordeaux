@@ -25,6 +25,7 @@ public class ProtocolMessages {
     public static final String NO_GAMES = "no games exist.";
     public static final String NO_GAME = "game requested does not exist.";
     public static final String NO_GAME_JOINED = "user is not in a game.";
+    public static final String GAME_FULL = "the game is full.";
     public static final String EMPTY_MSG = "message sent is empty or null.";
     public static final String EMPTY = "protocol sent contains empty or null elements.";
     public static final String BET_NOT_IN_BUDGET = "bet not within player budget.";
@@ -35,7 +36,7 @@ public class ProtocolMessages {
     public static final String NO_BET = "player has not placed a bet.";
     public static final String ALREADY_STANDING = "player already standing.";
     public static final String PLAYER_BET_PLACED = "you have already bet.";
-    public static final String PLAYER_BUST = "your cards bust, you are lost. ";
+    public static final String PLAYER_BUST = "you are bust. Please wait for other players to finish or place a bet.";
     public static final String PLAYER_STAND_ALL = "all players are standing."; // need to be fixed
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;

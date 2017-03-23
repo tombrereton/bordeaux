@@ -26,8 +26,6 @@ public class HomeScreen extends JPanel implements Observer {
     private String username;
     private JLabel lblWelcome;
     private JButton btnGoToLobby;
-    private JButton btnStatistics;
-    private JButton btnSettings;
     private JLabel lblCredits;
     private JLabel lblGamesWon;
     private JLabel lblGamesLost;
@@ -50,8 +48,6 @@ public class HomeScreen extends JPanel implements Observer {
 
         btnLogout = new JButton("Logout");
         btnGoToLobby = new JButton("Go To Lobby");
-        btnStatistics = new JButton("Statistics");
-        btnSettings = new JButton("Settings");
         lblCredits = new JLabel("Credits:");
         lblGamesWon = new JLabel("Games Won:");
         lblGamesLost = new JLabel("Games Lost:");
@@ -70,7 +66,7 @@ public class HomeScreen extends JPanel implements Observer {
          * button events for the logout button
          */
         btnLogout.setBackground(new Color(255, 255, 255));
-        btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 12));
+        btnLogout.setFont(new Font("Soho Std", Font.PLAIN, 16));
         btnLogout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -113,32 +109,7 @@ public class HomeScreen extends JPanel implements Observer {
         });
         btnGoToLobby.setFont(new Font("Soho Std", Font.PLAIN, 16));
         btnGoToLobby.setBackground(Color.WHITE);
-
         add(btnGoToLobby);
-
-        /**
-         * Button to go to stats panel.
-         */
-        btnStatistics.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getClientModel().setCurrentScreen(STATISTICSSCREEN);
-            }
-        });
-        btnStatistics.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        btnStatistics.setBackground(Color.WHITE);
-        add(btnStatistics);
-
-        /**
-         * Button to go to settings panel.
-         */
-        btnSettings.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getClientModel().setCurrentScreen(SETTINGSSCREEN);
-            }
-        });
-        btnSettings.setFont(new Font("Soho Std", Font.PLAIN, 16));
-        btnSettings.setBackground(Color.WHITE);
-        add(btnSettings);
 
         lblCredits.setFont(new Font("Soho Std", Font.PLAIN, 18));
         add(lblCredits);
@@ -154,15 +125,13 @@ public class HomeScreen extends JPanel implements Observer {
     }
 
     public void updateBounds() {
-        btnLogout.setBounds(blackjackOnline.getScreenWidthCurrent() - 130, 10, 100, 30);
-        lblWelcome.setBounds(blackjackOnline.getxOrigin() + 391, 10, 242, 34);
-        btnGoToLobby.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 174, 165, 34);
-        btnStatistics.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 271, 165, 34);
-        btnSettings.setBounds(blackjackOnline.getxOrigin() + 148, blackjackOnline.getyOrigin() + 368, 165, 34);
-        lblCredits.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 191, 225, 34);
-        lblGamesWon.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 300, 225, 34);
-        lblGamesLost.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 352, 225, 34);
-        lblGamesPlayed.setBounds(blackjackOnline.getxOrigin() + 560, blackjackOnline.getyOrigin() + 243, 225, 34);
+        btnLogout.setBounds(blackjackOnline.getxScreenDiff() + 250, blackjackOnline.getyScreenDiff() + 320, 165, 34);
+        lblWelcome.setBounds(blackjackOnline.getxScreenDiff() + 391, 10, 242, 34);
+        btnGoToLobby.setBounds(blackjackOnline.getxScreenDiff() + 250, blackjackOnline.getyScreenDiff() + 220, 165, 34);
+        lblCredits.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 191, 225, 34);
+        lblGamesWon.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 300, 225, 34);
+        lblGamesLost.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 352, 225, 34);
+        lblGamesPlayed.setBounds(blackjackOnline.getxScreenDiff() + 560, blackjackOnline.getyScreenDiff() + 243, 225, 34);
     }
 
     public GameClient getClientModel() {

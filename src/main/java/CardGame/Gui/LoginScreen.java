@@ -122,13 +122,13 @@ public class LoginScreen extends JPanel {
 	}
 
 	public void updateBounds(){
-		lblLogo.setBounds(blackjackOnline.getxOrigin()+312, blackjackOnline.getyOrigin()+40, 400, 221);
-		btnCreateAccount.setBounds(blackjackOnline.getxOrigin()+432, blackjackOnline.getyOrigin()+480, 160, 30);
-		btnLogin.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+400, 140, 30);
-		passwordField.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+350, 140, 20);
-		usernameField.setBounds(blackjackOnline.getxOrigin()+526, blackjackOnline.getyOrigin()+300, 140, 20);
-		lblPassword.setBounds(blackjackOnline.getxOrigin()+345, blackjackOnline.getyOrigin()+350, 101, 17);
-		lblUsername.setBounds(blackjackOnline.getxOrigin()+345, blackjackOnline.getyOrigin()+300, 127, 31);
+		lblLogo.setBounds(blackjackOnline.getxScreenDiff()+312, blackjackOnline.getyScreenDiff()+40, 400, 221);
+		btnCreateAccount.setBounds(blackjackOnline.getxScreenDiff()+432, blackjackOnline.getyScreenDiff()+480, 160, 30);
+		btnLogin.setBounds(blackjackOnline.getxScreenDiff()+526, blackjackOnline.getyScreenDiff()+400, 140, 30);
+		passwordField.setBounds(blackjackOnline.getxScreenDiff()+526, blackjackOnline.getyScreenDiff()+350, 140, 20);
+		usernameField.setBounds(blackjackOnline.getxScreenDiff()+526, blackjackOnline.getyScreenDiff()+300, 140, 20);
+		lblPassword.setBounds(blackjackOnline.getxScreenDiff()+345, blackjackOnline.getyScreenDiff()+350, 101, 17);
+		lblUsername.setBounds(blackjackOnline.getxScreenDiff()+345, blackjackOnline.getyScreenDiff()+300, 127, 31);
 	}
 
 	public GameClient getClientModel() {
