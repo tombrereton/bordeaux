@@ -1,7 +1,7 @@
 package CardGame.Gui;
 
 import CardGame.GameClient;
-import CardGame.Responses.ResponseRegisterUser;
+import CardGame.Responses.ResponseProtocol;
 
 import javax.swing.*;
 import java.awt.*;
@@ -130,8 +130,14 @@ public class CreateAccountScreen extends JPanel {
                 String lastName = lastnameField.getText();
 
                 // sent register request to server
-                ResponseRegisterUser responseRegisterUser = getClientModel().
+                ResponseProtocol responseRegisterUser = getClientModel().
                         requestRegisterUser(username, password, firstName, lastName);
+
+                if (responseRegisterUser == null){
+                    JOptionPane.showMessageDialog(null, "Can't connect to server. Ensure server is up.", "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
                 // We display the error if not successful
                 String errorMsg = responseRegisterUser.getErrorMsg();

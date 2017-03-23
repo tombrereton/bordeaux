@@ -222,6 +222,9 @@ public class BlackjackOnline extends JFrame implements Observer, ComponentListen
                         this.lobbyScreen = new LobbyScreen(model, this);
                     }
                     setPane(this.lobbyScreen);
+                    if (this.gameScreen != null){
+                        this.gameScreen.resetHands();
+                    }
                     break;
                 case GAMESCREEN:
                     if (this.gameScreen == null) {

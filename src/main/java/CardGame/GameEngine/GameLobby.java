@@ -96,6 +96,12 @@ public class GameLobby {
     }
 
 
+    /**
+     * This method determines if the player wins or loses.
+     *
+     * @param player
+     * @return
+     */
     public synchronized boolean wonAgainstDealer(Player player) {
         int playerValue = player.getPlayerHand().getBlackjackValue();
 

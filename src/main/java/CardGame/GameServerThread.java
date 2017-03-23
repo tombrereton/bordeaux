@@ -207,9 +207,26 @@ public class GameServerThread implements Runnable {
                 return handleGetDealerhand(protocolId);
             case PUSH_ARE_PLAYERS_FINISHED:
                 return handleGetAllPlayersFinished(protocolId);
+            case PUSH_ARE_ALL_BETS_PLACED:
+                return handleGetAllBetsPlaced(protocolId);
             default:
                 return new ResponseProtocol(protocolId, UNKNOWN_TYPE, FAIL, UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * This method handles requests for allBetsPlaced variable.
+     * @param protocolId
+     * @return
+     */
+    private ResponseProtocol handleGetAllBetsPlaced(int protocolId) {
+        boolean allBetsPlaced = false;
+        if (gameJoined != null) {
+            allBetsPlaced = this.getGame(gameJoined).isAllPlayersBetPlaced();
+        }
+
+        return new PushAreAllPlayersFinished(protocolId, SUCCESS, allBetsPlaced);
+
     }
 
     /**
@@ -554,7 +571,7 @@ public class GameServerThread implements Runnable {
      * @param betAmount
      */
     private void makeBet(int betAmount) {
-        if (getGame(gameJoined).isAllPlayersFinished()) {
+        if (getGame(gameJoined).isAllPlayersBetPlaced()) {
             getGame(gameJoined).nextGame();
         }
 
