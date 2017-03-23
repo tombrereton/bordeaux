@@ -59,6 +59,7 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersWon;
     private ArrayList<String> playerAvatars;
     private boolean allPlayersFinished;
+    private boolean allBetsPlaced;
 
     // chat variables
     private int chatOffset;
@@ -655,6 +656,17 @@ public class GameClient extends Observable {
         return pushAreAllPlayersFinished;
     }
 
+    public synchronized PushAreAllBetsPlaced requestGetAreAllBetsPlaced() {
+        // create request and send request
+        RequestGetAllBetsPlaced requestGetAllBetsPlaced = new RequestGetAllBetsPlaced();
+        sendRequest(requestGetAllBetsPlaced);
+
+        // get response from server and return it
+        PushAreAllBetsPlaced pushAreAllBetsPlaced = getResponse(PushAreAllBetsPlaced.class);
+        this.allBetsPlaced = pushAreAllBetsPlaced.isAllBetsPlaced();
+
+        return pushAreAllBetsPlaced;
+    }
 
     /**
      * getter for current screen
@@ -846,6 +858,9 @@ public class GameClient extends Observable {
         // All players finished
         requestGetAreAllPlayersFinished();
 
+        // bets placed
+        requestGetAreAllBetsPlaced();
+
         // Dealer hand
         requestGetDealerHand();
 
@@ -870,6 +885,7 @@ public class GameClient extends Observable {
         // players won
         requestGetPlayersWon();
 
+
         isGameDataUpdated = true;
 
     }
@@ -893,7 +909,7 @@ public class GameClient extends Observable {
 
 
                     // sleep thread for 1000
-                    Thread.sleep(1000);
+                    Thread.sleep(1200);
                 } catch (NullPointerException e) {
                     System.out.println("Can't get game data. Server down.");
 
@@ -986,6 +1002,10 @@ public class GameClient extends Observable {
 
     public boolean isAllPlayersFinished() {
         return allPlayersFinished;
+    }
+
+    public boolean isAllBetsPlaced() {
+        return allBetsPlaced;
     }
 
     public synchronized void resetDealerAndPlayerHands() {

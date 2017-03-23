@@ -264,6 +264,8 @@ public class GameScreen extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, errorMsg, "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
+
+//                resetHands();
             }
         });
         btnHit.setContentAreaFilled(false);
@@ -691,7 +693,7 @@ public class GameScreen extends JPanel implements Observer {
             int dealerHandSize = model.getDealerHand().getHand().size();
 
             if (dealerHandSize >= 2 && model.isAllPlayersFinished()) {
-               setLbCards(dealerGui,0,model.getDealerHand().getCard(0).getImageID());
+                setLbCards(dealerGui, 0, model.getDealerHand().getCard(0).getImageID());
                 repaint();
                 revalidate();
             }
@@ -757,6 +759,7 @@ public class GameScreen extends JPanel implements Observer {
 
     private void updatePlayerHand(GameClient model, String playerName, int i) {
 
+
         // set each player's card
         ArrayList<Card> playersCards = model.getPlayerHands().get(playerName).getHand();
         int playerHandSize = playersCards.size();
@@ -775,7 +778,7 @@ public class GameScreen extends JPanel implements Observer {
         setPlayerHandOffset(i, playerHandOffset);
     }
 
-    private void resetHands() {
+    public void resetHands() {
         // we reset the client player and dealer hands
         getClientModel().resetDealerAndPlayerHands();
 
