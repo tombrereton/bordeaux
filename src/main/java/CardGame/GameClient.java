@@ -74,7 +74,11 @@ public class GameClient extends Observable {
     private boolean isServerDown;
     private int reconnectAttempts;
 
-
+/**
+ * Constructor for GameClient object
+ * @param HOST Server host address
+ * @param PORT Server port
+ */
     public GameClient(String HOST, int PORT) {
         // connection variables
         this.HOST = HOST;
@@ -348,7 +352,7 @@ public class GameClient extends Observable {
 
 
     /**
-     * log out request
+     * Sends a log out request
      *
      * @return
      */
@@ -556,6 +560,10 @@ public class GameClient extends Observable {
         return getResponse(ResponseStand.class);
     }
 
+    /**
+     * Requests dealer hand
+     * @return
+     */
     public synchronized PushDealerHand requestGetDealerHand() {
         // create request and send request
         RequestGetDealerHand requestGetDealerHand = new RequestGetDealerHand();
@@ -568,6 +576,10 @@ public class GameClient extends Observable {
         return pushDealerHand;
     }
 
+    /**
+     * Requests game names.
+     * @return
+     */
     public synchronized PushGameNames requestGetGameNames() {
         // create request and send request
         RequestGetGameNames requestGetGameNames = new RequestGetGameNames();
@@ -577,6 +589,10 @@ public class GameClient extends Observable {
         return getResponse(PushGameNames.class);
     }
 
+    /**
+     * Requests players bets.
+     * @return
+     */
     public synchronized PushPlayerBets requestGetPlayerBets() {
         // create request and send request
         RequestGetPlayerBets requestGetPlayerBets = new RequestGetPlayerBets();
@@ -588,6 +604,10 @@ public class GameClient extends Observable {
         return pushPlayerBets;
     }
 
+    /**
+     * Requests player budgets.
+     * @return
+     */
     public synchronized PushPlayerBudgets requestGetPlayerBudgets() {
         // create request and send request
         RequestGetPlayerBudgets requestGetPlayerBudgets = new RequestGetPlayerBudgets();
@@ -599,6 +619,10 @@ public class GameClient extends Observable {
         return pushPlayerBudgets;
     }
 
+    /**
+     * Requests players bust
+     * @return
+     */
     public synchronized PushPlayersBust requestGetPlayersBust() {
         // create request and send request
         RequestGetPlayersBust requestGetPlayersBust = new RequestGetPlayersBust();
@@ -611,6 +635,10 @@ public class GameClient extends Observable {
         return pushPlayersBust;
     }
 
+    /**
+     * Requests current player hands
+     * @return
+     */
     public synchronized PushPlayerHands requestGetPlayerHands() {
         // create request and send request
         RequestGetPlayerHands requestGetPlayerHands = new RequestGetPlayerHands();
@@ -621,7 +649,10 @@ public class GameClient extends Observable {
         this.playerHands = pushPlayerHands.getPlayerHands();
         return pushPlayerHands;
     }
-
+/**
+ * Requests player names.
+ * @return
+ */
     public synchronized PushPlayerNames requestGetPlayerNames() {
         // create request and send request
         RequestGetPlayerNames requestGetPlayerNames = new RequestGetPlayerNames();
@@ -634,6 +665,10 @@ public class GameClient extends Observable {
         return pushPlayerNames;
     }
 
+    /**
+     * Requests Player hands
+     * @return
+     */
     public synchronized PushPlayersStand requestGetPlayersStand() {
         // create request and send request
         RequestGetPlayersStand requestGetPlayersStand = new RequestGetPlayersStand();
@@ -646,6 +681,10 @@ public class GameClient extends Observable {
         return pushPlayersStand;
     }
 
+    /**
+     * Requests players won.
+     * @return
+     */
     public synchronized PushPlayersWon requestGetPlayersWon() {
         // create request and send request
         RequestGetPlayersWon requestGetPlayersWon = new RequestGetPlayersWon();
@@ -679,15 +718,24 @@ public class GameClient extends Observable {
         notifyObservers();
     }
 
-
+/**
+ * Gets list of games.
+ * @return
+ */
     public ConcurrentSkipListSet<String> getListOfGames() {
         return listOfGames;
     }
-
+/**
+ * Gets the current chat log offset.
+ * @return
+ */
     public int getChatOffset() {
         return chatOffset;
     }
-
+/**
+ * Sets the chat offset.
+ * @param chatOffset
+ */
     public void setChatOffset(int chatOffset) {
         this.chatOffset = chatOffset;
     }
@@ -732,6 +780,9 @@ public class GameClient extends Observable {
         gameNamesThread.start();
     }
 
+    /**
+     * Attempts ot reconnect to server.
+     */
     public void reconnectToServer() {
 
         while (isServerDown && reconnectAttempts < 3) {
@@ -758,7 +809,9 @@ public class GameClient extends Observable {
             notifyObservers();
         }
     }
-
+/**
+ * Stops the game names thread.
+ */
     public void stopGettingGameNames() {
         isGettingGames = false;
     }
@@ -828,7 +881,9 @@ public class GameClient extends Observable {
             setChatOffset(responseOffset - 1);
         }
     }
-
+/**
+ * Stops the getMessages thread.
+ */
     public void stopGettingMessages() {
         this.isGettingMessages = false;
     }
@@ -910,66 +965,110 @@ public class GameClient extends Observable {
         getGameData.start();
 
     }
-
+/**
+ * Stops the game data thread
+ */
     public void stopGettingGameData() {
         this.isGettingGameData = false;
     }
-
+/**
+ * Getter for messages.
+ * @return
+ */
     public ConcurrentLinkedDeque<MessageObject> getMessages() {
         return messages;
     }
-
+/**
+ * Adds messages to message list.
+ * @param messages
+ */
     public synchronized void addMessages(ArrayList<MessageObject> messages) {
         for (MessageObject mo : messages) {
             this.messages.add(mo);
         }
     }
-
+/**
+ * Get current game.
+ * @return
+ */
     public String getGameJoined() {
         return gameJoined;
     }
-
+/**
+ * set curretn game.
+ * @param gameJoined
+ */
     public void setGameJoined(String gameJoined) {
         this.gameJoined = gameJoined;
     }
 
-
+/**
+ * Get dealers hand.
+ * @return
+ */
     public Hand getDealerHand() {
         return dealerHand;
     }
-
+/**
+ * get players bets.
+ * @return
+ */
     public Map<String, Integer> getPlayerBets() {
         return playerBets;
     }
-
+/**
+ * get player budgets.
+ * @return
+ */
     public Map<String, Integer> getPlayerBudgets() {
         return playerBudgets;
     }
-
+/**
+ * get player hands.
+ * @return
+ */
     public Map<String, Hand> getPlayerHands() {
         return playerHands;
     }
-
+    
+    /**
+     * get player names
+     * @return
+     */
     public ArrayList<String> getPlayerNames() {
         return new ArrayList<>(playerNames);
     }
-
+/**
+ * get players bust.
+ * @return
+ */
     public Map<String, Boolean> getPlayersBust() {
         return playersBust;
     }
-
+/**
+ * get players stand
+ * @return
+ */
     public Map<String, Boolean> getPlayersStand() {
         return playersStand;
     }
-
+/**
+ * Get if server is down
+ * @return
+ */
     public boolean isServerDown() {
         return isServerDown;
     }
-
+/**
+ * get number of reconnect attempts.
+ * @return
+ */
     public int getReconnectAttempts() {
         return reconnectAttempts;
     }
-
+/**
+ * Reset player and ealers hands
+ */
     public synchronized void resetDealerAndPlayerHands(){
 
         // reset player hands to empty
@@ -985,7 +1084,9 @@ public class GameClient extends Observable {
             dealerIterator.remove();
         }
     }
-
+/**
+ * reset game data.
+ */
     public synchronized void resetGameData() {
         this.chatOffset = -1;
         this.playersFinished = new TreeMap<>();
@@ -999,5 +1100,3 @@ public class GameClient extends Observable {
         this.playersWon = new TreeMap<>();
     }
 }
-
-
