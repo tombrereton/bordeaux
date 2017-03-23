@@ -734,15 +734,21 @@ public class GameScreen extends JPanel implements Observer {
      * @param offset
      */
     private void setPlayerHandOffset(int player, int offset) {
+        // Bug fixed: !IMPORTANT please write break after you write the case
         switch (player) {
             case 0:
                 this.player0HandOffset = offset;
+                break;
             case 1:
                 this.player1HandOffset = offset;
+                break;
             case 2:
                 this.player2HandOffset = offset;
+                break;
             case 3:
                 this.player3HandOffset = offset;
+                break;
+
         }
 
     }
@@ -751,7 +757,7 @@ public class GameScreen extends JPanel implements Observer {
 
         // set each player's card
         ArrayList<Card> playersCards = model.getPlayerHands().get(playerName).getHand();
-        int playerHandSize = model.getPlayerHands().get(playerName).getHand().size();
+        int playerHandSize = playersCards.size();
 
         //get this player's hand offset
         int playerHandOffset = getPlayerHandOffset(i);
@@ -763,7 +769,6 @@ public class GameScreen extends JPanel implements Observer {
             repaint();
             revalidate();
         }
-
         // we set the playerHandOffset after iterating
         setPlayerHandOffset(i, playerHandOffset);
     }
