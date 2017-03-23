@@ -92,7 +92,9 @@ public class LoginScreen extends JPanel {
 
 
                 if (responseProtocol == null){
-                    return;
+					JOptionPane.showMessageDialog(null, "Can't connect to server. Ensure server is up.", "Warning",
+							JOptionPane.WARNING_MESSAGE);
+					return;
                 }
 
                 // We display the error if not successful

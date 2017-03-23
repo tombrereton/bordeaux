@@ -99,8 +99,8 @@ public class GameClient extends Observable {
         playersWon = new TreeMap<>();
         playerAvatars = new ArrayList<>();
         Random r = new Random();
-        for(int i=0;i<4;i++){
-            playerAvatars.add(i,Integer.toString(r.nextInt(39)+2));
+        for (int i = 0; i < 4; i++) {
+            playerAvatars.add(i, Integer.toString(r.nextInt(39) + 2));
         }
 
         // chat variables
@@ -121,9 +121,9 @@ public class GameClient extends Observable {
         } catch (ConnectException e) {
             System.out.println("Cannot connect to server. Ensure server is up.");
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            System.out.println("Unknown host when connecting to server.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IO exeption when connecting to server.");
         }
     }
 
@@ -209,6 +209,8 @@ public class GameClient extends Observable {
 
             // print out response
             System.out.println(jsonInput);
+        } catch (NullPointerException e) {
+            System.out.println("Null pointer exception when trying to get a response.");
         } catch (IOException e) {
             System.out.println("Server down. Please try restarting client");
         }
@@ -338,9 +340,16 @@ public class GameClient extends Observable {
         RequestRegisterUser requestRegisterUser = new RequestRegisterUser(user);
         sendRequest(requestRegisterUser);
 
-        // get the response from the server
-        ResponseRegisterUser responseRegisterUser = getResponse(ResponseRegisterUser.class);
-        int success = responseRegisterUser.getRequestSuccess();
+        int success = 0;
+        ResponseRegisterUser responseRegisterUser = null;
+        try {
+            // get the response from the server
+            responseRegisterUser = getResponse(ResponseRegisterUser.class);
+            success = responseRegisterUser.getRequestSuccess();
+        } catch (NullPointerException e) {
+            System.out.println("Can't connect to server when trying to register user.");
+            connectToServer();
+        }
 
         if (success == 1) {
             setCurrentScreen(LOGINSCREEN);
@@ -951,7 +960,9 @@ public class GameClient extends Observable {
         return new ArrayList<>(playerNames);
     }
 
-    public ArrayList<String> getPlayerAvatars(){return playerAvatars;}
+    public ArrayList<String> getPlayerAvatars() {
+        return playerAvatars;
+    }
 
     public Map<String, Boolean> getPlayersBust() {
         return playersBust;
