@@ -265,7 +265,7 @@ public class GameScreen extends JPanel implements Observer {
                             JOptionPane.WARNING_MESSAGE);
                 }
 
-//                resetHands();
+                resetHands();
             }
         });
         btnHit.setContentAreaFilled(false);
