@@ -58,6 +58,7 @@ public class GameClient extends Observable {
     private Map<String, Boolean> playersBust;
     private Map<String, Boolean> playersStand;
     private Map<String, Boolean> playersWon;
+    private ArrayList<String> playerAvatars;
     private boolean allPlayersFinished;
 
 
@@ -99,6 +100,11 @@ public class GameClient extends Observable {
         playersBust = new TreeMap<>();
         playersStand = new TreeMap<>();
         playersWon = new TreeMap<>();
+        playerAvatars = new ArrayList<>();
+        Random r = new Random();
+        for(int i=0;i<4;i++){
+            playerAvatars.add(i,Integer.toString(r.nextInt(39)+2));
+        }
 
         // chat variables
         this.messages = new ConcurrentLinkedDeque<>();
@@ -941,6 +947,8 @@ public class GameClient extends Observable {
     public ArrayList<String> getPlayerNames() {
         return new ArrayList<>(playerNames);
     }
+
+    public ArrayList<String> getPlayerAvatars(){return playerAvatars;}
 
     public Map<String, Boolean> getPlayersBust() {
         return playersBust;

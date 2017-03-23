@@ -476,7 +476,7 @@ public class GameScreen extends JPanel implements Observer {
         textArea.setBounds(blackjackOnline.getxScreenDiff() + 850, blackjackOnline.getScreenHeightCurrent() - 170, blackjackOnline.getxScreenDiff() + 150, 60);
         lblChat.setBounds(blackjackOnline.getxScreenDiff() + 850, 10, 205, 35);
         lblSideHud.setBounds(blackjackOnline.getxScreenDiff() + 800, blackjackOnline.getScreenHeightCurrent() - 1500, 66, 1434);
-        lblSideFillHud.setBounds(blackjackOnline.getxScreenDiff() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getyScreenDiff() + 800);
+        lblSideFillHud.setBounds(blackjackOnline.getxScreenDiff() + 850, 0, blackjackOnline.getScreenWidthCurrent(), blackjackOnline.getScreenHeightCurrent());
         btnSendMessage.setBounds(845 + (int) (blackjackOnline.getxScreenDiff() * 1.5), blackjackOnline.getScreenHeightCurrent() - 105, 159, 60);
         btnLeaveGame.setBounds(blackjackOnline.getScreenWidthCurrent() - 120, 10, 100, 30);
         btnStand.setBounds(540, blackjackOnline.getScreenHeightCurrent() - 100, 98, 55);
@@ -639,7 +639,7 @@ public class GameScreen extends JPanel implements Observer {
                     String playerName = model.getPlayerNames().get(i);
                     String playerBudget = model.getPlayerBudgets().get(playerName) + "";
                     String playerBets = model.getPlayerBets().get(playerName) + "";
-                    String playerAvatar = model.getLoggedInUser().getAvatarID();
+                    String playerAvatar = model.getPlayerAvatars().get(i);
 
                     // set each player's name
                     getplayerGui(i).setLblName(playerName);
