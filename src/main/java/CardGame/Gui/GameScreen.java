@@ -691,13 +691,15 @@ public class GameScreen extends JPanel implements Observer {
             int dealerHandSize = model.getDealerHand().getHand().size();
 
             if (dealerHandSize >= 2 && model.isAllPlayersFinished()) {
-                dealerHandOffset = 0;
+               setLbCards(dealerGui,0,model.getDealerHand().getCard(0).getImageID());
+                repaint();
+                revalidate();
             }
             while (dealerHandOffset < dealerHandSize) {
                 // only iterate over new cards
                 setLbCards(dealerGui, dealerHandOffset, model.getDealerHand().getCard(dealerHandOffset).getImageID());
-                dealerHandOffset++;
                 getDealerGui().refreshPlayerGui();
+                dealerHandOffset++;
                 repaint();
                 revalidate();
             }
